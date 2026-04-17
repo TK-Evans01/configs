@@ -1,0 +1,121 @@
+#!/bin/bash
+# Per-task git worktree workflow integrated with tmux + nvim.
+# Layout: ~/Projects/<proj>/ main checkout, ~/Projects/<proj>.wt/<slug>/ task worktrees.
+
+set -e
+
+ROOT="${TASK_ROOT:-$HOME/Projects}"
+
+usage() {
+    cat <<EOF
+usage: task <command> [args]
+
+commands:
+  new <project> <slug>   create branch + worktree, open tmux window with nvim
+  rm  <project> <slug>   remove worktree (branch stays)
+  ls                     list all worktrees across projects
+  help                   show this message (also: -h, --help)
+
+run 'task <command> --help' for per-command details.
+
+env:
+  TASK_ROOT              project root (default: ~/Projects)
+EOF
+}
+
+help_new() {
+    cat <<EOF
+usage: task new <project> <slug>
+
+Creates a new branch and git worktree for an isolated task sandbox, then opens
+a fresh tmux window with nvim (dev tab + claude tab) cd'd into the worktree.
+
+  project   path under TASK_ROOT (e.g. 'oxidize-idle' or 'Personal/repo')
+  slug      branch + worktree name (no slashes)
+
+Behaviour:
+  - branches off origin/main if available, else local main
+  - if project has no .git, skips worktree, opens tmux window in project dir
+  - runs <project>/.task-init (if executable) inside new worktree for setup
+    (e.g. symlink node_modules, copy .env)
+  - tmux window named '<project-basename>:<slug>'
+
+Must be run from inside tmux.
+EOF
+}
+
+help_rm() {
+    cat <<EOF
+usage: task rm <project> <slug>
+
+Removes the worktree at TASK_ROOT/<project>.wt/<slug>. Branch is preserved
+(delete with: git -C TASK_ROOT/<project> branch -D <slug>).
+EOF
+}
+
+help_ls() {
+    cat <<EOF
+usage: task ls
+
+Lists all worktrees across every git repo found under TASK_ROOT (recursive).
+EOF
+}
+
+cmd_new() {
+    case "${1:-}" in -h|--help) help_new; return 0 ;; esac
+    [ -n "$TMUX" ] || { echo "task: must be run inside tmux" >&2; exit 1; }
+    [ $# -eq 2 ] || { echo "usage: task new <project> <slug>" >&2; exit 1; }
+    local proj=$1 slug=$2
+    local main=$ROOT/$proj
+    local wt=$ROOT/$proj.wt/$slug
+
+    [ -d "$main" ] || { echo "task: $main does not exist" >&2; exit 1; }
+    [[ "$slug" != */* ]] || { echo "task: slug cannot contain '/'" >&2; exit 1; }
+
+    local cwd=$main
+    if [ -d "$main/.git" ]; then
+        [ ! -e "$wt" ] || { echo "task: $wt already exists" >&2; exit 1; }
+        git -C "$main" fetch origin main 2>/dev/null || true
+        local base=main
+        git -C "$main" rev-parse --verify origin/main >/dev/null 2>&1 && base=origin/main
+        git -C "$main" worktree add -b "$slug" "$wt" "$base"
+        cwd=$wt
+        if [ -x "$main/.task-init" ]; then
+            ( cd "$wt" && "$main/.task-init" "$wt" )
+        fi
+    else
+        echo "task: $main has no .git, skipping worktree" >&2
+    fi
+
+    local winname
+    winname="$(basename "$proj"):$slug"
+    tmux new-window -n "$winname" -c "$cwd" \
+        "nvim -c 'TabooRename dev' -c 'tabnew' -c 'TabooRename claude' -c 'terminal claude' -c 'tabprev'"
+}
+
+cmd_rm() {
+    case "${1:-}" in -h|--help) help_rm; return 0 ;; esac
+    [ $# -eq 2 ] || { echo "usage: task rm <project> <slug>" >&2; exit 1; }
+    local proj=$1 slug=$2
+    git -C "$ROOT/$proj" worktree remove "$ROOT/$proj.wt/$slug"
+}
+
+cmd_ls() {
+    case "${1:-}" in -h|--help) help_ls; return 0 ;; esac
+    # Find every .git dir under ROOT, skip worktree dirs (*.wt/*) and nested .git inside worktrees.
+    while IFS= read -r repo; do
+        local dir
+        dir=$(dirname "$repo")
+        [[ "$dir" == *.wt/* || "$dir" == *.wt ]] && continue
+        # Skip if this dir is itself a worktree (has .git as file, not dir — handled by -type d above).
+        git -C "$dir" worktree list
+    done < <(find "$ROOT" -type d -name .git 2>/dev/null)
+}
+
+case "${1:-}" in
+    new) shift; cmd_new "$@" ;;
+    rm)  shift; cmd_rm "$@" ;;
+    ls)  shift; cmd_ls "$@" ;;
+    -h|--help|help|"") usage ;;
+    *) echo "task: unknown command '$1'" >&2; usage; exit 1 ;;
+esac
