@@ -528,55 +528,84 @@ require("lazy").setup({
 	},
 
 	-- ---------------------------------------------------------------------------
-	-- treesitter: syntax highlighting + indent
+	-- treesitter (main branch rewrite): parsers + queries only.
+	-- Highlight/indent wired via core Neovim APIs in FileType autocmd below.
+	-- Requires gcc/clang + git on PATH for parser compile.
 	-- ---------------------------------------------------------------------------
 	{
 		"nvim-treesitter/nvim-treesitter",
-		build = ":TSUpdate",
-		main = "nvim-treesitter.configs",
-		opts = {
-			ensure_installed = {
+		branch = "main",
+		lazy = false,
+		build = function()
+			require("nvim-treesitter").update()
+		end,
+		config = function()
+			local parsers = {
 				"bash", "c", "diff", "html", "lua", "luadoc",
 				"markdown", "markdown_inline", "query", "vim", "vimdoc",
-				-- daily-driver languages
 				"typescript", "tsx", "javascript", "jsdoc",
 				"python", "go", "gomod", "gosum", "rust",
-				-- config + data
 				"json", "jsonc", "yaml", "toml", "dockerfile", "gitignore", "gitcommit",
-			},
-			auto_install = true,
-			highlight = { enable = true, additional_vim_regex_highlighting = { "ruby" } },
-			indent = { enable = true, disable = { "ruby" } },
-		},
+			}
+			local installed = require("nvim-treesitter").get_installed("parsers")
+			local missing = vim.tbl_filter(function(p)
+				return not vim.tbl_contains(installed, p)
+			end, parsers)
+			if #missing > 0 then
+				require("nvim-treesitter").install(missing)
+			end
+
+			vim.api.nvim_create_autocmd("FileType", {
+				group = vim.api.nvim_create_augroup("ts-highlight", { clear = true }),
+				callback = function(args)
+					local ft = vim.bo[args.buf].filetype
+					local lang = vim.treesitter.language.get_lang(ft)
+					if lang and vim.treesitter.language.add(lang) then
+						vim.treesitter.start(args.buf, lang)
+						-- indent via treesitter (skip ruby)
+						if ft ~= "ruby" then
+							vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+						end
+					end
+				end,
+			})
+		end,
 	},
 
 	-- ---------------------------------------------------------------------------
-	-- treesitter-textobjects: select/move by function, class, etc.
+	-- treesitter-textobjects (main branch): select/move by function, class, etc.
 	-- Keys:  vif/vaf  inside/around function    vic/vac  inside/around class
 	--        ]f / [f  next/prev function start  ]c / [c  next/prev class start
 	-- ---------------------------------------------------------------------------
 	{
 		"nvim-treesitter/nvim-treesitter-textobjects",
+		branch = "main",
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
+		event = "VeryLazy",
 		config = function()
-			require("nvim-treesitter.configs").setup({
-				textobjects = {
-					select = {
-						enable = true,
-						lookahead = true,
-						keymaps = {
-							["af"] = "@function.outer", ["if"] = "@function.inner",
-							["ac"] = "@class.outer",    ["ic"] = "@class.inner",
-							["aa"] = "@parameter.outer", ["ia"] = "@parameter.inner",
-						},
-					},
-					move = {
-						enable = true, set_jumps = true,
-						goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer" },
-						goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer" },
-					},
-				},
+			require("nvim-treesitter-textobjects").setup({
+				select = { lookahead = true },
+				move = { set_jumps = true },
 			})
+
+			local select = require("nvim-treesitter-textobjects.select")
+			local move = require("nvim-treesitter-textobjects.move")
+
+			local sel_map = {
+				["af"] = "@function.outer", ["if"] = "@function.inner",
+				["ac"] = "@class.outer",    ["ic"] = "@class.inner",
+				["aa"] = "@parameter.outer", ["ia"] = "@parameter.inner",
+			}
+			for lhs, query in pairs(sel_map) do
+				vim.keymap.set({ "x", "o" }, lhs, function()
+					select.select_textobject(query, "textobjects")
+				end, { desc = "Select " .. query })
+			end
+
+			vim.keymap.set({ "n", "x", "o" }, "]f", function() move.goto_next_start("@function.outer", "textobjects") end, { desc = "Next function start" })
+			vim.keymap.set({ "n", "x", "o" }, "]c", function() move.goto_next_start("@class.outer", "textobjects") end, { desc = "Next class start" })
+			vim.keymap.set({ "n", "x", "o" }, "[f", function() move.goto_previous_start("@function.outer", "textobjects") end, { desc = "Prev function start" })
+			vim.keymap.set({ "n", "x", "o" }, "[c", function() move.goto_previous_start("@class.outer", "textobjects") end, { desc = "Prev class start" })
 		end,
 	},
 
