@@ -1,6 +1,6 @@
 # Architecture
 
-Quickshell-based bar for Hyprland on Arch. Gruvbox-material palette, top anchor, per-monitor replication. Currently running alongside waybar during migration.
+Quickshell bar for Hyprland on Arch. Retro look: gruvbox-material palette, DepartureMono Nerd Font, square corners. Top anchor, one bar per monitor. Sole status bar (waybar retired).
 
 ## Entry point
 
@@ -16,7 +16,7 @@ rice/
 ├── core/               reusable bar / widget / popout primitives
 ├── config/             Theme + Settings singletons
 ├── services/           singleton data/control layer
-├── widgets/            per-widget UI (Bar.qml, optional Popout.qml)
+├── widgets/            per-widget UI (Bar.qml, optional Popout.qml + parts)
 └── docs/               this file
 ```
 
@@ -26,52 +26,54 @@ Every subdir has a `qmldir` so imports resolve as QML modules rather than file p
 
 ### `config/` — singletons
 
-- `Theme.qml` — gruvbox-material colors, font (`DepartureMono Nerd Font Mono`, 13pt), spacing (`pad=8`, `gap=12`, `radius=0`, `accentThickness=2`).
-- `Settings.qml` — `barHeight=32` plus layout arrays (`leftWidgets`, `centerWidgets`, `rightWidgets`) driving `core/Bar.qml` via its widget registry.
+- `Theme.qml` — gruvbox-material colors (`bg0..3`, `fg0/1`, `grey`, and `base/Dim/Bright` triples for red, orange, yellow, green, aqua, blue, purple), font (`DepartureMono Nerd Font Mono`, 18px), `iconSize=32`, spacing (`pad=11`, `gap=16`, `radius=0`, `accentThickness=2`).
+- `Settings.qml` — `barHeight=44`, label width caps + carousel tuning (`windowLabelWidth`, `mprisLabelWidth`, `scrollMsPerPx`, `scrollGap`), and layout arrays (`leftWidgets`, `centerWidgets`, `rightWidgets`) driving `core/Bar.qml` via its widget registry.
 
-Both `pragma Singleton`, imported via `import "../config"`.
+Both `pragma Singleton`.
 
 ### `core/` — primitives
 
-- **`Bar.qml`** — the `PanelWindow`. Anchors top/left/right, height `Settings.barHeight`, bg `Theme.bg1`, 1px `bg3` bottom border. Declares one inline `Component` per widget type and exposes a `registry` map `name → Component`. Three `Row`s (left / center / right) each run a `Repeater` over the matching `Settings.*Widgets` array, instantiating widgets via `Loader { sourceComponent: bar.registry[modelData] }`. Layout is therefore config-driven.
-- **`Widget.qml`** — base component for bar items. Props: `label`, `labelColor`, `hasPopout`. Exposes `hovered`, `hoverEntered/Exited`, `clicked`. Renders a text label inside a hover-highlighted rectangle sized `implicitWidth + Theme.pad*2 × Settings.barHeight`.
-- **`Popout.qml`** — dropdown panel anchored under an owner widget. Own `PanelWindow` positioned by computing the owner's center X via `mapToItem(null, …)` and clamping to screen bounds. Slide-in animation (`y: opened ? 0 : -height`, 220ms OutCubic). Shown while either the owner or the popout itself is hovered; a 150ms `hideTimer` bridges widget→popout cursor movement. `rendered` flag keeps the window alive through the close animation.
+- **`Bar.qml`** — the `PanelWindow`. Declares one inline `Component` per widget type and exposes a `registry` map `name → Component`. Three `Row`s (left / center / right) each run a `Repeater` over the matching `Settings.*Widgets` array, instantiating widgets via `Loader { sourceComponent: bar.registry[modelData] }`. Layout is config-driven.
+- **`Widget.qml`** — base component for bar items. Props: `label`, `labelPrefix`, `labelColor`, `labelSize`, `hasPopout`, `maxLabelWidth`, `scrollLabel`. Exposes `hovered`, `clicked`. Labels past `maxLabelWidth` carousel via `ScrollingText`.
+- **`Popout.qml`** — slide-down dropdown under its owner widget. A `PopupWindow` anchored to the owner's rect, so Hyprland places it on the owner's output (no manual screen math). Slide animation (`slideDuration=220`). Stays open while owner or popout is hovered; `hideDelay=150` bridges the gap. `rendered` keeps the window alive through the close animation.
+- **`ScrollingText.qml`** — text that carousels left through a second copy when it overflows (no bounce). Falls back to elide when `scrolling` is off.
 
 ### `services/` — singletons for data + control
 
-Each is a `QtObject` marked `pragma Singleton`. Widgets bind to properties and call imperative methods. No widget does its own IO.
+Widgets bind to properties and call methods. No widget does its own IO.
 
-- **`Hyprland.qml`** — thin wrapper over `Quickshell.Hyprland`. Exposes `workspaces`, `focusedWorkspace`, `activeToplevel`, and `dispatch(cmd)`.
-- **`Audio.qml`** — PulseAudio/pipewire via `pactl`. **Event-driven**: a long-running `pactl subscribe` Process streams events through a `SplitParser`; any sink/source/server event re-triggers the poll Process (`pactl get-* / list …`) which parses `---marker---` sections. Write path: `_run([...])` fires a one-shot `pactl set-*` then re-triggers poll on exit. No periodic timer — the subscription supplies change signals.
-- **`Mpris.qml`** — wraps `Quickshell.Services.Mpris`. Picks the `ncspot` player by identity, falls back to the first available. Exposes title/artist/album/art, playing state, position (ticked by a 500ms timer), capabilities, shuffle/loop/volume, and transport methods. `launch()` spawns `alacritty -e ncspot`.
-- **`Cpu.qml`** — polls `head -n1 /proc/stat` every 2s, computes delta percent from prior total/idle.
-- **`Memory.qml`** — polls `/proc/meminfo` every 5s via awk, exposes used percent.
-- **`Mullvad.qml`** — polls `mullvad status` every 2s, parses state/relay/location/ip with regex. `toggle()` connect/disconnect, `reconnect()`. Convenience bools `connected`, `connecting`.
+| Service | Source | Update model |
+|---------|--------|--------------|
+| `Hyprland` | `Quickshell.Hyprland` | reactive. `workspaces`, `monitors`, `focusedWorkspace`, `activeToplevel`, `dispatch(cmd)` |
+| `Audio` | `pactl` | event-driven: long-running `pactl subscribe` re-triggers a poll; writes via one-shot `pactl set-*`. Outputs + inputs, default device, mute |
+| `Mpris` | `Quickshell.Services.Mpris` | reactive + 500ms position tick. Prefers player with identity `ncspot`, else first. `launch()` attaches to (or creates) a detached `tmux` session `ncspot` in alacritty |
+| `Sys` | `/proc`, `/sys` (amdgpu), `df` | 2s poll. CPU %/temp/model, GPU %/temp/VRAM, RAM, disks, process count |
+| `Network` | `mullvad status`, `ip`, `/sys/class/net`, ping | 5s poll. **Mullvad VPN** state/relay/location/IP + `toggle()` / `reconnect()`; internet reachability; physical links (wifi / eth / usb) with uplink flag |
+| `Docker` | `docker ps` + `docker events` | event-driven, 10s fallback poll; restarts the events stream if the daemon bounces |
+| `Bluetooth` | `Quickshell.Bluetooth` (BlueZ DBus) | reactive. Sorted `devices`; `activate(d)` = disconnect / connect / pair→trust→connect. Runs a `bluetoothctl` NoInputNoOutput agent; scans auto-stop after 60s |
 
 ### `widgets/` — per-widget UI
 
-Each folder is a QML module (`qmldir`) referenced from `core/Bar.qml`.
-
 Conventions:
 
-- `Bar.qml` is the in-bar component, extending `Core.Widget` and binding `label` / `labelColor` directly to service singleton properties.
-- `Popout.qml` (where present) is the dropdown content. It accepts a single `required property var service` — the service singleton — and binds/calls on it directly. No snapshot `model` object; all state is reactive because bindings live on the singleton.
+- `Bar.qml` extends `Core.Widget`, binding `label` / `labelColor` to service properties.
+- `Popout.qml` takes `required property var service` and binds/calls on the singleton directly — all state stays reactive.
+- Extra parts live beside them (`Volume/Slider.qml`, `Network/Entry.qml`, `System/Meter.qml`…).
 - Widgets hold no Process/Timer logic.
 
-Current widgets:
+Current widgets (placement from `Settings.qml`):
 
 | Position | Widget     | Service       | Popout |
 |----------|------------|---------------|--------|
-| left     | Workspaces | `Svc.Hyprland` | no    |
-| left     | Window     | `Svc.Hyprland.activeToplevel` | no |
+| left     | Workspaces | `Hyprland`    | no     |
+| left     | Window     | `Hyprland.activeToplevel` | no |
+| left     | Mpris      | `Mpris`       | yes    |
 | center   | Clock      | local Timer   | no     |
-| right    | Mpris      | `Svc.Mpris`   | yes    |
-| right    | Mullvad    | `Svc.Mullvad` | yes    |
-| right    | Volume     | `Svc.Audio`   | yes    |
-| right    | Cpu        | `Svc.Cpu`     | no     |
-| right    | Memory     | `Svc.Memory`  | no     |
-
-Placement controlled entirely by `Settings.leftWidgets` / `centerWidgets` / `rightWidgets`.
+| right    | Docker     | `Docker`      | yes    |
+| right    | Network    | `Network` (incl. Mullvad) | yes |
+| right    | Bluetooth  | `Bluetooth`   | yes    |
+| right    | Volume     | `Audio`       | yes    |
+| right    | System     | `Sys`         | yes    |
 
 ### Popout service-passthrough pattern
 
@@ -84,14 +86,25 @@ Core.Popout {
 }
 ```
 
-The popout binds directly to the service singleton (`root.service.outPercent`, `root.service.toggleMute()`, …). Adding a new field to the service auto-flows to every popout that binds it.
+Adding a field to the service flows to every popout that binds it.
 
 ## Hot reload
 
-Quickshell watches the source tree; saving any file re-parses the shell. Dev loop: `quickshell -c rice` running against `~/.config/quickshell/rice` which is a symlink into this repo.
+Quickshell watches the source tree; saving any file re-parses the shell. Dev loop: `quickshell -c rice` against `~/.config/quickshell/rice`, a symlink into this repo.
 
-## Remaining rough edges
+Note: `qmllint` misses property-shadow-of-FINAL errors (e.g. declaring `property int z` on an Item). The shell then fails only at load time. Avoid names that collide with Item built-ins (`z`, `state`, `data`, `parent`…) and verify by actually loading the shell.
 
-- Theme has 30+ flat color props — could group into nested `palette.red.{base,dim,bright}` `QtObject`s.
-- Poll/timer boilerplate repeats across Cpu/Memory/Mullvad — candidate for a `PollingProcess` helper in `core/`.
-- Mpris player-selection hardcodes `ncspot` identity preference.
+## Roadmap
+
+Borrowing layout + behavior from [lyne-dots](https://github.com/caioax/lyne-dots) (GPLv3 — reimplement, don't copy) while keeping the retro look:
+
+- Semantic theme tokens loaded from JSON presets (gruvbox-material default).
+- Shared `components/` (card, slider, switch, ring, sparkline, animated popup).
+- `state.json` over defaults instead of hardcoded `Settings.qml`.
+- New surfaces: OSD, notifications (replace dunst), launcher (replace tofi), dashboard, lyrics.
+
+## Rough edges
+
+- Theme has 30+ flat color props — candidate for semantic tokens (see roadmap).
+- Poll/timer boilerplate repeats across `Sys`/`Network`/`Docker` — candidate for a `PollingProcess` helper in `core/`.
+- `Mpris` player selection hardcodes `ncspot` identity preference.

@@ -1,6 +1,6 @@
 # quickshell-rice
 
-Quickshell config for Hyprland rice. Top bar, gradually replacing waybar.
+Quickshell config for Hyprland rice. Retro gruvbox top bar (replaced waybar).
 
 ## Layout
 
@@ -24,5 +24,3 @@ qmlls -p .                   # editor LSP
 ## Autostart
 
 `~/.config/hypr/hyprland.conf`: `exec-once = quickshell -c rice`
-
-Runs alongside waybar during migration.
