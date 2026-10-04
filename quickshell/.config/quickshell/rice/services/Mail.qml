@@ -65,8 +65,9 @@ QtObject {
         _seen = uids;
     }
 
+    // Bridge comes up a little after login: retry quickly until it answers.
     readonly property var timer: Timer {
-        interval: Settings.mailRefreshSec * 1000
+        interval: (root.state_ === "offline" || root.state_ === "loading" ? 15 : Settings.mailRefreshSec) * 1000
         running: true
         repeat: true
         triggeredOnStart: true
