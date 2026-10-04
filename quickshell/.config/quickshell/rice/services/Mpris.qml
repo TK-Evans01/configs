@@ -7,13 +7,21 @@ QtObject {
     id: root
     readonly property var all: M.Mpris.players
     readonly property var _list: all && all.values ? all.values : []
+    // Picked by hand in the dashboard; sticks until that player goes away.
+    property var _picked: null
+    readonly property var players: _list
+
+    // Hand-picked > playing (ncspot first) > ncspot > first.
     readonly property var player: {
-        for (let i = 0; i < _list.length; i++) {
-            const p = _list[i];
-            if (p && (p.identity || "").toLowerCase() === "ncspot") return p;
-        }
-        return _list.length > 0 ? _list[0] : null;
+        if (_picked && _list.indexOf(_picked) >= 0) return _picked;
+        const isNcspot = p => (p.identity || "").toLowerCase() === "ncspot";
+        const playingNow = _list.filter(p => p && p.isPlaying);
+        if (playingNow.length) return playingNow.find(isNcspot) || playingNow[0];
+        return _list.find(p => p && isNcspot(p)) || (_list.length > 0 ? _list[0] : null);
     }
+    function select(p) { _picked = p; }
+    function playerName(p) { return p ? (p.identity || p.dbusName || "player") : ""; }
+    readonly property string identity: playerName(player)
 
     readonly property bool running: player !== null
     readonly property bool hasPlayer: running

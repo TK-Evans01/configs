@@ -1,0 +1,17 @@
+module components
+Label 1.0 Label.qml
+BarButton 1.0 BarButton.qml
+BarDivider 1.0 BarDivider.qml
+BarPopup 1.0 BarPopup.qml
+Card 1.0 Card.qml
+CardHeader 1.0 CardHeader.qml
+DeviceRow 1.0 DeviceRow.qml
+IconButton 1.0 IconButton.qml
+Meter 1.0 Meter.qml
+PageHeader 1.0 PageHeader.qml
+ScrollingText 1.0 ScrollingText.qml
+Slider 1.0 Slider.qml
+Sparkline 1.0 Sparkline.qml
+Switch 1.0 Switch.qml
+TabBar 1.0 TabBar.qml
+Tile 1.0 Tile.qml

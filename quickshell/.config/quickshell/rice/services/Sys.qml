@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell.Io
+import "../config"
 
 // One poller for everything the System widget shows: CPU, GPU, RAM, disks,
 // process count. Emits "key value..." lines so parsing stays line-oriented.
@@ -28,6 +29,24 @@ QtObject {
     readonly property int memPercent: memTotal > 0 ? Math.round(memUsed * 100 / memTotal) : 0
 
     property int procs: 0
+    property real uptime: 0          // seconds
+    property string kernel: ""
+    property string host: ""
+    property string loadAvg: ""
+
+    // Rolling samples (oldest first) for sparklines.
+    property var cpuHistory: []
+    property var gpuHistory: []
+    property var memHistory: []
+    function _push(list, v) {
+        const out = list.concat([v]);
+        return out.length > Settings.historySize ? out.slice(out.length - Settings.historySize) : out;
+    }
+
+    function fmtUptime(s) {
+        const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+        return (d ? d + "d " : "") + (d || h ? h + "h " : "") + m + "m";
+    }
 
     // [{ target, size, used, percent }]
     property var disks: []
@@ -48,6 +67,8 @@ QtObject {
         command: ["sh", "-c", `
 awk -F': ' '/^model name/{print "cpumodel", $2; exit}' /proc/cpuinfo
 echo "cores $(nproc)"
+echo "kernel $(uname -r)"
+echo "host $(cat /etc/hostname 2>/dev/null || uname -n)"
 lspci -mm -d ::0300 2>/dev/null | head -n1 | awk -F'"' '{print $6}' |
   sed -E 's/.*\\[([^]]*)\\].*/\\1/; s@/.*@@; s/^/gpumodel /'
 `]
@@ -76,6 +97,8 @@ for d in /sys/class/drm/card*/device; do
   done
   break
 done
+echo "uptime $(cut -d' ' -f1 /proc/uptime)"
+echo "load $(cut -d' ' -f1-3 /proc/loadavg)"
 echo "procs $(ls -d /proc/[0-9]* 2>/dev/null | wc -l)"
 df -B1 -x tmpfs -x devtmpfs -x efivarfs -x overlay -x squashfs --output=target,size,used 2>/dev/null |
   tail -n +2 | awk 'NF==3 {print "disk", $1, $2, $3}'
@@ -118,6 +141,10 @@ df -B1 -x tmpfs -x devtmpfs -x efivarfs -x overlay -x squashfs --output=target,s
             case "mem":      root.memTotal = Number(f[1]); root.memUsed = Number(f[2]); break;
             case "swap":     root.swapTotal = Number(f[1]); root.swapUsed = Number(f[2]); break;
             case "procs":    root.procs = Number(f[1]); break;
+            case "uptime":   root.uptime = Number(f[1]); break;
+            case "load":     root.loadAvg = f.slice(1).join(" "); break;
+            case "kernel":   root.kernel = f[1] || ""; break;
+            case "host":     root.host = f[1] || ""; break;
             case "disk": {
                 const size = Number(f[2]), used = Number(f[3]);
                 if (size > 0) ds.push({ target: f[1], size, used, percent: Math.round(used * 100 / size) });
@@ -126,6 +153,11 @@ df -B1 -x tmpfs -x devtmpfs -x efivarfs -x overlay -x squashfs --output=target,s
             }
         }
         if (ds.length) root.disks = ds;
+        if (/^cpu /m.test(text) && root._prevCpu) {
+            root.cpuHistory = root._push(root.cpuHistory, root.cpuPercent);
+            root.gpuHistory = root._push(root.gpuHistory, root.gpuPercent);
+            root.memHistory = root._push(root.memHistory, root.memPercent);
+        }
     }
 
     readonly property var _timer: Timer {

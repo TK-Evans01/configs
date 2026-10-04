@@ -6,3 +6,13 @@ singleton Sys 1.0 Sys.qml
 singleton Network 1.0 Network.qml
 singleton Docker 1.0 Docker.qml
 singleton Bluetooth 1.0 Bluetooth.qml
+singleton Ui 1.0 Ui.qml
+singleton Desktop 1.0 Desktop.qml
+singleton Lyrics 1.0 Lyrics.qml
+singleton Launcher 1.0 Launcher.qml
+singleton Weather 1.0 Weather.qml
+singleton Mail 1.0 Mail.qml
+singleton Calendar 1.0 Calendar.qml
+singleton Keybinds 1.0 Keybinds.qml
+singleton Clipboard 1.0 Clipboard.qml
+singleton Screenshot 1.0 Screenshot.qml
