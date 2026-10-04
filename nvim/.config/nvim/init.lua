@@ -544,7 +544,7 @@ require("lazy").setup({
 				"bash", "c", "diff", "html", "lua", "luadoc",
 				"markdown", "markdown_inline", "query", "vim", "vimdoc",
 				"typescript", "tsx", "javascript", "jsdoc",
-				"python", "go", "gomod", "gosum", "rust",
+				"python", "go", "gomod", "gosum", "rust", "scala",
 				"json", "jsonc", "yaml", "toml", "dockerfile", "gitignore", "gitcommit",
 			}
 			local installed = require("nvim-treesitter").get_installed("parsers")
@@ -791,6 +791,36 @@ require("lazy").setup({
 					},
 				},
 			}
+		end,
+	},
+
+	-- ---------------------------------------------------------------------------
+	-- nvim-metals: Scala LSP (Metals) + worksheet eval + build import
+	-- Owns scala/sbt/java filetypes. DO NOT also add metals to lspconfig servers.
+	-- First open: run :MetalsInstall, then :MetalsImportBuild for sbt projects.
+	-- Worksheets: open any *.worksheet.sc — results render inline on save.
+	-- ---------------------------------------------------------------------------
+	{
+		"scalameta/nvim-metals",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		ft = { "scala", "sbt" },
+		config = function(self)
+			local metals_config = require("metals").bare_config()
+			metals_config.settings = {
+				showImplicitArguments = true,
+				showInferredType = true,
+			}
+			metals_config.init_options.statusBarProvider = "off"
+			metals_config.init_options.decorationProvider = true
+			metals_config.init_options.inlineDecorationProvider = true
+			metals_config.capabilities = require("blink.cmp").get_lsp_capabilities()
+
+			local group = vim.api.nvim_create_augroup("nvim-metals", { clear = true })
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = self.ft,
+				callback = function() require("metals").initialize_or_attach(metals_config) end,
+				group = group,
+			})
 		end,
 	},
 
