@@ -24,6 +24,7 @@ if [ -f "$HOME/.face.icon" ]; then
 fi
 
 if [ "${1:-}" = wayland ]; then
+    sudo install -D -m644 "$here/weston.ini" /etc/sddm/weston.ini
     sudo install -m644 "$here/wayland.conf" /etc/sddm.conf.d/wayland.conf
     echo "wayland greeter enabled (takes effect on next boot / sddm restart)"
 fi

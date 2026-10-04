@@ -11,7 +11,7 @@ block cursor, caps-lock and wrong-password messages.
 
 ```
 ./install.sh            # theme + avatar (~/.face.icon) — sudo
-./install.sh wayland    # + greeter on weston instead of Xorg
+./install.sh wayland    # + greeter on weston instead of Xorg (weston.ini mirrors DP-3 onto DP-2)
 sddm-greeter-qt6 --test-mode --theme ./rice   # preview in a window
 ```
 
