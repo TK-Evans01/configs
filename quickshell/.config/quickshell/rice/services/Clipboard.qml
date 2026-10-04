@@ -24,9 +24,15 @@ QtObject {
         }
     }
 
-    readonly property var _watch: Process {
+    // One process per type, run directly: background jobs of an sh wrapper
+    // outlived the shell and piled up.
+    readonly property var _watchText: Process {
         running: root.available
-        command: ["sh", "-c", "wl-paste --type text --watch cliphist store & wl-paste --type image --watch cliphist store & wait"]
+        command: Settings.tether.concat(["wl-paste", "--type", "text", "--watch", "cliphist", "store"])
+    }
+    readonly property var _watchImage: Process {
+        running: root.available
+        command: Settings.tether.concat(["wl-paste", "--type", "image", "--watch", "cliphist", "store"])
     }
 
     // Re-probes while missing, so installing cliphist needs no shell restart.

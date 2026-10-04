@@ -53,6 +53,8 @@ Directories are imported by relative path (`import "../../components"`);
 | `Keybinds` | `hyprctl binds -j` | readable `rows` ({ keys, label, group, dispatcher, arg, runnable }); labels derived from dispatcher/arg (rice IPC, playerctl, wpctl…); 1…0 workspace runs collapsed; loaded when the keybinds mode opens |
 | `Clipboard` | `cliphist` + `wl-paste --watch` | runs the text + image watchers itself while cliphist exists (re-probed on use); `entries` ({ id, text, image, info, thumb }), image thumbs decoded to `~/.cache/quickshell/cliphist/`; `copy`, `remove`, `wipe` |
 | `Screenshot` | `grimblast`, `tesseract`, `satty` | `take(target, action)` after the popup has closed; targets area/active/output/screen; actions save (copysave → `Settings.screenshotDir`) / copy / text (OCR → wl-copy + notify) / edit (satty); `latest`, `hasOcr`, `hasEditor` (re-probed) |
+| `Github` | `gh api graphql` + `gh api notifications` (gh's login) | one query: profile, contribution calendar (`days` with GitHub-style quartile `level`s), recently pushed `repos` + their latest `commits`, open `prs` / `issues` / review requests; derived `today`, `thisWeek`, `streak`, `longestStreak`, `busiest`; refresh every `githubRefreshMin` |
+| `Lock` | `PamContext` (login), `hyprctl devices`, `awww query`, `systemd-inhibit` + `gdbus monitor` (logind) | `locked`, shared `buffer`, `submit()` → PAM, `failed`/`failMessage`/`attempts`, `capsLock`, per-output `wallpapers`; lock-before-sleep via a delay inhibitor released once `secure`; `IdleMonitor`s for auto-lock and dpms; `caffeine` |
 | `Weather` | Open-Meteo via `curl` | `current`, `hourly` (24h), `daily` (7d); WMO code → `icon()`, `describe()`, `color()`; refresh every `weatherRefreshMin` |
 | `Hyprland` | `Quickshell.Hyprland` | workspaces, monitors, `focusedMonitor`, `activeToplevel`, `monitorFor(screen)`, `dispatch()`. Refreshes toplevels on start so the title isn't blank after a reload |
 | `Audio` | `pactl` | event-driven (`pactl subscribe`); outputs/inputs, defaults, mute, volume setters |
@@ -87,11 +89,18 @@ Directories are imported by relative path (`import "../../components"`);
 
 `DashboardWindow` — `TabBar` + horizontally sliding pages (Loaders, live only while open). The panel height tracks the current tab.
 
-- **Overview**: `ClockCard` (big time, date, weather line, uptime, user@host), `MonthCard` (Monday-first grid, today filled, ‹ › months, event dots, click a day to pick it), `AgendaCard` (Proton Calendar: picked day or upcoming), `PlayerCard`, `ResourcesCard` (CPU/GPU/RAM/root meters)
+- **Overview**: `ClockCard` (big time, date, weather line, uptime, user@host), `MonthCard` (Monday-first grid, today filled, ‹ › months, event dots, click a day to pick it), `AgendaCard` (Proton Calendar: picked day or upcoming), `PlayerCard`, `ResourcesCard` (CPU/GPU/RAM/root meters), `GithubCard` (commit frequency: `ContributionGrid` + today/streak/week; ▸ → GitHub tab)
 - **Media**: `CoverArt`, player picker chips, title/artist/album, `LyricsView`, `Progress` (seek), `Transport` (shuffle/prev/play/next/loop), player volume
 - **System**: `StatCard`s for CPU / GPU (+VRAM) / Memory with sparklines, storage meters, network + Mullvad row, host/kernel/uptime/procs footer
 - **Weather**: now (big glyph, °, condition, feels-like, hi/lo, humidity, wind, sunrise/sunset), next 24h column chart (height = temperature, color = condition, blue ticks = rain chance), 7 days with min–max bars on the week's scale
+- **GitHub**: profile stats, full-year `ContributionGrid` (hover a day; busiest day), recent commits, repositories, open PRs / review requests / issues, notifications button; rows open in the browser
 - **Docker**: container list with start/stop/restart
+
+### `modules/lock/`
+
+`LockScreen` — `WlSessionLock` loaded by `shell.qml` while `Lock.locked`; one `WlSessionLockSurface` per output: blurred wallpaper (`MultiEffect`), bar-like strip, clock, avatar card with prompt/status, shake on failure. Keys go to `Lock.buffer`, so every screen mirrors the prompt; the first surface to see `authSucceeded` fades out and releases the lock.
+
+Long-running helpers (pactl, docker events, bluetoothctl, wl-paste, systemd-inhibit, gdbus) are launched through `Settings.tether` (`setpriv --pdeathsig TERM`) and never through an `sh` wrapper, so they die with the shell instead of piling up as orphans.
 
 ### `modules/launcher/`
 

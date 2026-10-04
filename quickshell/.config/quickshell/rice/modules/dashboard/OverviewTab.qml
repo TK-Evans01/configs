@@ -26,6 +26,7 @@ Item {
             spacing: Theme.pad
             PlayerCard { Layout.fillWidth: true }
             ResourcesCard { Layout.fillWidth: true }
+            GithubCard { Layout.fillWidth: true }
         }
     }
 }

@@ -5,6 +5,10 @@ import Quickshell
 QtObject {
     readonly property int barHeight: 44
 
+    // Prefix for long-running helpers: the kernel kills them when the shell
+    // dies (restart, crash, kill), so they can't pile up as orphans.
+    readonly property var tether: ["setpriv", "--pdeathsig", "TERM", "--"]
+
     // Label width caps (px) and carousel tuning for text that scrolls.
     readonly property int windowLabelWidth: 420
     readonly property int mediaLabelWidth: 260
@@ -19,6 +23,8 @@ QtObject {
     readonly property bool showWeather: true
     readonly property bool showMail: true
     readonly property string terminal: "alacritty"
+    // Same face SDDM shows (AccountsService convention).
+    readonly property string avatar: Quickshell.env("HOME") + "/.face.icon"
 
     // Launcher
     readonly property int launcherWidth: 640
@@ -31,6 +37,7 @@ QtObject {
         { id: "media",    label: "Media",    icon: "󰝚" },
         { id: "system",   label: "System",   icon: "󰍛" },
         { id: "weather",  label: "Weather",  icon: "󰖐" },
+        { id: "github",   label: "GitHub",   icon: "\uf09b" },
         { id: "docker",   label: "Docker",   icon: "󰡨" }
     ]
     readonly property int dashboardWidth: 900
@@ -62,6 +69,17 @@ QtObject {
 
     // Clipboard history (cliphist)
     readonly property int clipboardMax: 200
+
+    // GitHub card on the Overview (gh CLI login)
+    readonly property bool showGithub: true
+    readonly property int githubRefreshMin: 10
+    readonly property int githubRepos: 8        // most recently pushed repos (commits are read from these)
+    readonly property int githubCommits: 8
+
+    // Lock screen / idle
+    readonly property int lockAfterMin: 10          // 0 = never auto-lock
+    readonly property int screenOffAfterMin: 15     // 0 = never turn screens off
+    readonly property bool lockBeforeSleep: true
 
     // Synced lyrics from lrclib.net (sends artist/title/album to it).
     readonly property bool lyrics: true

@@ -16,3 +16,5 @@ singleton Calendar 1.0 Calendar.qml
 singleton Keybinds 1.0 Keybinds.qml
 singleton Clipboard 1.0 Clipboard.qml
 singleton Screenshot 1.0 Screenshot.qml
+singleton Github 1.0 Github.qml
+singleton Lock 1.0 Lock.qml

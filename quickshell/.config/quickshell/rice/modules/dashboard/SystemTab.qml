@@ -114,8 +114,7 @@ Item {
 
         Label {
             Layout.alignment: Qt.AlignHCenter
-            text: Svc.Sys.host + "  ·  linux " + Svc.Sys.kernel + "  ·  up " + Svc.Sys.fmtUptime(Svc.Sys.uptime)
-                  + "  ·  " + Svc.Sys.procs + " procs"
+            text: Svc.Sys.host + "  ·  linux " + Svc.Sys.kernel + "  ·  " + Svc.Sys.procs + " procs"
             size: Theme.fontSizeSmall - 2
             color: Theme.muted
         }

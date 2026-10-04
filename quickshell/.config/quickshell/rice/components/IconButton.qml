@@ -24,8 +24,21 @@ Rectangle {
     opacity: enabledState ? 1 : 0.4
     Behavior on color { ColorAnimation { duration: Theme.animShort } }
 
+    // Icon-only: one glyph centred in the square (a Row centres by advance
+    // width, which leaves nerd-font glyphs off-centre).
+    Label {
+        visible: root.text === ""
+        anchors.fill: parent
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        text: root.icon
+        color: root.checked ? Theme.textReverse : root.fg
+        size: Theme.fontSize
+    }
+
     Row {
         id: row
+        visible: root.text !== ""
         anchors.centerIn: parent
         spacing: Theme.spacing
         Label {

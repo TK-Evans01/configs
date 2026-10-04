@@ -1,0 +1,13 @@
+[SddmGreeterTheme]
+Name=Rice
+Description=Retro gruvbox login matching the quickshell rice bar and lock screen
+Author=tk
+License=MIT
+Type=sddm-theme
+Version=1.0
+Website=https://github.com/TK-Evans01/configs
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=rice
+Theme-API=2.0
+QtVersion=6

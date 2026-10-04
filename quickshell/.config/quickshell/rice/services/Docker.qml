@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell.Io
+import "../config"
 
 QtObject {
     id: root
@@ -58,7 +59,8 @@ QtObject {
     // docker events streams container lifecycle changes; any line re-triggers poll.
     readonly property var _events: Process {
         running: true
-        command: ["sh", "-c", "docker events --format '{{.Type}} {{.Action}}' --filter type=container 2>/dev/null"]
+        // Run directly (no sh wrapper): stopping a wrapper left docker orphaned.
+        command: Settings.tether.concat(["docker", "events", "--format", "{{.Type}} {{.Action}}", "--filter", "type=container"])
         stdout: SplitParser {
             splitMarker: "\n"
             onRead: line => {

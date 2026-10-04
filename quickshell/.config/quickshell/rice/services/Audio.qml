@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell.Io
+import "../config"
 
 QtObject {
     id: root
@@ -79,7 +80,7 @@ QtObject {
     // pactl subscribe streams events; each line re-triggers poll. Replaces periodic timer.
     readonly property var _subscribe: Process {
         running: true
-        command: ["pactl", "subscribe"]
+        command: Settings.tether.concat(["pactl", "subscribe"])
         stdout: SplitParser {
             splitMarker: "\n"
             onRead: line => {

@@ -29,7 +29,6 @@ QtObject {
     readonly property int memPercent: memTotal > 0 ? Math.round(memUsed * 100 / memTotal) : 0
 
     property int procs: 0
-    property real uptime: 0          // seconds
     property string kernel: ""
     property string host: ""
     property string loadAvg: ""
@@ -43,10 +42,6 @@ QtObject {
         return out.length > Settings.historySize ? out.slice(out.length - Settings.historySize) : out;
     }
 
-    function fmtUptime(s) {
-        const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
-        return (d ? d + "d " : "") + (d || h ? h + "h " : "") + m + "m";
-    }
 
     // [{ target, size, used, percent }]
     property var disks: []
@@ -97,7 +92,6 @@ for d in /sys/class/drm/card*/device; do
   done
   break
 done
-echo "uptime $(cut -d' ' -f1 /proc/uptime)"
 echo "load $(cut -d' ' -f1-3 /proc/loadavg)"
 echo "procs $(ls -d /proc/[0-9]* 2>/dev/null | wc -l)"
 df -B1 -x tmpfs -x devtmpfs -x efivarfs -x overlay -x squashfs --output=target,size,used 2>/dev/null |
@@ -141,7 +135,6 @@ df -B1 -x tmpfs -x devtmpfs -x efivarfs -x overlay -x squashfs --output=target,s
             case "mem":      root.memTotal = Number(f[1]); root.memUsed = Number(f[2]); break;
             case "swap":     root.swapTotal = Number(f[1]); root.swapUsed = Number(f[2]); break;
             case "procs":    root.procs = Number(f[1]); break;
-            case "uptime":   root.uptime = Number(f[1]); break;
             case "load":     root.loadAvg = f.slice(1).join(" "); break;
             case "kernel":   root.kernel = f[1] || ""; break;
             case "host":     root.host = f[1] || ""; break;

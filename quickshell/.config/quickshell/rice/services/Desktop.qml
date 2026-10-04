@@ -166,12 +166,14 @@ echo "wait $(dunstctl count waiting 2>/dev/null)"
 
     // --- power ---
     readonly property var actions: [
+        { id: "lock",     label: "Lock",     icon: "󰌾", cmd: [] },
         { id: "logout",   label: "Log out",  icon: "󰍃", cmd: ["hyprctl", "dispatch", "exit"] },
         { id: "suspend",  label: "Suspend",  icon: "󰤄", cmd: ["systemctl", "suspend"] },
         { id: "reboot",   label: "Reboot",   icon: "󰜉", cmd: ["systemctl", "reboot"] },
         { id: "poweroff", label: "Shut down", icon: "󰐥", cmd: ["systemctl", "poweroff"] }
     ]
     function power(id) {
+        if (id === "lock") { Lock.lock(); return; }
         const a = actions.find(x => x.id === id);
         if (a) Quickshell.execDetached(a.cmd);
     }

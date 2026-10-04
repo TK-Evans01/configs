@@ -11,8 +11,30 @@ ColumnLayout {
     PageHeader {
         icon: "󰓃"
         title: "Sound"
-        subtitle: "default devices"
+        subtitle: "volume and devices"
         onBackClicked: Svc.Ui.back()
+    }
+
+    Card {
+        Layout.fillWidth: true
+        CardHeader { icon: "󰕾"; title: "Volume" }
+        Slider {
+            icon: Svc.Audio.outMuted ? "󰝟" : "󰕾"
+            value: Svc.Audio.outPercent
+            max: 150
+            muted: Svc.Audio.outMuted
+            onMoved: p => Svc.Audio.setOutputVolume(p)
+            onIconClicked: Svc.Audio.toggleMute()
+        }
+        Slider {
+            icon: Svc.Audio.inMuted ? "󰍭" : "󰍬"
+            value: Svc.Audio.inPercent
+            max: 150
+            muted: Svc.Audio.inMuted
+            fill: Theme.aqua
+            onMoved: p => Svc.Audio.setInputVolume(p)
+            onIconClicked: Svc.Audio.toggleInputMute()
+        }
     }
 
     component Section: Card {

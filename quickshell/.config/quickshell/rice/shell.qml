@@ -4,9 +4,20 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 import "modules/bar"
+import "modules/lock"
 import "services" as Svc
 
 ShellRoot {
+    // Singletons are created on first use; the clipboard watcher has to run
+    // from startup, so touch it here.
+    readonly property bool _clipboardReady: Svc.Clipboard.available
+    // Idle lock, screen-off and lock-before-sleep live in the Lock singleton.
+    readonly property bool _lockReady: Svc.Lock.locked
+
+    Loader {
+        active: Svc.Lock.locked
+        sourceComponent: LockScreen {}
+    }
     Variants {
         model: Quickshell.screens
 
@@ -29,9 +40,11 @@ ShellRoot {
         function dashboard(tab: string): void { Svc.Ui.toggle("dashboard", focused(), tab); }
         function quicksettings(page: string): void { Svc.Ui.toggle("quicksettings", focused(), page); }
         function close(): void { Svc.Ui.close(); }
-        function refresh(): void { Svc.Weather.refresh(); Svc.Mail.refresh(); Svc.Calendar.refresh(); }
+        function refresh(): void { Svc.Weather.refresh(); Svc.Mail.refresh(); Svc.Calendar.refresh(); Svc.Github.refresh(); }
         function mail(): void { Svc.Ui.toggle("quicksettings", focused(), "mail"); }
         function dnd(): void { Svc.Desktop.toggleDnd(); }
+        function lock(): void { Svc.Lock.lock(); }
+        function caffeine(): void { Svc.Lock.caffeine = !Svc.Lock.caffeine; }
         function nightlight(): void { Svc.Desktop.toggleNightLight(); }
         function launcher(): void { Svc.Ui.toggle("launcher", focused(), ""); }
         function clipboard(): void { Svc.Ui.toggle("launcher", focused(), "clipboard"); }

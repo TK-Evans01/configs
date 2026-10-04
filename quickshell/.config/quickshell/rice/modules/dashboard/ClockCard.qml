@@ -55,7 +55,7 @@ Card {
         }
     }
     Label {
-        text: "up " + Svc.Sys.fmtUptime(Svc.Sys.uptime) + "  ·  " + Svc.Desktop.user + "@" + Svc.Sys.host
+        text: Svc.Desktop.user + "@" + Svc.Sys.host
         size: Theme.fontSizeSmall
         color: Theme.subtext
     }

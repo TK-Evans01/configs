@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell.Io
+import "../config"
 import Quickshell.Bluetooth as QsBt
 
 // BlueZ via Quickshell's native bindings — reactive over DBus, no polling.
@@ -37,7 +38,7 @@ QtObject {
     // means "just works" pairing, which is what headsets and pads use.
     readonly property var _agent: Process {
         running: true
-        command: ["bluetoothctl", "--agent", "NoInputNoOutput"]
+        command: Settings.tether.concat(["bluetoothctl", "--agent", "NoInputNoOutput"])
         stdinEnabled: true
         onStarted: write("default-agent\n")
         onRunningChanged: if (!running) root._agentRestart.restart()

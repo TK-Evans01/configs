@@ -33,6 +33,7 @@ BarButton {
         }
         if (A.inMuted) out.push({ g: "󰍭", c: Theme.warning });
         if (Svc.Desktop.dnd) out.push({ g: "󰂛", c: Theme.warning });
+        if (Svc.Lock.caffeine) out.push({ g: "󰅶", c: Theme.yellow });
         if (A.outMuted) out.push({ g: "󰝟", c: Theme.error });
         else out.push({ g: A.outPercent >= 66 ? "󰕾" : (A.outPercent >= 33 ? "󰖀" : "󰕿"), c: Theme.text });
         return out;

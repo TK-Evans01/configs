@@ -76,6 +76,7 @@ BarPopup {
                             media: mediaC,
                             system: systemC,
                             weather: weatherC,
+                            github: githubC,
                             docker: dockerC
                         })[modelData.id] || null
                     }
@@ -89,5 +90,6 @@ BarPopup {
     Component { id: mediaC; MediaTab { shownTab: root.onTab && Svc.Ui.tab === "media" } }
     Component { id: systemC; SystemTab {} }
     Component { id: weatherC; WeatherTab {} }
+    Component { id: githubC; GithubTab {} }
     Component { id: dockerC; DockerTab {} }
 }

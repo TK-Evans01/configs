@@ -16,7 +16,7 @@ three bar islands, a tabbed dashboard and a Quick Settings panel.
 - `services/` — singleton data/control layer (no UI)
 - `components/` — shared retro widgets (BarButton, Card, Tile, Slider, Sparkline, Meter, BarPopup…)
 - `modules/bar/` — the bar and its buttons
-- `modules/dashboard/` — tabbed dashboard: Overview, Media, System, Weather, Docker
+- `modules/dashboard/` — tabbed dashboard: Overview, Media, System, Weather, GitHub, Docker
 - `modules/quicksettings/` — Quick Settings: profile/power, tiles, sound, sub-pages
 - `modules/launcher/` — launcher with three modes: apps (icons, fuzzy, frequent, `=` calculator), clipboard (cliphist), keybinds
 - `scripts/` — Python helpers: `proton-mail.py` (Bridge IMAP), `proton-calendar.py` (ICS)
@@ -38,11 +38,24 @@ three bar islands, a tabbed dashboard and a Quick Settings panel.
 | Status glyphs | Quick Settings | mute | do-not-disturb | volume |
 
 Popups close on Escape or a click outside. Dashboard: Ctrl+Tab / Ctrl+Shift+Tab
-cycle tabs, Alt+1…5 jump. Quick Settings: ‹ or Escape goes back from a sub-page.
+cycle tabs, Alt+1…6 jump. Quick Settings: ‹ or Escape goes back from a sub-page.
 Power buttons arm on the first click and fire on the second (3s window).
 
-Quick Settings' profile card row: **screenshot**, **clipboard**, **keybinds** │
-log out, suspend, reboot, shut down (hover names the button).
+Quick Settings' profile card (avatar = `~/.face.icon`, same as SDDM) row:
+**screenshot**, **clipboard**, **keybinds** │ lock, log out, suspend, reboot,
+shut down (hover names the button). Tiles: Mullvad, Bluetooth, Night light,
+Do not disturb, Caffeine, Sound (click mutes; ▸ = volume sliders + devices).
+
+## Lock screen
+
+SUPER+Escape or the lock button. One surface per monitor: that monitor's
+wallpaper blurred, bar-style top strip (lock time, clock, now playing,
+suspend/reboot/power off), big clock, avatar card with a `>` prompt — your
+password is checked by PAM (`login`). Caps-lock and wrong-password messages.
+Auto-locks after `Settings.lockAfterMin` (10) idle minutes, turns screens off
+after `screenOffAfterMin` (15), and locks before suspend (logind delay
+inhibitor). Caffeine (tile or SUPER+SHIFT+C) pauses both. The SDDM theme in
+`sddm/rice` has the same look.
 
 Launcher modes — chips at the top, or Alt+1 / Alt+2 / Alt+3: **apps**, **clipboard**
 (cliphist history incl. image thumbnails; Enter copies, Shift+Del removes,
@@ -103,6 +116,15 @@ link can read that calendar. Events (recurrences expanded, timezones converted)
 show as dots on the Overview month, and the agenda under it lists upcoming
 events — click a day for that day's. Refreshes every 30 min; cached offline.
 
+## GitHub
+
+Uses the `gh` CLI's login (`gh auth login`); nothing is stored by the shell.
+The Overview card shows commit frequency only (contribution grid, today /
+streak / this week); its ▸ opens the **GitHub** tab: profile stats, full-year
+grid (busiest day, longest streak), recent commits across your recently pushed
+repos, repositories (language, stars, last push, private), open PRs / review
+requests / issues and the unread notification count. Refreshes every 10 min.
+
 ## Keybinds (in `~/.config/hypr/external/keybindings.conf`)
 
 | Keys | Opens |
@@ -115,6 +137,8 @@ events — click a day for that day's. Refreshes every 30 min; cached offline.
 | SUPER+Y | Notification history |
 | SUPER+SHIFT+N | Night light on/off |
 | SUPER+SHIFT+D | Do not disturb on/off |
+| SUPER+Escape | Lock |
+| SUPER+SHIFT+C | Caffeine on/off |
 | SUPER+SHIFT+V | Clipboard history |
 | SUPER+SHIFT+/ | Keybinds |
 | SUPER+SHIFT+S | Screenshot region → `~/Pictures/Screenshots` + clipboard |
@@ -130,7 +154,7 @@ again, 󰆴 to remove, clear all).
 ## IPC
 
 ```
-qs -c rice ipc call rice dashboard overview   # overview | media | system | docker
+qs -c rice ipc call rice dashboard overview   # overview | media | system | weather | github | docker
 qs -c rice ipc call rice dashboard weather
 qs -c rice ipc call rice quicksettings ""     # "" | network | bluetooth | sound | nightlight | notifications | mail | screenshot
 qs -c rice ipc call rice launcher
@@ -139,8 +163,10 @@ qs -c rice ipc call rice keybinds
 qs -c rice ipc call rice screenshot area save  # area|active|output|screen  save|copy|text|edit
 qs -c rice ipc call rice nightlight           # toggle
 qs -c rice ipc call rice dnd                  # toggle
+qs -c rice ipc call rice lock
+qs -c rice ipc call rice caffeine             # toggle
 qs -c rice ipc call rice mail                 # Quick Settings › Mail
-qs -c rice ipc call rice refresh              # weather + mail + calendar now
+qs -c rice ipc call rice refresh              # weather + mail + calendar + github now
 qs -c rice ipc call rice close
 ```
 

@@ -83,7 +83,8 @@ ColumnLayout {
             IconButton {
                 icon: "󰐊"
                 text: "open bridge"
-                onClicked: { Svc.Ui.close(); Quickshell.execDetached(["protonmail-bridge"]); }
+                // The headless copy holds Bridge's lock; stop it before opening the window.
+                onClicked: { Svc.Ui.close(); Svc.Mail.openBridgeWindow(); }
             }
             IconButton {
                 icon: "󰑓"

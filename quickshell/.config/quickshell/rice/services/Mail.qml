@@ -24,8 +24,14 @@ QtObject {
         if (!proc.running) proc.running = true;
     }
     function openWebmail() { Quickshell.execDetached(["xdg-open", Settings.mailUrl]); }
+    // Bridge's window, after stopping the headless copy (they share a lock).
+    // Close the window and use "start bridge" / next login to go headless again.
+    function openBridgeWindow() {
+        Quickshell.execDetached(["sh", "-c",
+            "pkill -f '[p]rotonmail-bridge --noninteractive'; sleep 2; rm -f \"$HOME\"/.cache/protonmail/bridge-v3/*.lock; exec protonmail-bridge"]);
+    }
     function startBridge() {
-        Quickshell.execDetached(Settings.bridgeCommand);
+        Quickshell.execDetached(["sh", "-c", "rm -f \"$HOME\"/.cache/protonmail/bridge-v3/*.lock; exec \"$@\"", "sh"].concat(Settings.bridgeCommand));
         retry.restart();
     }
 

@@ -68,35 +68,23 @@ ColumnLayout {
             onToggled: Svc.Desktop.toggleDnd()
             onOpenDetails: Svc.Ui.showPage("notifications")
         }
-    }
-
-    Card {
-        Layout.fillWidth: true
-        CardHeader {
-            icon: "󰓃"
-            title: "Sound"
-            subtitle: root.shortSink(Svc.Audio.outDefault)
-            IconButton {
-                icon: "󰅂"
-                onClicked: Svc.Ui.showPage("sound")
-            }
+        Tile {
+            icon: Svc.Lock.caffeine ? "󰅶" : "󰛊"
+            label: "Caffeine"
+            sublabel: Svc.Lock.caffeine ? "staying awake" : "lock after " + Settings.lockAfterMin + " min"
+            active: Svc.Lock.caffeine
+            activeColor: Theme.yellow
+            onToggled: Svc.Lock.caffeine = !Svc.Lock.caffeine
         }
-        Slider {
-            icon: Svc.Audio.outMuted ? "󰝟" : "󰕾"
-            value: Svc.Audio.outPercent
-            max: 150
-            muted: Svc.Audio.outMuted
-            onMoved: p => Svc.Audio.setOutputVolume(p)
-            onIconClicked: Svc.Audio.toggleMute()
-        }
-        Slider {
-            icon: Svc.Audio.inMuted ? "󰍭" : "󰍬"
-            value: Svc.Audio.inPercent
-            max: 150
-            muted: Svc.Audio.inMuted
-            fill: Theme.aqua
-            onMoved: p => Svc.Audio.setInputVolume(p)
-            onIconClicked: Svc.Audio.toggleInputMute()
+        Tile {
+            icon: Svc.Audio.outMuted ? "󰝟" : (Svc.Audio.outPercent >= 66 ? "󰕾" : Svc.Audio.outPercent >= 33 ? "󰖀" : "󰕿")
+            label: "Sound"
+            sublabel: Svc.Audio.outMuted ? "muted" : Svc.Audio.outPercent + "%  ·  " + root.shortSink(Svc.Audio.outDefault)
+            active: !Svc.Audio.outMuted
+            activeColor: Theme.aqua
+            hasDetails: true
+            onToggled: Svc.Audio.toggleMute()
+            onOpenDetails: Svc.Ui.showPage("sound")
         }
     }
 }
