@@ -1,5 +1,6 @@
 import QtQuick
 import "../../config"
+import "../../core" as Core
 import "../Volume" as Vol
 
 Item {
@@ -40,31 +41,27 @@ Item {
             Column {
                 width: parent.width - 82
                 spacing: 2
-                Text {
+                Core.ScrollingText {
                     width: parent.width
+                    maxWidth: parent.width
                     text: root.service.title || "(nothing playing)"
                     color: Theme.purpleBright
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSize + 1
-                    font.bold: true
-                    elide: Text.ElideRight
+                    pixelSize: Theme.fontSize + 1
+                    bold: true
                 }
-                Text {
+                Core.ScrollingText {
                     width: parent.width
+                    maxWidth: parent.width
                     text: root.service.artist
                     color: Theme.purpleDim
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSize
-                    elide: Text.ElideRight
                     visible: text !== ""
                 }
-                Text {
+                Core.ScrollingText {
                     width: parent.width
+                    maxWidth: parent.width
                     text: root.service.album
                     color: Theme.grey
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSize - 1
-                    elide: Text.ElideRight
+                    pixelSize: Theme.fontSize - 1
                     visible: text !== ""
                 }
             }

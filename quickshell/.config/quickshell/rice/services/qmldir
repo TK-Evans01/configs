@@ -2,7 +2,7 @@ module services
 singleton Mpris 1.0 Mpris.qml
 singleton Hyprland 1.0 Hyprland.qml
 singleton Audio 1.0 Audio.qml
-singleton Cpu 1.0 Cpu.qml
-singleton Memory 1.0 Memory.qml
-singleton Mullvad 1.0 Mullvad.qml
+singleton Sys 1.0 Sys.qml
+singleton Network 1.0 Network.qml
 singleton Docker 1.0 Docker.qml
+singleton Bluetooth 1.0 Bluetooth.qml

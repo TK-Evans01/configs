@@ -5,14 +5,21 @@ Item {
     id: root
 
     property string label: ""
+    property string labelPrefix: ""
     property color labelColor: Theme.fg0
+    property int labelSize: Theme.fontSize
     property bool hasPopout: false
+
+    // 0 = no cap. Past this width the label is clipped and carousels.
+    property int maxLabelWidth: 0
+    property bool scrollLabel: true
 
     readonly property alias hovered: hover.hovered
 
     signal hoverEntered()
     signal hoverExited()
     signal clicked()
+    signal rightClicked()
 
     implicitWidth: content.implicitWidth + Theme.pad * 2
     implicitHeight: Settings.barHeight
@@ -29,11 +36,22 @@ Item {
         spacing: 6
 
         Text {
-            text: root.label
+            text: root.labelPrefix
+            visible: root.labelPrefix !== ""
             color: root.labelColor
             font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSize
+            font.pixelSize: root.labelSize
             anchors.verticalCenter: parent.verticalCenter
+        }
+
+        ScrollingText {
+            id: labelText
+            anchors.verticalCenter: parent.verticalCenter
+            text: root.label
+            color: root.labelColor
+            pixelSize: root.labelSize
+            maxWidth: root.maxLabelWidth
+            scrolling: root.scrollLabel
         }
     }
 
@@ -43,6 +61,13 @@ Item {
     }
 
     TapHandler {
+        acceptedButtons: Qt.LeftButton
         onTapped: root.clicked()
+    }
+
+    TapHandler {
+        acceptedButtons: Qt.RightButton
+        gesturePolicy: TapHandler.ReleaseWithinBounds
+        onTapped: root.rightClicked()
     }
 }

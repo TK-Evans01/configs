@@ -13,37 +13,36 @@ Item {
             width: parent.width
             spacing: 4
 
-            Row {
+            Item {
                 width: parent.width
-                spacing: 8
+                height: 22
+
                 Text {
+                    id: outLabel
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
                     text: "output"
                     color: Theme.grey
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSize
-                    width: 54
                 }
-                Rectangle {
-                    width: 42; height: 20
-                    color: muteOut.hovered ? Theme.bg3 : Theme.bg2
-                    border.color: Theme.bg3; border.width: 1
-                    anchors.verticalCenter: parent.verticalCenter
-                    Text {
-                        anchors.centerIn: parent
-                        text: root.service.outMuted ? "unmute" : "mute"
-                        color: root.service.outMuted ? Theme.red : Theme.fg0
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSize - 2
-                    }
-                    HoverHandler { id: muteOut }
-                    TapHandler { onTapped: root.service.toggleMute() }
-                }
+
                 Text {
+                    id: outPct
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
                     text: root.service.outPercent + "%"
                     color: Theme.fg0
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSize
+                }
+
+                MuteButton {
+                    anchors.right: outPct.left
+                    anchors.rightMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
+                    muted: root.service.outMuted
+                    onToggled: root.service.toggleMute()
                 }
             }
 
@@ -67,37 +66,38 @@ Item {
             width: parent.width
             spacing: 4
 
-            Row {
+            Item {
                 width: parent.width
-                spacing: 8
+                height: 22
+
                 Text {
+                    id: inLabel
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
                     text: "input"
                     color: Theme.grey
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSize
-                    width: 54
                 }
-                Rectangle {
-                    width: 42; height: 20
-                    color: muteIn.hovered ? Theme.bg3 : Theme.bg2
-                    border.color: Theme.bg3; border.width: 1
-                    anchors.verticalCenter: parent.verticalCenter
-                    Text {
-                        anchors.centerIn: parent
-                        text: root.service.inMuted ? "unmute" : "mute"
-                        color: root.service.inMuted ? Theme.red : Theme.fg0
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSize - 2
-                    }
-                    HoverHandler { id: muteIn }
-                    TapHandler { onTapped: root.service.toggleInputMute() }
-                }
+
                 Text {
+                    id: inPct
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
                     text: root.service.inPercent + "%"
                     color: Theme.fg0
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSize
+                }
+
+                MuteButton {
+                    anchors.right: inPct.left
+                    anchors.rightMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
+                    muted: root.service.inMuted
+                    onIcon: "\uf130"    // nf-fa-microphone
+                    offIcon: "\uf131"   // nf-fa-microphone_slash
+                    onToggled: root.service.toggleInputMute()
                 }
             }
 

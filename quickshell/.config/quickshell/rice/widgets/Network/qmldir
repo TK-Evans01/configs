@@ -1,0 +1,4 @@
+module widgets.Network
+Bar 1.0 Bar.qml
+Popout 1.0 Popout.qml
+Entry 1.0 Entry.qml

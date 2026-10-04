@@ -5,15 +5,9 @@ import "../../services" as Svc
 
 Core.Widget {
     id: d
-    label: {
-        if (!Svc.Docker.daemonUp) return "\uf395  off";
-        return "\uf395  " + Svc.Docker.running + "/" + Svc.Docker.total;
-    }
-    labelColor: {
-        if (!Svc.Docker.daemonUp) return Theme.red;
-        if (Svc.Docker.total === 0) return Theme.grey;
-        return Svc.Docker.running === Svc.Docker.total ? Theme.blue : Theme.yellow;
-    }
+    label: "󰡨"   // nf-md-docker
+    labelSize: Theme.iconSize
+    labelColor: Svc.Docker.daemonUp ? Theme.blue : Theme.red
 
     Core.Popout {
         owner: d

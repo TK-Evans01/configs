@@ -1,5 +1,6 @@
 import QtQuick
 import "../../config"
+import "../../core" as Core
 
 Item {
     id: root
@@ -23,23 +24,21 @@ Item {
         border.color: Theme.bg3
         border.width: 1
 
-        Text {
+        Core.ScrollingText {
             anchors.left: parent.left
             anchors.leftMargin: 6
             anchors.right: caret.left
             anchors.verticalCenter: parent.verticalCenter
             text: root.currentDesc
             color: Theme.fg0
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSize - 1
-            elide: Text.ElideRight
+            pixelSize: Theme.fontSize - 1
         }
         Text {
             id: caret
             anchors.right: parent.right
             anchors.rightMargin: 6
             anchors.verticalCenter: parent.verticalCenter
-            text: root.open ? "\u25b4" : "\u25be"
+            text: root.open ? "\uf0d8" : "\uf0d7"
             color: Theme.grey
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSize
@@ -64,17 +63,16 @@ Item {
                 border.color: Theme.bg3
                 border.width: 1
 
-                Text {
+                Core.ScrollingText {
                     anchors.left: parent.left
                     anchors.leftMargin: 6
                     anchors.right: parent.right
                     anchors.rightMargin: 6
                     anchors.verticalCenter: parent.verticalCenter
-                    text: (modelData.name === root.selected ? "\u2713 " : "   ") + modelData.description
+                    text: (modelData.name === root.selected ? "\uf00c " : "   ") + modelData.description
                     color: modelData.name === root.selected ? Theme.yellow : Theme.fg0
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSize - 1
-                    elide: Text.ElideRight
+                    pixelSize: Theme.fontSize - 1
+                    scrolling: optHover.hovered
                 }
                 HoverHandler { id: optHover }
                 TapHandler { onTapped: { root.picked(modelData.name); root.open = false; } }

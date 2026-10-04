@@ -3,3 +3,4 @@ Bar 1.0 Bar.qml
 Popout 1.0 Popout.qml
 Slider 1.0 Slider.qml
 DeviceSelect 1.0 DeviceSelect.qml
+MuteButton 1.0 MuteButton.qml

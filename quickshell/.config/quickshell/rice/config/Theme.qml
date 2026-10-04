@@ -33,10 +33,12 @@ QtObject {
     readonly property color purpleBright: "#e8a5b8"
 
     readonly property string fontFamily: "DepartureMono Nerd Font Mono"
-    readonly property int fontSize: 13
+    readonly property int fontSize: 18
+    // Bar widgets that show a bare glyph instead of text.
+    readonly property int iconSize: 32
 
-    readonly property int pad: 8
-    readonly property int gap: 12
+    readonly property int pad: 11
+    readonly property int gap: 16
     readonly property int radius: 0
     readonly property int accentThickness: 2
 }

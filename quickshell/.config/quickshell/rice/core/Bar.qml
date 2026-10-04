@@ -6,10 +6,10 @@ import "../widgets/Window" as WindowW
 import "../widgets/Mpris" as MprisW
 import "../widgets/Workspaces" as WorkspacesW
 import "../widgets/Volume" as VolumeW
-import "../widgets/Mullvad" as MullvadW
-import "../widgets/Cpu" as CpuW
-import "../widgets/Memory" as MemoryW
+import "../widgets/Network" as NetworkW
+import "../widgets/Bluetooth" as BluetoothW
 import "../widgets/Docker" as DockerW
+import "../widgets/System" as SystemW
 
 PanelWindow {
     id: bar
@@ -30,22 +30,22 @@ PanelWindow {
     Component { id: cWindow;     WindowW.Bar {} }
     Component { id: cClock;      ClockW.Bar {} }
     Component { id: cMpris;      MprisW.Bar {} }
-    Component { id: cMullvad;    MullvadW.Bar {} }
+    Component { id: cNetwork;    NetworkW.Bar {} }
+    Component { id: cBluetooth;  BluetoothW.Bar {} }
     Component { id: cVolume;     VolumeW.Bar {} }
-    Component { id: cCpu;        CpuW.Bar {} }
-    Component { id: cMemory;     MemoryW.Bar {} }
     Component { id: cDocker;     DockerW.Bar {} }
+    Component { id: cSystem;     SystemW.Bar {} }
 
     readonly property var registry: ({
         "Workspaces": cWorkspaces,
         "Window":     cWindow,
         "Clock":      cClock,
         "Mpris":      cMpris,
-        "Mullvad":    cMullvad,
+        "Network":    cNetwork,
+        "Bluetooth":  cBluetooth,
         "Volume":     cVolume,
-        "Cpu":        cCpu,
-        "Memory":     cMemory,
-        "Docker":     cDocker
+        "Docker":     cDocker,
+        "System":     cSystem
     })
 
     Rectangle {

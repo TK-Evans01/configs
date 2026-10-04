@@ -1,0 +1,4 @@
+module widgets.System
+Bar 1.0 Bar.qml
+Popout 1.0 Popout.qml
+Meter 1.0 Meter.qml

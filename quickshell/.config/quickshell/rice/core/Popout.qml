@@ -1,9 +1,11 @@
 import QtQuick
-import QtQuick.Window
 import Quickshell
 import "../config"
 
-PanelWindow {
+// Slide-down popout anchored to its owner via the compositor.
+// Uses PopupWindow so Hyprland places it on the SAME output as the owner
+// widget — no manual screen/margin math, no cross-monitor misfires.
+PopupWindow {
     id: root
 
     required property Item owner
@@ -13,29 +15,39 @@ PanelWindow {
     property int hideDelay: 150
     property int slideDuration: 220
 
-    readonly property var ownerWin: owner ? owner.Window.window : null
+    readonly property var ownerAttached: owner ? owner.QsWindow : null
     readonly property bool ownerHovered: owner ? owner.hovered === true : false
-
-    readonly property real ownerCenterX: {
-        if (!owner || !ownerWin) return 0;
-        owner.x; owner.y; owner.width;
-        let p = owner.parent;
-        while (p) { p.x; p.y; p.width; p = p.parent; }
-        return owner.mapToItem(null, owner.width / 2, 0).x;
-    }
-
-    readonly property var resolvedScreen: {
-        if (ownerWin && ownerWin.screen) {
-            const name = ownerWin.screen.name;
-            for (let i = 0; i < Quickshell.screens.length; i++) {
-                if (Quickshell.screens[i].name === name) return Quickshell.screens[i];
-            }
-        }
-        return Quickshell.screens.length > 0 ? Quickshell.screens[0] : null;
-    }
 
     property bool opened: false
     property bool rendered: false
+
+    // Anchor to the owner widget's rect within ITS window. edges/gravity =
+    // Bottom → popup sits centered directly below the widget, on that screen.
+    anchor.window: ownerAttached ? ownerAttached.window : null
+    anchor.rect.x: {
+        if (!ownerAttached || !ownerAttached.window) return 0;
+        owner.x; owner.width;
+        let p = owner.parent;
+        while (p) { p.x; p = p.parent; }
+        return ownerAttached.itemRect(owner).x;
+    }
+    anchor.rect.y: {
+        if (!ownerAttached || !ownerAttached.window) return 0;
+        owner.y; owner.height;
+        let p = owner.parent;
+        while (p) { p.y; p = p.parent; }
+        return ownerAttached.itemRect(owner).y;
+    }
+    anchor.rect.width: owner ? owner.width : 0
+    anchor.rect.height: owner ? owner.height : 0
+    anchor.edges: Edges.Bottom
+    anchor.gravity: Edges.Bottom
+
+    implicitWidth: preferredWidth
+    implicitHeight: preferredHeight
+    color: "transparent"
+    visible: owner !== null && (ownerAttached ? ownerAttached.window !== null : false)
+        && contentComponent !== null && rendered
 
     onOwnerHoveredChanged: {
         if (ownerHovered) { hideTimer.stop(); opened = true; rendered = true; }
@@ -56,25 +68,7 @@ PanelWindow {
         onTriggered: root.opened = false
     }
 
-    screen: resolvedScreen
-    visible: owner !== null && ownerWin !== null && contentComponent !== null && rendered
-
-    anchors {
-        top: true
-        left: true
-    }
-    margins.top: 0
-    margins.left: ownerWin
-        ? Math.max(0, Math.min(ownerWin.width - preferredWidth, ownerCenterX - preferredWidth / 2))
-        : 0
-
-    implicitWidth: preferredWidth
-    implicitHeight: preferredHeight
-    color: "transparent"
-
-    mask: Region {
-        item: content
-    }
+    mask: Region { item: content }
 
     HoverHandler { id: self }
 

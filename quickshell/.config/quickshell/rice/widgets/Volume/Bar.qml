@@ -5,8 +5,13 @@ import "../../services" as Svc
 
 Core.Widget {
     id: vol
-    label: Svc.Audio.muted ? "muted \uf026" : (Svc.Audio.percent + "% \uf028")
+    label: {
+        if (Svc.Audio.muted) return "\uf026";                  // nf-fa-volume_off
+        return Svc.Audio.percent >= 50 ? "\uf028" : "\uf027"; // volume_up / volume_down
+    }
+    labelSize: Theme.iconSize
     labelColor: Svc.Audio.muted ? Theme.red : Theme.fg0
+    onClicked: Svc.Audio.toggleMute()
 
     Core.Popout {
         owner: vol
