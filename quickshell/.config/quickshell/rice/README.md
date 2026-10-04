@@ -107,7 +107,7 @@ Startup: Bridge needs a Secret Service keychain — `gnome-keyring`, whose
 keyring must be named `login` with your login password so SDDM's PAM
 (`pam_gnome_keyring`) unlocks it at login. Hyprland ignores
 `~/.config/autostart`, so Bridge starts from `hyprland.conf`:
-`exec-once = sleep 3 && protonmail-bridge --no-window` (tray). The first sync
+`exec-once = sleep 3 && protonmail-bridge --noninteractive` (headless). The first sync
 of a large mailbox takes a while; counts fill in as it goes.
 
 **Calendar** — Proton Calendar › Settings › calendar › *Share via link*, then
