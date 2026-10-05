@@ -22,7 +22,7 @@ QtObject {
     readonly property bool showTray: true
     readonly property bool showWeather: true
     readonly property bool showMail: true
-    readonly property string terminal: "alacritty"
+    readonly property string terminal: "ghostty"
 
     // Music: spotify_player in the tmux session `musicSession`. Its MPRIS
     // identity is preferred by the bar (playerctl name: spotify_player).

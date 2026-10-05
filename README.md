@@ -8,7 +8,8 @@ directory is a package mirroring `$HOME`.
 |---------|------|
 | `quickshell` | the shell — bar, dashboard, quick settings, launcher, lock screen ([README](quickshell/.config/quickshell/rice/README.md)) |
 | `hypr` | Hyprland (`hyprland.conf`, `external/` keybinds + look & feel, hyprsunset, wallpaper script) |
-| `alacritty` | terminal + gruvbox-material theme |
+| `ghostty` | terminal + gruvbox-material theme (images in yazi via kitty graphics) |
+| `alacritty` | old terminal, kept for reference |
 | `tmux` | tmux + tpm, gruvbox-material, resurrect/continuum (sessions survive reboots) |
 | `nvim` | Neovim |
 | `spotify-player` | spotify_player + gruvbox theme |
@@ -24,7 +25,7 @@ directory is a package mirroring `$HOME`.
 
 ```bash
 # 1. packages (official repos)
-sudo pacman -S --needed hyprland uwsm hyprsunset awww quickshell alacritty tmux dunst stow \
+sudo pacman -S --needed hyprland uwsm hyprsunset awww quickshell ghostty tmux dunst stow \
   wl-clipboard cliphist tesseract tesseract-data-eng playerctl grim slurp jq curl \
   spotify-player protonmail-bridge gnome-keyring python-dateutil python-gobject github-cli \
   btop zathura zathura-pdf-mupdf starship mpd ncmpcpp beets neovim \
@@ -34,7 +35,7 @@ yay -S grimblast-git mullvad-vpn-bin discordo-git
 
 # 2. dotfiles
 git clone git@github.com:TK-Evans01/configs.git ~/Projects/configs && cd ~/Projects/configs
-for p in alacritty bash beets btop dunst git gtk hypr mpd ncmpcpp nvim quickshell spotify-player starship tmux zathura; do
+for p in bash beets btop dunst ghostty git gtk hypr mpd ncmpcpp nvim quickshell spotify-player starship tmux zathura; do
   stow --no-folding -t ~ "$p"
 done
 crontab cron/crontab

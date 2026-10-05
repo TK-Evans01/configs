@@ -1,0 +1,20 @@
+# Ghostty — retro gruvbox-material, square, no chrome (ported from alacritty)
+theme = gruvbox-material
+
+font-family = DepartureMonoNerdFontMono
+font-size = 14
+
+# Hyprland tiles it; no GTK header bar or rounded CSD
+window-decoration = none
+gtk-titlebar = false
+window-padding-x = 4
+window-padding-y = 4
+confirm-close-surface = false
+cursor-style-blink = false
+mouse-hide-while-typing = true
+
+# bytes, not lines (~100k lines)
+scrollback-limit = 50000000
+
+# Shift+Enter sends ESC CR (newline in claude / nvim prompts), as in alacritty
+keybind = shift+enter=text:\x1b\r

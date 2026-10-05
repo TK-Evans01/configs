@@ -43,7 +43,7 @@ QtObject {
             if (/brightnessctl.*\+/.test(a)) return ["hardware", "brightness up"];
             if (/brightnessctl/.test(a)) return ["hardware", "brightness down"];
             if (/grimblast/.test(a)) return ["tools", "screenshot (" + (a.split(/\s+/).find(w => ["area", "active", "output", "screen"].includes(w)) || "area") + ")"];
-            m = a.match(/^(?:alacritty -e )?(\S+)/);
+            m = a.match(/^(?:(?:alacritty|ghostty) -e )?(\S+)/);
             return ["apps", "open " + (m ? m[1].split("/").pop() : a)];
         }
         if (d === "workspace") return ["workspaces", /^e[+-]/.test(a) ? (a.startsWith("e+") ? "next workspace" : "previous workspace") : "go to workspace " + a];
