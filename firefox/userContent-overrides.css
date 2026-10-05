@@ -1,0 +1,14 @@
+ /* Force-invert sites lacking dark mode. Add domains as needed. */
+ @-moz-document domain("youtube.com"), domain("github.org") {
+   html {
+     filter: invert(1) hue-rotate(180deg) !important;
+     background: #fff !important;
+   }
+
+   img,
+   video,
+   picture,
+   [style*="background-image"] {
+     filter: invert(1) hue-rotate(180deg) !important;
+   }
+ }

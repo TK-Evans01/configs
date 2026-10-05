@@ -1,0 +1,53 @@
+directory: ~/Music
+library: ~/.config/beets/library.db
+
+import:
+  copy: yes            # leave ~/Downloads untouched (seeding)
+  write: yes
+  incremental: no
+  quiet_fallback: skip # -q mode: skip weak matches, fix by hand later
+  log: ~/.config/beets/import.log
+  duplicate_keys:
+    album: [albumartist, album, mb_albumid]
+  languages: en
+
+match:
+  strong_rec_thresh: 0.25
+  preferred:
+    countries: ['US', 'GB|UK', 'XW']
+    media: ['CD', 'Digital Media|File', '12" Vinyl']
+    original_year: yes
+
+paths:
+  default: $albumartist/$original_year - $album%aunique{albumartist album,albumdisambig,()}/%if{$multidisc,$disc-}$track - $title
+  singleton: Non-Album/$artist - $title
+  comp: Compilations/$album%aunique{}/%if{$multidisc,$disc-}$track - $title
+
+path_sep_replace: "-"
+
+replace:
+  ':\s+': ' - '
+  '[\\/]': '-'
+  '^\.': _
+  '[\x00-\x1f]': _
+  '[<>:"\?\*\|]': _
+  '\.$': _
+  '\s+$': ''
+  '^\s+': ''
+
+plugins: musicbrainz fetchart embedart chroma info missing duplicates
+
+fetchart:
+  auto: yes
+  minwidth: 500
+  maxwidth: 600
+  enforce_ratio: 2%
+  cover_names: [cover, front, folder, album, art]
+  sources: [filesystem, coverart, itunes, amazon, albumart]
+
+embedart:
+  auto: yes
+  maxwidth: 600
+  remove_art_file: no
+
+art_filename: cover

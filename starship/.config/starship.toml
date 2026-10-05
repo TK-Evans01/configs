@@ -1,0 +1,67 @@
+add_newline = false
+
+format = """
+[](#d8a657)\
+$os\
+$username\
+[](bg:#7daea3 fg:#d8a657)\
+$directory\
+[](fg:#7daea3 bg:#a9b665)\
+$git_branch\
+$git_status\
+[](fg:#a9b665 bg:#45403d)\
+$nodejs\
+$rust\
+$golang\
+$python\
+[](fg:#45403d)\
+$line_break\
+$character"""
+
+[username]
+show_always = true
+style_user = "bg:#d8a657 fg:#282828"
+style_root = "bg:#d8a657 fg:#282828"
+format = '[ $user ]($style)'
+
+[os]
+disabled = true
+
+[directory]
+style = "bg:#7daea3 fg:#282828"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = ""
+style = "bg:#a9b665 fg:#282828"
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style = "bg:#a9b665 fg:#282828"
+format = '[$all_status$ahead_behind ]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:#45403d fg:#a9b665"
+format = '[ $symbol ($version) ]($style)'
+
+[rust]
+symbol = ""
+style = "bg:#45403d fg:#e78a4e"
+format = '[ $symbol ($version) ]($style)'
+
+[golang]
+symbol = ""
+style = "bg:#45403d fg:#7daea3"
+format = '[ $symbol ($version) ]($style)'
+
+[python]
+symbol = ""
+style = "bg:#45403d fg:#d8a657"
+format = '[ $symbol ($version) ]($style)'
+
+[character]
+success_symbol = '[](bold #a9b665)'
+error_symbol = '[](bold #ea6962)'

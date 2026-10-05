@@ -1,0 +1,45 @@
+set notification-error-bg       "#282828"
+set notification-error-fg       "#ea6962"
+set notification-warning-bg     "#282828"
+set notification-warning-fg     "#d8a657"
+set notification-bg             "#282828"
+set notification-fg             "#a9b665"
+
+set completion-bg               "#32302f"
+set completion-fg               "#d4be98"
+set completion-group-bg         "#32302f"
+set completion-group-fg         "#928374"
+set completion-highlight-bg     "#7daea3"
+set completion-highlight-fg     "#282828"
+
+set index-bg                    "#32302f"
+set index-fg                    "#d4be98"
+set index-active-bg             "#7daea3"
+set index-active-fg             "#282828"
+
+set inputbar-bg                 "#282828"
+set inputbar-fg                 "#d4be98"
+
+set statusbar-bg                "#32302f"
+set statusbar-fg                "#d4be98"
+
+set highlight-color             "#d8a657"
+set highlight-active-color      "#e78a4e"
+
+set default-bg                  "#282828"
+set default-fg                  "#d4be98"
+
+set render-loading              true
+set render-loading-fg           "#282828"
+set render-loading-bg           "#d4be98"
+
+set recolor-lightcolor          "#282828"
+set recolor-darkcolor           "#d4be98"
+set recolor                     "true"
+set recolor-keephue             true
+
+set selection-clipboard         clipboard
+set adjust-open                 best-fit
+set pages-per-row               1
+set scroll-page-aware           true
+set smooth-scroll               true

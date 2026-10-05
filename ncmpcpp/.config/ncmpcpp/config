@@ -1,0 +1,40 @@
+mpd_host = "127.0.0.1"
+mpd_port = "6600"
+mpd_music_dir = "~/Music"
+
+playlist_disable_highlight_delay = 0
+message_delay_time = 1
+playlist_display_mode = "classic"
+browser_display_mode = "columns"
+search_engine_display_mode = "columns"
+playlist_editor_display_mode = "columns"
+
+progressbar_look = "▃▃▃"
+progressbar_color = "black"
+progressbar_elapsed_color = "yellow"
+
+main_window_color = "default"
+header_window_color = "yellow"
+volume_color = "green"
+state_line_color = "yellow"
+state_flags_color = "yellow:b"
+statusbar_color = "default"
+statusbar_time_color = "green:b"
+player_state_color = "green:b"
+
+current_item_prefix = "$(yellow)$r"
+current_item_suffix = "$/r$(end)"
+current_item_inactive_column_prefix = "$(yellow)$r"
+current_item_inactive_column_suffix = "$/r$(end)"
+
+now_playing_prefix = "$b$(yellow)"
+now_playing_suffix = "$/b$(end)"
+
+song_columns_list_format = "(20)[blue]{a} (30)[green]{t|f:Title} (30)[magenta]{b} (7f)[yellow]{l}"
+song_status_format = "{{%a {- »» %b -}} »» }{%t}|{%f}"
+
+display_volume_level = yes
+display_bitrate = yes
+header_visibility = yes
+statusbar_visibility = yes
+titles_visibility = yes
