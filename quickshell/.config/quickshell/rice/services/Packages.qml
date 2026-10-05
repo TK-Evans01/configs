@@ -5,15 +5,12 @@ import Quickshell.Io
 import "../config"
 
 // Settings › Packages: search (repo + AUR), details, installed, updates,
-// bundles. Data from scripts/pkg.py (read-only, never root). Changes go
-// through one installer backend:
-//   "terminal" (now) — the command runs in a terminal you watch: password,
-//                      prompts, AUR PKGBUILD review all happen there.
-//   "polkit"   (later) — the shell as polkit agent; only run() changes.
+// bundles. Data from scripts/pkg.py (read-only, never root). Every change
+// goes through run(): the command opens in a terminal you watch — password,
+// prompts and AUR PKGBUILD review all happen there.
 QtObject {
     id: root
 
-    property string installer: "terminal"
     readonly property string _script: Quickshell.shellDir + "/scripts/pkg.py"
     property bool hasYay: true
     readonly property var _yayCheck: Process {
@@ -22,7 +19,7 @@ QtObject {
         onExited: code => root.hasYay = code === 0
     }
 
-    // Page state lives here so IPC (and later voice) can drive the page.
+    // Page state lives here so IPC can drive the page.
     property string tab: "search"
     property string openKey: ""          // "repo/name" or "aur/name" with details shown
 
@@ -104,15 +101,12 @@ QtObject {
 
     function run(spec) {
         if (busy) return;
-        if (installer === "terminal") {
-            running = spec.title;
-            _term.command = [Settings.terminal, "--title=rice · " + spec.title, "-e", "sh", "-c",
-                'printf "\\033[1m$ %s\\033[0m\\n\\n" "$1"; sh -c "$1"; s=$?; echo; '
-                + '[ $s = 0 ] && echo "✓ done" || echo "✗ exited with $s"; printf "press enter to close "; read -r _; exit $s',
-                "sh", spec.cmd];
-            _term.running = true;
-        }
-        // "polkit": the shell as polkit agent (option B) slots in here.
+        running = spec.title;
+        _term.command = [Settings.terminal, "--title=rice · " + spec.title, "-e", "sh", "-c",
+            'printf "\\033[1m$ %s\\033[0m\\n\\n" "$1"; sh -c "$1"; s=$?; echo; '
+            + '[ $s = 0 ] && echo "✓ done" || echo "✗ exited with $s"; printf "press enter to close "; read -r _; exit $s',
+            "sh", spec.cmd];
+        _term.running = true;
     }
     readonly property var _term: Process {
         onExited: code => {

@@ -79,7 +79,7 @@ Directories are imported by relative path (`import "../../components"`);
 | `Network` | `mullvad status -j listen`, `ip -o monitor`, `ping` | VPN state pushed by mullvad; links re-read when the kernel reports link/address/route changes; reachability ping once a minute (10 s while offline) |
 | `Bluetooth` | `Quickshell.Bluetooth` | sorted devices, `activate(d)` (pair→trust→connect), scan with 60s timeout, `bluetoothctl` agent |
 | `Docker` | `docker ps` + `docker events` | containers, start/stop/restart |
-| `Desktop` | `hyprctl hyprsunset`, `dunstctl`, `systemctl` | night light (`nightLight`, `nightTemp`, `nightGamma`, setters debounced 60ms), DND + counts, notification `history` (from `dunstctl history` while `historyWanted`; `showAgain`, `removeNotification`, `clearHistory`), power actions. hyprsunset reports its last temperature even under `identity`, so night-light state lives in `$XDG_RUNTIME_DIR/rice-nightlight` as `on|off <K> <gamma>` (on = `temperature`+`gamma`, off = `identity`+`gamma 100`) |
+| `Desktop` | `hyprctl hyprsunset`, `systemctl` | night light (`nightLight`, `nightTemp`, `nightGamma`, setters debounced 60ms; defaults follow Settings), user, power actions. The state file is watched; hyprsunset itself is re-read every 5 min (its profiles switch on their own). hyprsunset reports its last temperature even under `identity`, so night-light state lives in `$XDG_RUNTIME_DIR/rice-nightlight` as `on|off <K> <gamma>` (on = `temperature`+`gamma`, off = `identity`+`gamma 100`) |
 
 ### `components/`
 
@@ -165,14 +165,13 @@ All built on `components/EdgePanel`: a full-height layer surface on a screen edg
 
 `QuickSettingsWindow` — sub-pages slide in/out by `Ui.page`.
 
-- **Main**: `ProfileCard` (avatar, user@host; one icon row: screenshot page, clipboard + keybinds launcher modes │ lock, log out, suspend, reboot, shut down with confirm-on-second-click), 2×3 tiles (Mullvad VPN ▸, Bluetooth ▸, Night light ▸, Do not disturb ▸ notifications, Caffeine, Sound ▸ — click mutes)
+- **Main**: `ProfileCard` (avatar, user@host; one icon row: screenshot page, clipboard + keybinds launcher modes, settings │ `PowerRow`: lock, log out, suspend, reboot, shut down with confirm-on-second-click), tiles (Mullvad VPN ▸, Bluetooth ▸, Night light ▸, Do not disturb ▸ sidebar notifications, Focus ▸, Caffeine, Sound ▸ — click mutes), each lit in its domain colour
 - **network**: Mullvad switch, relay, exit location/IP, reconnect; links list
 - **bluetooth**: power switch, scan, device rows (click = connect / disconnect / pair, hover 󰆴 = forget)
 - **sound**: default output / input pickers
 - **nightlight**: switch, warmth slider (2500–6500K, 100K steps) + presets, brightness (gamma 40–100%)
 - **screenshot**: action chips (save + copy / copy / text / edit — the last two disabled until tesseract-data / satty exist), 4 target tiles, last-capture preview (click opens it), folder button
-- **mail**: unread list (subject, sender, age), refresh, open webmail; Bridge-offline card with a start button; error card
-- **notifications**: DND switch, dunst history (newest first, app icon, age, summary, body; click = `history-pop`, 󰆴 = `history-rm`, clear all)
+- **focus**: profile list + length and start; while running the countdown, what's blocked, and when it ends (no stop)
 
 ## Hot reload
 
@@ -186,7 +185,3 @@ Gotchas:
 - In layouts use `Layout.fillWidth` + `Layout.preferredWidth: 0` for `ScrollingText`, not `maxWidth: width` (binding loop).
 - `pkill -f 'quickshell …'` from a shell also matches that shell's own command line — kill by PID.
 - A new directory under `modules/` (or a `//@ pragma` change) isn't picked up by hot reload ("X is not a type") — restart the shell.
-
-## Rough edges / next
-
-See `docs/inspo/README.md` for the next round (design tokens, settings store, side panels + in-shell notifications, settings window, theme/wallpaper manager, focus mode, voice).

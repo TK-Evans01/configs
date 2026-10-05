@@ -31,7 +31,7 @@
    "id": "images",
    "name": "Images & wallpapers",
    "icon": "󰋩",
-   "about": "For the wallpaper manager (E7): conversions, metadata, thumbnails.",
+   "about": "Wallpaper tools: conversions, metadata, thumbnails.",
    "packages": [
     "imagemagick",
     "perl-image-exiftool",
@@ -42,7 +42,7 @@
    "id": "voice",
    "name": "Voice assistant (phase 1)",
    "icon": "󰍬",
-   "about": "Local speech-to-text + LLM on the RX 9070 via Vulkan (report 06). Models (~7 GB) download separately.",
+   "about": "Local speech-to-text + LLM on the RX 9070 via Vulkan. Models (~7 GB) download separately.",
    "packages": [
     "whisper-cpp",
     "llama-cpp",

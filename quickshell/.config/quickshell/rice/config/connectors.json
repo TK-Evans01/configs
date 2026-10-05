@@ -7,7 +7,7 @@
    "name": "Claude Code",
    "icon": "󰚩",
    "group": "Accounts",
-   "about": "The claude CLI (sessions, voice escalation later).",
+   "about": "The claude CLI.",
    "login": "terminal",
    "loginLabel": "sign in",
    "logout": true

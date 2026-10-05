@@ -31,7 +31,6 @@ notifications, weather and feeds. It is also the notification daemon.
 - `scripts/` — Python helpers: `proton-mail.py` (Bridge IMAP), `proton-calendar.py` (ICS), `check-actions.py` (actions.json vs IPC)
 - `docs/architecture.md` — deeper overview
 - `docs/ui-rules.md` — colour, type, shape and interaction rules
-- `docs/inspo/` — round-2 research reports + synthesis
 
 ## Using it
 
@@ -108,10 +107,12 @@ and Bridge password from its mailbox settings, then:
 umask 077; printf 'machine 127.0.0.1 login %s password %s\n' 'USERNAME' 'BRIDGE_PASSWORD' > ~/.config/rice/proton-bridge.netrc
 ```
 
-The bar shows the unread count (polled every 2 min); Quick Settings › Mail lists
-unread subjects. INBOX is opened read-only with `BODY.PEEK`, so nothing gets
-marked read. New mail fires a `notify-send`. Bridge must be running
-(`protonmail-bridge-core --noninteractive` runs it headless after the first sign-in; the Mail page has a start button).
+The bar shows the unread count (checked every `mailRefreshSec`, backing off
+while Bridge is down); the sidebar's notifications tab lists unread subjects at
+the top. INBOX is opened read-only with `BODY.PEEK`, so nothing gets marked
+read. New mail fires a notification. Bridge must be running
+(`protonmail-bridge-core --noninteractive` runs it headless after the first
+sign-in; Settings › Connections tests it and runs the CLI login).
 
 Startup: Bridge needs a Secret Service keychain — `gnome-keyring`, whose
 keyring must be named `login` with your login password so SDDM's PAM
@@ -291,8 +292,8 @@ Every change shows its exact command first (`sudo pacman -S --needed …`,
 `yay -S …`, `sudo pacman -Rns …`, `yay -Syu`, `paccache`); **run in terminal**
 opens it in ghostty, where you type your password, answer pacman / yay and
 review AUR PKGBUILDs. No `--noconfirm`, never `-Sy` alone. Data comes from
-`scripts/pkg.py` (read-only JSON). The install step is one switchable backend
-(`Packages.installer`: "terminal" now; a shell polkit agent can slot in later).
+`scripts/pkg.py` (read-only JSON). The install step is a single backend
+function (`Packages.run`), so the way changes are executed lives in one place.
 CLI: `packagesTab <tab>`, `packagesSearch <q>`, `packagesShow <name> repo|aur`.
 
 ## Themes
