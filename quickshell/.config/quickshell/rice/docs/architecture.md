@@ -39,14 +39,25 @@ Directories are imported by relative path (`import "../../components"`);
 
 ### `config/`
 
-- `Theme.qml` — the raw gruvbox-material palette (`bg0..4`, `fg0/1`, `red/orange/…` with `Dim`/`Bright`) plus **semantic roles** components bind to: `background`, `surface0..3`, `text`, `textBright`, `subtext`, `muted`, `accent` (yellow), `success`, `warning`, `error`, `info`. Helpers `usageColor(pct, calm)`, `tempColor(c)`. Type scale (`fontSizeSmall 14 / fontSize 18 / fontSizeLarge 22 / fontSizeHuge 66`, `iconSize 22` — multiples of DepartureMono's 11px grid stay crisp), geometry (`pad`, `gap`, `spacing`, `radius 0`, `border 1`, `accentThickness 2`), motion (`animShort/anim/animLong`).
-- `Settings.qml` — bar height, label caps/carousel tuning, show flags (`showLauncher/Media/System/Tray`), `launcherCommand`, dashboard tabs + widths, `lyrics`, `nightLightTemp`, `historySize`.
+- `Theme.qml` — tokens; see `docs/ui-rules.md` for how to use them.
+  - **Colour**: raw gruvbox-material hues (`bg0..4`, `fg0/1`, `red…purple` with `Dim`/`Bright`); **semantic roles** (`background`, `surface0..3`, `text`, `textBright`, `textReverse`, `subtext`, `muted`, `accent`, `success`, `warning`, `error`, `info`, `pending`); **domain colours** (`catMedia`/`catMediaBright`, `catSystem`, `catNet`, `catTime`, `catWeather`, `catDev`, `catNotify`); `series[0..3]` (cpu, gpu, mem, disk). Helpers `usageColor(pct, calm)`, `tempColor(c)`.
+  - **Type**: `fontXs 11 · fontSm 12 · fontBase 14 · fontTitle 15 · fontMd 18 · fontLg 22 · fontXl 44 · fontHuge 66`; `iconSize 22`, `iconSizeLarge 33`.
+  - **Shape**: `shape` ("square" | "round") → `round`, `radius`, `radiusSmall`, `radiusPill`, `accentStyle` ("underline" | "pill").
+  - **Geometry**: `pad`, `gap`, `spacing`, `border`, `accentThickness`, `rowHeight`, `rowHeightCompact`, `controlHeight`. **Motion**: `animShort/anim/animLong`, `easing`.
+- `Prefs.qml` — runtime choices (`theme`, `shape`, `font`, `dnd`) and `overrides` (settings changed in the settings window: `get(key, default)`, `override`, `reset`, `isSet`) in `~/.local/state/rice/prefs.json` via `FileView` + `JsonAdapter`; `set(key, value)` waits until the file loaded and coalesces writes.
+- `Fmt.qml` — `age()`, `since()`.
+- `actions.json` — the action allowlist (id, title, icon, group, `call` = IPC function + args, aliases, `confirm`, `voice`); `scripts/check-actions.py` checks it against the `IpcHandler`.
+- `settings-schema.json` — the settings window: pages → sections → items (`key`, `type` bool/int/real/string/list, label, help, range, unit); pages/sections may name a `custom` component.
+- `Settings.qml` — every tunable reads `Prefs.get("key", default)`, so overrides apply live; internal plumbing (tether, music/bridge commands, dashboard tab ids) stays constant. Bar height, label caps/carousel tuning, show flags (`showLauncher/Media/System/Tray/Weather/Mail/Github`), `terminal` + `tether`, launcher sizes + `launcherHidden` (desktop ids never listed), dashboard tabs + widths, `lyrics`, night light, weather (location, units, refresh), mail/calendar/github refresh, lock (idle timeouts, avatar), music (`musicPlayer`, `musicSession`, `musicTuiArgs`), screenshot dir.
 
 ### `services/`
 
 | Service | Source | Notes |
 |---------|--------|-------|
-| `Ui` | — | Popup state: `open` ("" / "dashboard" / "quicksettings" / "launcher"), `screen`, `tab`, `page`; `toggle(name, screen, where)`, `close()`, `dismiss()` (outside click / Escape — a toggle of the same popup within 300ms is then swallowed, so its bar button closes it), `showPage()`, `back()`, `cycleTab()` |
+| `Notifications` | `NotificationServer` (owns org.freedesktop.Notifications) | `history` (records, newest first, saved to `~/.local/state/rice/notifications.json`), `groups` by source (`Settings.notifySources`), `toasts` (rate-limited per source; critical always; none under DND or while the sidebar shows them), `unread`, `dnd`/`setDnd`, `activate`/`invoke`/`dismiss`/`clearSource`/`clearAll`; live `Notification` objects kept for actions |
+| `Feeds` | `XMLHttpRequest` (RSS/Atom, `Settings.feeds`) | `items` newest first, `errors`, `unread` (per session), `refresh()` every `feedsRefreshMin` |
+| `Actions` | `config/actions.json` + one per theme | `all`, `byId`, `search(q)` (Launcher scoring on title/aliases/group), `run(a)` → `qs ipc call rice …` |
+| `Ui` | — | Popup state: `open` ("" / "dashboard" / "quicksettings" / "launcher" / "traymenu" / "sidebar" / "session"), `screen`, `tab`, `page`; `toggle(name, screen, where)`, `close()`, `dismiss()` (outside click / Escape — a toggle of the same popup within 300ms is then swallowed, so its bar button closes it), `showPage()`, `back()`, `cycleTab()` |
 | `Launcher` | `DesktopEntries` | `apps` (visible, deduped, by name), `frequent`, `search(q)` (exact › prefix › word › substring › tight fuzzy, + usage bonus), `calc("= expr")`, `launch(e)` (terminal apps via `Settings.terminal`), usage counts in `~/.cache/quickshell/launcher-usage.json` |
 | `Mail` | `scripts/proton-mail.py` → Proton Mail Bridge IMAP (127.0.0.1:1143, STARTTLS, self-signed) | creds from `~/.config/rice/proton-bridge.netrc`; INBOX `readonly` + `BODY.PEEK` (never marks read); `state_` (ok / unconfigured / offline / error), `unread`, `total`, `messages`; notify-send for new uids after the first load; `openWebmail()`, `startBridge()` |
 | `Calendar` | `scripts/proton-calendar.py` → Proton share-link ICS | link from `~/.config/rice/proton-calendar.url`; RRULE/EXDATE/RECURRENCE-ID expanded with dateutil, TZID via zoneinfo, cancelled dropped, 60-day window, cached in `~/.cache/quickshell/calendar.json` (`stale` offline); `byDay`, `eventsOn(date)`, `upcoming(n)` |
@@ -57,19 +68,45 @@ Directories are imported by relative path (`import "../../components"`);
 | `Lock` | `PamContext` (login), `hyprctl devices`, `awww query`, `systemd-inhibit` + `gdbus monitor` (logind) | `locked`, shared `buffer`, `submit()` → PAM, `failed`/`failMessage`/`attempts`, `capsLock`, per-output `wallpapers`; lock-before-sleep via a delay inhibitor released once `secure`; `IdleMonitor`s for auto-lock and dpms; `caffeine` |
 | `Weather` | Open-Meteo via `curl` | `current`, `hourly` (24h), `daily` (7d); WMO code → `icon()`, `describe()`, `color()`; refresh every `weatherRefreshMin` |
 | `Hyprland` | `Quickshell.Hyprland` | workspaces, monitors, `focusedMonitor`, `activeToplevel`, `monitorFor(screen)`, `dispatch()`. Refreshes toplevels on start so the title isn't blank after a reload |
-| `Audio` | `pactl` | event-driven (`pactl subscribe`); outputs/inputs, defaults, mute, volume setters |
+| `Audio` | `Quickshell.Services.Pipewire` | event-driven, no processes: default sink/source volume % + mute, device lists, per-app streams (tracked only while shown); setters write the nodes |
+| `Privacy` | `Quickshell.Services.Pipewire` | apps using the mic (audio input streams), the camera (active links out of v4l2/libcamera sources) or the screen (other video sources); the bar's red indicator |
+| `LatestRun` | (helper type) | run a command where only the newest request counts (search as you type, lyrics); older output is dropped |
+| `CmdQueue` | (helper type, not a singleton) | runs commands one at a time without dropping any; `run(args, key)` replaces a queued command with the same key (latest volume wins); `busy`, `drained()`. Used by `Audio`, `Desktop`, `Docker` setters |
 | `Mpris` | `Quickshell.Services.Mpris` | `players`, `select(p)`; active = hand-picked › playing (`Settings.musicPlayer` first) › music player › first. Transport, seek, shuffle/loop, volume; `launch()` makes sure the headless player (`spotify_player -d`, from Hyprland) runs, then opens/attaches its TUI in tmux session `Settings.musicSession` as a remote (`Settings.musicTuiArgs`: no MPRIS, CLI port 8081; `enable_streaming = "DaemonOnly"` keeps audio in the daemon) |
 | `Spotify` | `spotify_player` CLI (`get key user-playlists` / `user-saved-albums` / `playback`, `playback start context\|liked`, `playback shuffle\|repeat`) | library for the Media tab's `LibraryCard`; `playPlaylist` / `playAlbum` / `playLiked` (optional shuffle); `playbackShuffle` / `playbackRepeat`, which spotify_player doesn't expose over MPRIS — `Mpris.toggleShuffle` / `cycleLoop` route through `cli()` for it |
 | `Lyrics` | lrclib.net via `curl` | fetches only while `wanted` (Media tab open) and the track changed; cached in `~/.cache/quickshell/lyrics`; `status`, `lines`, `currentIndex` |
-| `Sys` | `/proc`, `/sys`, `df` | 2s poll: CPU/GPU/RAM/disks/temps + `cpuHistory/gpuHistory/memHistory`, uptime, load, kernel, host |
-| `Network` | `mullvad`, `ip`, `/sys/class/net` | **Mullvad** state/relay/location/IP + `toggle()`/`reconnect()`; reachability; physical links with uplink flag |
+| `Sys` | `/proc`, `/sys`, `df` | direct file reads every 2 s (sensor paths found once at start), `df` once a minute: CPU/GPU/RAM/disks/temps + histories, load, kernel, host |
+| `Network` | `mullvad status -j listen`, `ip -o monitor`, `ping` | VPN state pushed by mullvad; links re-read when the kernel reports link/address/route changes; reachability ping once a minute (10 s while offline) |
 | `Bluetooth` | `Quickshell.Bluetooth` | sorted devices, `activate(d)` (pair→trust→connect), scan with 60s timeout, `bluetoothctl` agent |
 | `Docker` | `docker ps` + `docker events` | containers, start/stop/restart |
 | `Desktop` | `hyprctl hyprsunset`, `dunstctl`, `systemctl` | night light (`nightLight`, `nightTemp`, `nightGamma`, setters debounced 60ms), DND + counts, notification `history` (from `dunstctl history` while `historyWanted`; `showAgain`, `removeNotification`, `clearHistory`), power actions. hyprsunset reports its last temperature even under `identity`, so night-light state lives in `$XDG_RUNTIME_DIR/rice-nightlight` as `on|off <K> <gamma>` (on = `temperature`+`gamma`, off = `identity`+`gamma 100`) |
 
 ### `components/`
 
-`Label` (shell-font Text), `BarButton` (hover cell + accent underline when its popup is open; click/right/middle/wheel), `BarDivider`, `BarPopup` (see below), `Card` + `CardHeader`, `Tile` (QS toggle with ▸ details cell), `Slider` (icon=mute, blocky track, %), `Switch` (OFF│ON), `IconButton`, `DeviceRow`, `PageHeader`, `TabBar` (sliding underline), `Meter` (segmented bar), `Sparkline` (column history), `ScrollingText` (carousel).
+Shared building blocks: use these instead of hand-rolling (see `docs/ui-rules.md`).
+
+| Component | What |
+|---|---|
+| `Label` | shell-font Text; `size` takes a `Theme.font*` token |
+| `BarButton` | bar cell: hover = raised, `active` (its popup is open) = raised + `AccentIndicator`; `indicator` colour, `minWidth`; click/right/middle/wheel. `Workspaces` cells are BarButtons |
+| `AccentIndicator` | the selection mark: 2px underline/side bar (square) or soft pill (round); `edge`, `tint`, `active`. Declare first in the parent so content draws on top |
+| `ListRow` | the list row: glyph or `leading` component, title, subtitle, `note`, trailing slot, `active` (indicator on the left), `compact` (menus); click/right-click. Used by device lists, the library, tray menus |
+| `SectionLabel` | small-caps group label inside lists |
+| `Card` + `CardHeader` | inset panel + its title row (domain-coloured glyph/title, subtitle, trailing slot) |
+| `PageHeader` | Quick Settings sub-page header (back, glyph, title/subtitle, trailing) |
+| `TabBar` | text tabs; indicator stretches between tabs (leading edge fast, trailing slow) |
+| `Tile` | QS toggle with ▸ details cell; on = filled accent icon cell + accent border |
+| `IconButton` | glyph (+ text) button; `checked` = filled accent (chips / segmented choices) |
+| `TextField` | framed input: prefix glyph, placeholder, block cursor; unhandled keys via `keyPressed(e)` |
+| `PowerRow` | power actions that arm on the first click and fire on the second; `instant` ids skip arming |
+| `Slider`, `Switch`, `Meter`, `Sparkline` | controls / data; tracks and handles follow `radiusPill` |
+| `Stat` | big value over a caption |
+| `Spinner` | 3×3 block spinner; reserves its size |
+| `PanelShape` | silhouette of a bar-attached panel (top-hung or side): one path for fill + outline, concave joins in round shape |
+| `EdgePanel` | full-height side panel (sidebar, session) with wipe / slide reveal |
+| `ScrollingText`, `BarDivider` | carousel text, bar separator |
+
+`config/Fmt` (singleton): `age(seconds)`, `since(dateOrUnixSeconds)` → "now", "5m", "3h", "2d".
 
 **`BarPopup`** — a layer-shell `PanelWindow` per bar on the Overlay layer. It sits flush under the bar (overlapping its 1px border so it reads as attached), centered on `anchorItem` and clamped to the screen. Slides down and follows its content height. `mask` limits input to the panel. Keyboard mode is `OnDemand` from `wanted` (set *before* mapping — Hyprland gives focus at map time); `initialFocus` takes focus on open (the launcher's search field). A `HyprlandFocusGrab` over the popup only (including the bar made Hyprland hand keyboard focus to the bar) closes it on an outside click → `dismissed`; Escape too (`keyTargets` get keys first, so pages can use Escape for "back").
 
@@ -90,9 +127,9 @@ Directories are imported by relative path (`import "../../components"`);
 
 `DashboardWindow` — `TabBar` + horizontally sliding pages (Loaders, live only while open). The panel height tracks the current tab.
 
-- **Overview**: `ClockCard` (big time, date, weather line, uptime, user@host), `MonthCard` (Monday-first grid, today filled, ‹ › months, event dots, click a day to pick it), `AgendaCard` (Proton Calendar: picked day or upcoming), `PlayerCard`, `ResourcesCard` (CPU/GPU/RAM/root meters), `GithubCard` (commit frequency: `ContributionGrid` + today/streak/week; ▸ → GitHub tab)
+- **Overview**: `ClockCard` (big time, date, weather line, user@host), `MonthCard` (Monday-first grid, today filled, ‹ › months, event dots, click a day to pick it), `AgendaCard` (Proton Calendar: picked day or upcoming), `PlayerCard`, `ResourcesCard` (CPU/GPU/RAM/root meters), `GithubCard` (commit frequency: `ContributionGrid` + today/streak/week; ▸ → GitHub tab)
 - **Media**: `CoverArt`, player picker chips, title/artist/album, `LyricsView`, `Progress` (seek), `Transport` (shuffle/prev/play/next/loop), player volume
-- **System**: `StatCard`s for CPU / GPU (+VRAM) / Memory with sparklines, storage meters, network + Mullvad row, host/kernel/uptime/procs footer
+- **System**: `StatCard`s for CPU / GPU (+VRAM) / Memory with sparklines, storage meters, network + Mullvad row, host/kernel/procs footer
 - **Weather**: now (big glyph, °, condition, feels-like, hi/lo, humidity, wind, sunrise/sunset), next 24h column chart (height = temperature, color = condition, blue ticks = rain chance), 7 days with min–max bars on the week's scale
 - **GitHub**: profile stats, full-year `ContributionGrid` (hover a day; busiest day), recent commits, repositories, open PRs / review requests / issues, notifications button; rows open in the browser
 - **Docker**: container list with start/stop/restart
@@ -103,15 +140,32 @@ Directories are imported by relative path (`import "../../components"`);
 
 Long-running helpers (pactl, docker events, bluetoothctl, wl-paste, systemd-inhibit, gdbus) are launched through `Settings.tether` (`setpriv --pdeathsig TERM`) and never through an `sh` wrapper, so they die with the shell instead of piling up as orphans.
 
+### Lazy windows
+
+`modules/bar/Bar.qml` creates each popup / panel (dashboard, launcher, Quick Settings, wallpaper picker, sidebar, session) with a `LazyLoader` only while it is open on that monitor, keeps it through its closing animation, then frees it. Toasts exist only while there are some, on the focused monitor. Popups therefore run their open logic from `Component.onCompleted` as well as `onWantedChanged`; the focus grab retries if it is cleared while the surface is still mapping. The dashboard builds only the shown tab (and the one sliding out).
+
+### `modules/sidebar/`, `modules/session/`, `modules/osd/`
+
+All built on `components/EdgePanel`: a full-height layer surface on a screen edge under the bar. Square shape: a clipped wipe from the edge with the content standing still and an accent line on the moving edge; round: the panel slides and fades. Animation time scales with the distance left, so interrupting an open/close never snaps. `mask` = the visible part; same focus handling as `BarPopup` (grab the panel only, `OnDemand` keyboard set before mapping, Escape / outside click → `dismissed`). Content loads only while open unless `keepLoaded`.
+
+- `SidebarWindow` — right edge, `Settings.sidebarWidth`. Tabs (`Ui.page`): **notifications** (`NotifyPage`: mail inbox card from `Mail`, then a card per source group, latest five until "show all"; rows = `ListRow` with app icon / image, body up to 3 lines, age, action buttons, dismiss; critical rows get the error indicator), **weather** (the dashboard `WeatherTab` in a Flickable), **feeds** (`FeedsPage`: per-feed chips, two-line rows, read state). Ctrl+Tab cycles, Alt+1…3 jumps. Binds `Notifications.panelOpen`.
+- `ToastWindow` — top-right under the bar on the focused monitor; newest on top; timeout bar (pauses on hover); click = default action, right-click = hide, 󰅖 = dismiss. Hidden while the sidebar is open.
+- `SessionWindow` — right edge, power actions as `ListRow`s; j/k/↑↓ move, Enter fires, mouse arms then fires.
+- `OsdWindow` — volume meter under the bar centre on the focused monitor; armed 2 s after start and after an output switch; hidden while any popup is open.
+
+### `modules/settings/`
+
+`SettingsWindow` — a `FloatingWindow` titled "rice settings" (Hyprland `windowrule` floats/sizes it), created by a `Loader` in `shell.qml` while `Ui.settingsOpen`. Left: search + page list; right: the page. `SchemaPage` renders a schema page: its custom component (Appearance, Sound, Bluetooth, Network, NightLight, Actions, About — the device pages embed the Quick Settings pages with `embedded: true`), then a card per section with `SchemaItem`s (Switch / stepper+Slider / TextField committing on Enter or blur / string-list chips) or a custom section (`FeedsSection`, `SourcesSection`). `SettingRow` = label + help + control + ↺ when overridden. Search matches page titles/keywords and item labels/help/keys; matching items are rendered (editable) on top of the page.
+
 ### `modules/launcher/`
 
-`LauncherWindow` — mode chips (apps / clipboard / keybinds = `Ui.page`, Alt+1-3), then prompt (`>`/`=`, blinking block cursor) + `ListView` of rows: section headers ("frequent", "all apps") on an empty query, ranked matches otherwise, or one calculator row. Rows show the theme icon (lettered tile fallback), name, generic name/comment, a terminal marker; the selected row gets the accent bar and ↵. Mouse hover selects, click launches.
+`LauncherWindow` — in apps mode a query starting with `>` lists `Actions` (confirm-tier ones need Enter twice; the row turns red) and `@` lists open windows (Enter focuses). Mode chips (apps / clipboard / keybinds = `Ui.page`, Alt+1-3), then prompt (`>`/`=`, blinking block cursor) + `ListView` of rows: section headers ("frequent", "all apps") on an empty query, ranked matches otherwise, or one calculator row. Rows show the theme icon (lettered tile fallback), name, generic name/comment, a terminal marker; the selected row gets the accent bar and ↵. Mouse hover selects, click launches.
 
 ### `modules/quicksettings/`
 
 `QuickSettingsWindow` — sub-pages slide in/out by `Ui.page`.
 
-- **Main**: `ProfileCard` (user@host, uptime, log out / suspend / reboot / shut down with confirm-on-second-click; tool row: screenshot page, clipboard + keybinds launcher modes), 2×2 tiles (Mullvad VPN ▸, Bluetooth ▸, Night light, Do not disturb), Sound card (output + mic sliders, ▸ sound page)
+- **Main**: `ProfileCard` (avatar, user@host; one icon row: screenshot page, clipboard + keybinds launcher modes │ lock, log out, suspend, reboot, shut down with confirm-on-second-click), 2×3 tiles (Mullvad VPN ▸, Bluetooth ▸, Night light ▸, Do not disturb ▸ notifications, Caffeine, Sound ▸ — click mutes)
 - **network**: Mullvad switch, relay, exit location/IP, reconnect; links list
 - **bluetooth**: power switch, scan, device rows (click = connect / disconnect / pair, hover 󰆴 = forget)
 - **sound**: default output / input pickers
@@ -135,6 +189,4 @@ Gotchas:
 
 ## Rough edges / next
 
-- Notifications are still dunst; an in-shell notification center + OSD would complete the lyne set.
-- Theme presets from JSON + syncing alacritty/nvim/hyprland borders.
-- Poll boilerplate across `Sys`/`Network`/`Docker`/`Desktop` could share a helper.
+See `docs/inspo/README.md` for the next round (design tokens, settings store, side panels + in-shell notifications, settings window, theme/wallpaper manager, focus mode, voice).
