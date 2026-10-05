@@ -1,112 +1,62 @@
 pragma Singleton
 import QtQuick
-import Quickshell.Io
+import Quickshell
+import Quickshell.Services.Pipewire
 import "../config"
 
+// Audio through Quickshell's PipeWire service: event-driven, no processes.
+// Default output / input (volume %, mute), device lists, per-app streams.
+// Volumes are percent (0–150) like pactl.
 QtObject {
     id: root
 
-    property int outPercent: 0
-    property bool outMuted: false
-    property string outDefault: ""
-    property var outputs: []
+    readonly property var _sink: Pipewire.defaultAudioSink
+    readonly property var _source: Pipewire.defaultAudioSource
+    readonly property var _nodes: Pipewire.nodes.values
 
-    property int inPercent: 0
-    property bool inMuted: false
-    property string inDefault: ""
-    property var inputs: []
-
-    readonly property int percent: outPercent
-    readonly property bool muted: outMuted
-
-    readonly property var _poll: Process {
-        running: true
-        command: ["sh", "-c", [
-            "echo '---out-vol---'",
-            "pactl get-sink-volume @DEFAULT_SINK@ | awk '/Volume/{print $5; exit}' | tr -d '%'",
-            "echo '---out-mute---'",
-            "pactl get-sink-mute @DEFAULT_SINK@ | awk '{print $2}'",
-            "echo '---out-def---'",
-            "pactl get-default-sink",
-            "echo '---in-vol---'",
-            "pactl get-source-volume @DEFAULT_SOURCE@ | awk '/Volume/{print $5; exit}' | tr -d '%'",
-            "echo '---in-mute---'",
-            "pactl get-source-mute @DEFAULT_SOURCE@ | awk '{print $2}'",
-            "echo '---in-def---'",
-            "pactl get-default-source",
-            "echo '---sinks---'",
-            "pactl list short sinks | awk '{print $2}'",
-            "echo '---sink-descs---'",
-            "pactl list sinks | awk -F': ' '/Name:/{n=$2} /Description:/{print n\"\\t\"$2}'",
-            "echo '---sources---'",
-            "pactl list short sources | awk '$2 !~ /\\.monitor$/ {print $2}'",
-            "echo '---source-descs---'",
-            "pactl list sources | awk -F': ' '/Name:/{n=$2} /Description:/{print n\"\\t\"$2}'"
-        ].join("; ")]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const sections = {};
-                let cur = null;
-                for (const line of this.text.split("\n")) {
-                    const m = line.match(/^---(.+)---$/);
-                    if (m) { cur = m[1]; sections[cur] = []; continue; }
-                    if (cur !== null) sections[cur].push(line);
-                }
-                const first = k => (sections[k] && sections[k][0] || "").trim();
-                const all = k => (sections[k] || []).filter(l => l.trim() !== "");
-
-                root.outPercent = parseInt(first("out-vol")) || 0;
-                root.outMuted = first("out-mute") === "yes";
-                root.outDefault = first("out-def");
-                root.inPercent = parseInt(first("in-vol")) || 0;
-                root.inMuted = first("in-mute") === "yes";
-                root.inDefault = first("in-def");
-
-                const buildList = (namesKey, descsKey) => {
-                    const names = all(namesKey);
-                    const descMap = {};
-                    for (const l of all(descsKey)) {
-                        const tab = l.indexOf("\t");
-                        if (tab > 0) descMap[l.substring(0, tab)] = l.substring(tab + 1).trim();
-                    }
-                    return names.map(n => ({ name: n.trim(), description: descMap[n.trim()] || n.trim() }));
-                };
-                root.outputs = buildList("sinks", "sink-descs");
-                root.inputs = buildList("sources", "source-descs");
-            }
-        }
+    // Volume / mute / names update only for tracked nodes.
+    readonly property var _track: PwObjectTracker {
+        objects: [root._sink, root._source].filter(n => n).concat(root.streamsWanted ? root._streamNodes : [])
     }
 
-    // pactl subscribe streams events; each line re-triggers poll. Replaces periodic timer.
-    readonly property var _subscribe: Process {
-        running: true
-        command: Settings.tether.concat(["pactl", "subscribe"])
-        stdout: SplitParser {
-            splitMarker: "\n"
-            onRead: line => {
-                if (!line) return;
-                if (line.indexOf("sink") >= 0 || line.indexOf("source") >= 0 || line.indexOf("server") >= 0) {
-                    if (!root._poll.running) root._poll.running = true;
-                }
-            }
-        }
-    }
+    function _pct(n) { return n && n.audio ? Math.round(n.audio.volume * 100) : 0; }
 
-    function _run(args) {
-        runner.command = args;
-        runner.running = true;
-    }
+    readonly property int outPercent: _pct(_sink)
+    readonly property bool outMuted: _sink && _sink.audio ? _sink.audio.muted : false
+    readonly property string outDefault: _sink ? _sink.name : ""
+    readonly property int inPercent: _pct(_source)
+    readonly property bool inMuted: _source && _source.audio ? _source.audio.muted : false
+    readonly property string inDefault: _source ? _source.name : ""
 
-    readonly property var _runner: Process {
-        id: runner
-        running: false
-        onRunningChanged: if (!running) root._poll.running = true
+    function _isDevice(n, sink) {
+        return n.audio && !n.isStream && n.isSink === sink
+            && (n.properties["media.class"] || "").indexOf(sink ? "Audio/Sink" : "Audio/Source") === 0;
     }
+    readonly property var outputs: _nodes.filter(n => _isDevice(n, true)).map(n => ({ name: n.name, description: n.description || n.nickname || n.name }))
+    readonly property var inputs: _nodes.filter(n => _isDevice(n, false)).map(n => ({ name: n.name, description: n.description || n.nickname || n.name }))
 
-    function toggleMute()       { _run(["pactl", "set-sink-mute",   "@DEFAULT_SINK@",   "toggle"]); }
-    function toggleInputMute()  { _run(["pactl", "set-source-mute", "@DEFAULT_SOURCE@", "toggle"]); }
-    function setOutputVolume(p) { _run(["pactl", "set-sink-volume",   "@DEFAULT_SINK@",   Math.max(0, Math.min(150, p)) + "%"]); }
-    function setInputVolume(p)  { _run(["pactl", "set-source-volume", "@DEFAULT_SOURCE@", Math.max(0, Math.min(150, p)) + "%"]); }
-    function setDefaultSink(n)   { _run(["pactl", "set-default-sink",   n]); }
-    function setDefaultSource(n) { _run(["pactl", "set-default-source", n]); }
+    // --- per-app playback streams (only tracked while something shows them) ---
+    property bool streamsWanted: false
+    readonly property var _streamNodes: _nodes.filter(n => n.isStream && n.audio && (n.properties["media.class"] || "") === "Stream/Output/Audio")
+    readonly property var streams: _streamNodes.map(n => ({
+        id: n.id,
+        app: n.properties["application.name"] || n.properties["application.process.binary"] || n.name || "app",
+        bin: n.properties["application.process.binary"] || "",
+        icon: n.properties["application.icon_name"] || "",
+        title: n.properties["media.name"] || "",
+        volume: _pct(n),
+        muted: n.audio.muted
+    }))
+    function _node(id) { return _nodes.find(n => n.id === id) || null; }
+
+    // --- setters ---
+    function _setVol(n, p) { if (n && n.audio) n.audio.volume = Math.max(0, Math.min(150, Math.round(p))) / 100; }
+    function setOutputVolume(p) { _setVol(_sink, p); }
+    function setInputVolume(p)  { _setVol(_source, p); }
+    function toggleMute()       { if (_sink && _sink.audio) _sink.audio.muted = !_sink.audio.muted; }
+    function toggleInputMute()  { if (_source && _source.audio) _source.audio.muted = !_source.audio.muted; }
+    function setDefaultSink(name)   { const n = _nodes.find(x => x.name === name); if (n) Pipewire.preferredDefaultAudioSink = n; }
+    function setDefaultSource(name) { const n = _nodes.find(x => x.name === name); if (n) Pipewire.preferredDefaultAudioSource = n; }
+    function setStreamVolume(id, p) { _setVol(_node(id), p); }
+    function toggleStreamMute(id)   { const n = _node(id); if (n && n.audio) n.audio.muted = !n.audio.muted; }
 }

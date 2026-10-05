@@ -13,7 +13,7 @@ QtObject {
         const seen = {};
         const out = [];
         for (const e of DesktopEntries.applications.values) {
-            if (e.noDisplay || seen[e.id]) continue;
+            if (e.noDisplay || seen[e.id] || Settings.launcherHidden.indexOf(e.id) >= 0) continue;
             seen[e.id] = true;
             out.push(e);
         }
@@ -49,6 +49,12 @@ QtObject {
         return Math.max(1, 300 - gaps * 10);
     }
 
+    // Fuzzy score for other searches (actions, windows): 0 = no match.
+    function score(q, text) { return _score(q, text); }
+
+    // Focus mode can block an app until the session ends.
+    function blocked(e) { return Focus.blocksEntry(e); }
+
     function search(query) {
         const q = query.trim().toLowerCase();
         if (!q) return [];
@@ -82,6 +88,10 @@ QtObject {
     }
 
     function launch(e) {
+        if (Focus.blocksEntry(e)) {
+            Quickshell.execDetached(["notify-send", "-a", "Focus", e.name + " is blocked", "focus ends at " + Focus.endsText]);
+            return;
+        }
         if (!e) return;
         const next = Object.assign({}, usage);
         next[e.id] = (next[e.id] || 0) + 1;

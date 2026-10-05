@@ -25,6 +25,24 @@ QtObject {
 
     signal authSucceeded()
 
+    // A hot reload rebuilds this singleton; without this a reload while
+    // locked would come up unlocked and drop the session lock. The marker
+    // lives in $XDG_RUNTIME_DIR (gone after a reboot) and is read
+    // synchronously, before the lock surface's Loader evaluates.
+    readonly property var _lockMark: FileView {
+        path: (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp") + "/rice-locked"
+        blockLoading: true
+        printErrors: false
+    }
+    Component.onCompleted: {
+        if (_lockMark.text().trim() === "1") {
+            lockedAt = new Date();
+            locked = true;
+            checkCaps();
+            if (!_wallProc.running) _wallProc.running = true;
+        }
+    }
+
     function lock() {
         if (locked) return;
         buffer = "";
@@ -34,6 +52,7 @@ QtObject {
         authenticating = false;
         lockedAt = new Date();
         Ui.close();
+        _lockMark.setText("1");
         locked = true;
         checkCaps();
         if (!_wallProc.running) _wallProc.running = true;
@@ -41,6 +60,7 @@ QtObject {
 
     // Called by the lock surface once it has let go of the session.
     function finishUnlock() {
+        _lockMark.setText("0");
         locked = false;
         secure = false;
         buffer = "";
@@ -119,9 +139,11 @@ QtObject {
     // --- lock before sleep ---
     // A logind "delay" inhibitor holds suspend (lid / menu / systemctl) until
     // the lock is secure; PrepareForSleep(true) locks, (false) re-arms it.
-    property bool _holdSleep: Settings.lockBeforeSleep
+    // The inhibitor follows the setting; `_released` drops it while suspending
+    // (once the lock is secure) and is reset on resume.
+    property bool _released: false
     readonly property var _sleepInhibitor: Process {
-        running: root._holdSleep
+        running: Settings.lockBeforeSleep && !root._released
         command: Settings.tether.concat(["systemd-inhibit", "--what=sleep", "--mode=delay", "--who=rice",
                                          "--why=Lock the screen before sleeping", "sleep", "infinity"])
     }
@@ -134,20 +156,20 @@ QtObject {
                 if (line.indexOf("PrepareForSleep") < 0) return;
                 if (line.indexOf("true") >= 0) {
                     root.lock();
-                    if (root.secure) root._holdSleep = false;
+                    if (root.secure) root._released = true;
                     else root._releaseFallback.restart();
                 } else {
                     root._releaseFallback.stop();
-                    root._holdSleep = Settings.lockBeforeSleep;
+                    root._released = false;
                 }
             }
         }
     }
-    onSecureChanged: if (secure && _releaseFallback.running) { _releaseFallback.stop(); _holdSleep = false; }
+    onSecureChanged: if (secure && _releaseFallback.running) { _releaseFallback.stop(); _released = true; }
     // Never keep the machine awake if the lock surface doesn't come up.
     readonly property var _releaseFallback: Timer {
         interval: 3000
-        onTriggered: root._holdSleep = false
+        onTriggered: root._released = true
     }
 
     // --- idle ---

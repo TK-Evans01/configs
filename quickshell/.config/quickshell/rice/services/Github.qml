@@ -19,7 +19,6 @@ QtObject {
     property string name: ""
     property int followers: 0
     property int following: 0
-    property int starred: 0
     property int repoCount: 0
     property var repos: []         // [{ name, private, stars, forks, pushed (Date), lang, langColor, description, url }]
     property int prCount: 0
@@ -60,7 +59,7 @@ QtObject {
     function open(url) { Quickshell.execDetached(["xdg-open", url]); }
 
     readonly property string _query: "query { viewer { login name "
-        + "followers { totalCount } following { totalCount } starredRepositories { totalCount } "
+        + "followers { totalCount } following { totalCount } "
         + "pullRequests(first: 6, states: OPEN, orderBy: { field: UPDATED_AT, direction: DESC }) { totalCount "
         + "nodes { title number url updatedAt isDraft repository { nameWithOwner } } } "
         + "issues(first: 6, states: OPEN, orderBy: { field: UPDATED_AT, direction: DESC }) { totalCount "
@@ -82,7 +81,8 @@ QtObject {
             onStreamFinished: {
                 const i = this.text.lastIndexOf("@@notifications");
                 if (i >= 0) root.notifications = Number(this.text.slice(i + 15).trim()) || 0;
-                root._parse(i >= 0 ? this.text.slice(0, i) : this.text);
+                const body = i >= 0 ? this.text.slice(0, i) : this.text;
+                if (body.trim()) root._parse(body);   // empty: gh failed, stderr has why
             }
         }
         stderr: StdioCollector {
@@ -93,19 +93,18 @@ QtObject {
 
     function _parse(text) {
         let o;
-        try { o = JSON.parse(text); } catch (e) { return; }
+        try { o = JSON.parse(text); } catch (e) { state_ = "error"; error = "bad response from gh"; return; }
         const v = o && o.data && o.data.viewer;
         if (!v) { state_ = "error"; error = (o.errors && o.errors[0] && o.errors[0].message) || "no data"; return; }
         login = v.login;
         name = v.name || v.login;
         followers = v.followers.totalCount;
         following = v.following.totalCount;
-        starred = v.starredRepositories.totalCount;
         repoCount = v.repositories.totalCount;
         repos = v.repositories.nodes.map(r => ({
             name: r.nameWithOwner.split("/").pop(), private: r.isPrivate, stars: r.stargazerCount,
             forks: r.forkCount, pushed: new Date(r.pushedAt), lang: r.primaryLanguage ? r.primaryLanguage.name : "",
-            langColor: r.primaryLanguage && r.primaryLanguage.color ? r.primaryLanguage.color : Theme.grey,
+            langColor: r.primaryLanguage && r.primaryLanguage.color ? r.primaryLanguage.color : Theme.subtext,
             description: r.description || "", url: r.url
         }));
         const item = n => ({ title: n.title, number: n.number, url: n.url, repo: n.repository.nameWithOwner,
@@ -147,13 +146,6 @@ QtObject {
         error = "";
         updated = new Date();
         state_ = "ok";
-    }
-
-    function age(d) {
-        const s = (Date.now() - d.getTime()) / 1000;
-        if (s < 3600) return Math.max(1, Math.floor(s / 60)) + "m";
-        if (s < 86400) return Math.floor(s / 3600) + "h";
-        return Math.floor(s / 86400) + "d";
     }
 
     readonly property var timer: Timer {

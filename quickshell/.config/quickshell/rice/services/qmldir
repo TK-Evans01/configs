@@ -19,3 +19,14 @@ singleton Screenshot 1.0 Screenshot.qml
 singleton Github 1.0 Github.qml
 singleton Lock 1.0 Lock.qml
 singleton Spotify 1.0 Spotify.qml
+CmdQueue 1.0 CmdQueue.qml
+singleton Actions 1.0 Actions.qml
+singleton Notifications 1.0 Notifications.qml
+singleton Feeds 1.0 Feeds.qml
+singleton ThemeSync 1.0 ThemeSync.qml
+singleton Connectors 1.0 Connectors.qml
+singleton Packages 1.0 Packages.qml
+singleton Focus 1.0 Focus.qml
+singleton Wallpaper 1.0 Wallpaper.qml
+singleton Privacy 1.0 Privacy.qml
+LatestRun 1.0 LatestRun.qml

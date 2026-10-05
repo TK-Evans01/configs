@@ -24,16 +24,6 @@ QtObject {
         if (!proc.running) proc.running = true;
     }
     function openWebmail() { Quickshell.execDetached(["xdg-open", Settings.mailUrl]); }
-    // Bridge's window, after stopping the headless copy (they share a lock).
-    // Close the window and use "start bridge" / next login to go headless again.
-    function openBridgeWindow() {
-        Quickshell.execDetached(["sh", "-c",
-            "pkill -f '[b]ridge/bridge --noninteractive'; sleep 2; rm -f \"$HOME\"/.cache/protonmail/bridge-v3/*.lock; exec protonmail-bridge"]);
-    }
-    function startBridge() {
-        Quickshell.execDetached(["sh", "-c", "rm -f \"$HOME\"/.cache/protonmail/bridge-v3/*.lock; exec \"$@\"", "sh"].concat(Settings.bridgeCommand));
-        retry.restart();
-    }
 
     readonly property var proc: Process {
         command: ["python3", root._script]
@@ -67,14 +57,12 @@ QtObject {
 
     // Bridge comes up a little after login: retry quickly until it answers.
     readonly property var timer: Timer {
-        interval: (root.state_ === "offline" || root.state_ === "loading" ? 15 : Settings.mailRefreshSec) * 1000
+        interval: (root.state_ === "offline" || root.state_ === "loading" ? root._offlineSec : Settings.mailRefreshSec) * 1000
         running: true
         repeat: true
         triggeredOnStart: true
         onTriggered: root.refresh()
     }
-    readonly property var retry: Timer {
-        interval: 8000
-        onTriggered: root.refresh()
-    }
+    property int _offlineSec: 15
+    onState_Changed: _offlineSec = state_ === "offline" ? Math.min(300, _offlineSec * 2) : 15
 }

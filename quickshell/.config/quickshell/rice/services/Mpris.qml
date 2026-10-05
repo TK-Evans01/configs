@@ -27,7 +27,6 @@ QtObject {
     readonly property string identity: playerName(player)
 
     readonly property bool running: player !== null
-    readonly property bool hasPlayer: running
 
     readonly property string title: player ? (player.trackTitle || "") : ""
     readonly property string artist: {

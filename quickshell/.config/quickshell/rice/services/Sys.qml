@@ -3,8 +3,9 @@ import QtQuick
 import Quickshell.Io
 import "../config"
 
-// One poller for everything the System widget shows: CPU, GPU, RAM, disks,
-// process count. Emits "key value..." lines so parsing stays line-oriented.
+// Everything the System widget shows: CPU, GPU, RAM, disks, load. Live
+// numbers are direct file reads (/proc, /sys) every 2 s — no processes;
+// disks via df once a minute. Lines are "key value…" for one parser.
 QtObject {
     id: root
 
@@ -56,7 +57,7 @@ QtObject {
         return (b >= 100 || i === 0 ? Math.round(b) : b.toFixed(1)) + u[i];
     }
 
-    // Static bits: model strings and core count. Read once at startup.
+    // Static bits + where the live numbers live. Run once at startup.
     readonly property var _once: Process {
         running: true
         command: ["sh", "-c", `
@@ -66,40 +67,66 @@ echo "kernel $(uname -r)"
 echo "host $(cat /etc/hostname 2>/dev/null || uname -n)"
 lspci -mm -d ::0300 2>/dev/null | head -n1 | awk -F'"' '{print $6}' |
   sed -E 's/.*\\[([^]]*)\\].*/\\1/; s@/.*@@; s/^/gpumodel /'
+for h in /sys/class/hwmon/*; do
+  case "$(cat "$h/name" 2>/dev/null)" in
+    k10temp|coretemp|zenpower) [ -r "$h/temp1_input" ] && echo "path cputemp $h/temp1_input" && break ;;
+  esac
+done
+for d in /sys/class/drm/card*/device; do
+  [ -r "$d/gpu_busy_percent" ] || continue
+  echo "path gpu $d/gpu_busy_percent"
+  [ -r "$d/mem_info_vram_used" ] && echo "path vramused $d/mem_info_vram_used" && echo "vramtotal $(cat "$d/mem_info_vram_total")"
+  for h in "$d"/hwmon/hwmon*; do [ -r "$h/temp1_input" ] && echo "path gputemp $h/temp1_input" && break; done
+  break
+done
 `]
         stdout: StdioCollector {
             onStreamFinished: root._parse(this.text)
         }
     }
 
-    readonly property var _poll: Process {
+    // Live numbers: plain file reads every 2 s, no processes. Paths for
+    // sensors come from _once.
+    property var _paths: ({})
+    component Src: FileView { blockLoading: true; printErrors: false }
+    readonly property var _stat: Src { path: "/proc/stat" }
+    readonly property var _meminfo: Src { path: "/proc/meminfo" }
+    readonly property var _loadavg: Src { path: "/proc/loadavg" }
+    readonly property var _cpuTempF: Src { path: root._paths.cputemp || "" }
+    readonly property var _gpuF: Src { path: root._paths.gpu || "" }
+    readonly property var _vramF: Src { path: root._paths.vramused || "" }
+    readonly property var _gpuTempF: Src { path: root._paths.gputemp || "" }
+    function _read(f) { if (!f.path) return ""; f.reload(); return f.text(); }
+
+    function _sample() {
+        const out = [];
+        out.push(_read(_stat).split("\n")[0]);
+        const mem = {};
+        for (const l of _read(_meminfo).split("\n")) { const m = /^(\w+):\s+(\d+)/.exec(l); if (m) mem[m[1]] = Number(m[2]) * 1024; }
+        out.push("mem " + mem.MemTotal + " " + (mem.MemTotal - mem.MemAvailable));
+        out.push("swap " + mem.SwapTotal + " " + (mem.SwapTotal - mem.SwapFree));
+        const la = _read(_loadavg).trim().split(" ");
+        out.push("load " + la.slice(0, 3).join(" "));
+        // "running/total" scheduling entities (threads).
+        if (la[3]) out.push("procs " + la[3].split("/")[1]);
+        if (_cpuTempF.path) out.push("cputemp " + _read(_cpuTempF).trim());
+        if (_gpuF.path) out.push("gpu " + _read(_gpuF).trim());
+        if (_vramF.path) out.push("vramused " + _read(_vramF).trim());
+        if (_gpuTempF.path) out.push("gputemp " + _read(_gpuTempF).trim());
+        _parse(out.join("\n"));
+    }
+
+    // Disks change slowly: df once a minute.
+    readonly property var _df: Process {
         running: true
-        command: ["sh", "-c", `
-head -n1 /proc/stat | sed 's/^cpu /cpu /'
-for h in /sys/class/hwmon/*; do
-  case "$(cat "$h/name" 2>/dev/null)" in
-    k10temp|coretemp|zenpower) [ -r "$h/temp1_input" ] && echo "cputemp $(cat "$h/temp1_input")" ;;
-  esac
-done
-awk '/^MemTotal/{t=$2} /^MemAvailable/{a=$2} END{print "mem", t*1024, (t-a)*1024}' /proc/meminfo
-awk '/^SwapTotal/{t=$2} /^SwapFree/{f=$2} END{print "swap", t*1024, (t-f)*1024}' /proc/meminfo
-for d in /sys/class/drm/card*/device; do
-  [ -r "$d/gpu_busy_percent" ] || continue
-  echo "gpu $(cat "$d/gpu_busy_percent")"
-  [ -r "$d/mem_info_vram_total" ] && echo "vram $(cat "$d/mem_info_vram_used") $(cat "$d/mem_info_vram_total")"
-  for h in "$d"/hwmon/hwmon*; do
-    [ -r "$h/temp1_input" ] && echo "gputemp $(cat "$h/temp1_input")" && break
-  done
-  break
-done
-echo "load $(cut -d' ' -f1-3 /proc/loadavg)"
-echo "procs $(ls -d /proc/[0-9]* 2>/dev/null | wc -l)"
-df -B1 -x tmpfs -x devtmpfs -x efivarfs -x overlay -x squashfs --output=target,size,used 2>/dev/null |
-  tail -n +2 | awk 'NF==3 {print "disk", $1, $2, $3}'
-`]
-        stdout: StdioCollector {
-            onStreamFinished: root._parse(this.text)
-        }
+        command: ["sh", "-c", "df -B1 -x tmpfs -x devtmpfs -x efivarfs -x overlay -x squashfs --output=target,size,used 2>/dev/null | tail -n +2 | awk 'NF==3 {print \"disk\", $1, $2, $3}'"]
+        stdout: StdioCollector { onStreamFinished: root._parse(this.text) }
+    }
+    readonly property var _dfTimer: Timer {
+        interval: 60000
+        running: true
+        repeat: true
+        onTriggered: if (!root._df.running) root._df.running = true
     }
 
     function _parse(text) {
@@ -131,7 +158,9 @@ df -B1 -x tmpfs -x devtmpfs -x efivarfs -x overlay -x squashfs --output=target,s
             case "gpu":      root.gpuPercent = Number(f[1]); break;
             case "gputemp":  root.gpuTemp = Number(f[1]) / 1000; break;
             case "gpumodel": root.gpuModel = f.slice(1).join(" "); break;
-            case "vram":     root.gpuVramUsed = Number(f[1]); root.gpuVramTotal = Number(f[2]); break;
+            case "vramused": root.gpuVramUsed = Number(f[1]); break;
+            case "vramtotal": root.gpuVramTotal = Number(f[1]); break;
+            case "path": { const p = Object.assign({}, root._paths); p[f[1]] = f.slice(2).join(" "); root._paths = p; break; }
             case "mem":      root.memTotal = Number(f[1]); root.memUsed = Number(f[2]); break;
             case "swap":     root.swapTotal = Number(f[1]); root.swapUsed = Number(f[2]); break;
             case "procs":    root.procs = Number(f[1]); break;
@@ -157,6 +186,6 @@ df -B1 -x tmpfs -x devtmpfs -x efivarfs -x overlay -x squashfs --output=target,s
         interval: 2000
         running: true
         repeat: true
-        onTriggered: if (!root._poll.running) root._poll.running = true
+        onTriggered: root._sample()
     }
 }

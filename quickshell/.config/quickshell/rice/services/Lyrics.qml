@@ -39,8 +39,7 @@ QtObject {
         lines = [];
         if (!trackKey) { status = "idle"; return; }
         status = "loading";
-        fetcher.running = false;
-        fetcher.command = ["sh", "-c", `
+        fetcher.run(["sh", "-c", `
 dir="$1"; file="$dir/$(printf '%s' "$2 - $3" | tr '/' '_' | cut -c1-180).json"
 if [ -s "$file" ]; then cat "$file"; exit 0; fi
 mkdir -p "$dir"
@@ -52,8 +51,7 @@ out="$(curl -sfG --max-time 8 https://lrclib.net/api/get -H "User-Agent: $ua" \
   --data-urlencode "artist_name=$2" --data-urlencode "track_name=$3" | jq -c '.[0] // empty')"
 [ -n "$out" ] && printf '%s' "$out" > "$file"
 printf '%s' "$out"
-`, "sh", cacheDir, Mpris.artist.split(",")[0].trim(), Mpris.title, Mpris.album, String(Math.round(Mpris.length))];
-        fetcher.running = true;
+`, "sh", cacheDir, Mpris.artist.split(",")[0].trim(), Mpris.title, Mpris.album, String(Math.round(Mpris.length))]);
     }
 
     function _parse(text) {
@@ -79,9 +77,8 @@ printf '%s' "$out"
         status = "none";
     }
 
-    readonly property var fetcher: Process {
-        stdout: StdioCollector {
-            onStreamFinished: root._parse(this.text)
-        }
+    // Newest track only: a fetch for a track already skipped is dropped.
+    readonly property var fetcher: LatestRun {
+        onDone: (stdout, stderr, code) => root._parse(stdout)
     }
 }

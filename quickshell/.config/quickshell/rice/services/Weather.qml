@@ -10,7 +10,6 @@ import "../config"
 QtObject {
     id: root
 
-    property bool available: false
     property bool loading: false
     property string error: ""
     property date updated: new Date(0)
@@ -42,9 +41,9 @@ QtObject {
         if (code === 0 || code === 1) return isDay === false ? Theme.purple : Theme.yellow;
         if (code === 2) return isDay === false ? Theme.purpleDim : Theme.yellowBright;
         if (code >= 95) return Theme.orange;
-        if ((code >= 71 && code <= 77) || code === 85 || code === 86) return Theme.fg1;
+        if ((code >= 71 && code <= 77) || code === 85 || code === 86) return Theme.textBright;
         if (code >= 51) return Theme.blue;
-        return Theme.grey;
+        return Theme.subtext;
     }
     function fmtTemp(t) { return Math.round(t) + "°"; }
 
@@ -96,7 +95,6 @@ QtObject {
         }));
         error = "";
         updated = new Date();
-        available = true;
     }
 
     readonly property var _timer: Timer {

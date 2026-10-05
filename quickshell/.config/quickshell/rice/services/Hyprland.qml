@@ -3,12 +3,11 @@ import QtQuick
 import Quickshell.Hyprland as Hypr
 
 QtObject {
-    readonly property var raw: Hypr.Hyprland
     readonly property var workspaces: Hypr.Hyprland.workspaces
     readonly property var monitors: Hypr.Hyprland.monitors
     readonly property var focusedMonitor: Hypr.Hyprland.focusedMonitor
-    readonly property var focusedWorkspace: Hypr.Hyprland.focusedWorkspace
     readonly property var activeToplevel: Hypr.Hyprland.activeToplevel
+    readonly property var toplevels: Hypr.Hyprland.toplevels
 
     function monitorFor(screen) {
         return screen ? Hypr.Hyprland.monitorFor(screen) : null;

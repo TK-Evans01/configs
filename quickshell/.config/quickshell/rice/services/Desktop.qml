@@ -5,7 +5,7 @@ import Quickshell.Io
 import "../config"
 
 // Desktop-session odds and ends for Quick Settings: night light (hyprsunset),
-// do-not-disturb (dunst), user/host, and session power actions.
+// user, and session power actions.
 QtObject {
     id: root
 
@@ -21,12 +21,12 @@ QtObject {
     property bool nightLight: false
     property int nightTemp: Settings.nightLightTemp
     property int nightGamma: Settings.nightLightGamma
+    // Changing the defaults in Settings takes effect (and applies if it's on).
+    readonly property int _defTemp: Settings.nightLightTemp
+    readonly property int _defGamma: Settings.nightLightGamma
+    on_DefTempChanged: { nightTemp = _defTemp; if (nightLight) _nlApply.restart(); }
+    on_DefGammaChanged: { nightGamma = _defGamma; if (nightLight) _nlApply.restart(); }
     readonly property string _nlFile: (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp") + "/rice-nightlight"
-
-    // --- dunst ---
-    property bool dnd: false
-    property int historyCount: 0
-    property int waitingCount: 0
 
     readonly property var _poll: Process {
         running: true
@@ -34,9 +34,6 @@ QtObject {
 echo "temp $(hyprctl hyprsunset temperature 2>/dev/null | tr -dc '0-9')"
 echo "gamma $(hyprctl hyprsunset gamma 2>/dev/null | tr -dc '0-9')"
 echo "nl $(cat "$1" 2>/dev/null)"
-echo "dnd $(dunstctl is-paused 2>/dev/null)"
-echo "hist $(dunstctl count history 2>/dev/null)"
-echo "wait $(dunstctl count waiting 2>/dev/null)"
 `, "sh", root._nlFile]
         stdout: StdioCollector {
             onStreamFinished: {
@@ -47,9 +44,6 @@ echo "wait $(dunstctl count waiting 2>/dev/null)"
                     if (f[0] === "temp" && f[1]) root.temperature = Number(f[1]);
                     else if (f[0] === "gamma" && f[1]) gamma = Number(f[1]);
                     else if (f[0] === "nl") saved = f.slice(1).filter(x => x);
-                    else if (f[0] === "dnd") root.dnd = f[1] === "true";
-                    else if (f[0] === "hist") root.historyCount = Number(f[1]) || 0;
-                    else if (f[0] === "wait") root.waitingCount = Number(f[1]) || 0;
                 }
                 if (root._nlBusy) return;   // a slider write is in flight
                 if (saved.length) {
@@ -64,8 +58,17 @@ echo "wait $(dunstctl count waiting 2>/dev/null)"
         }
     }
 
+    // The shell is the only writer of the state file: watch it. hyprsunset
+    // changes on its own only at its profile times (hyprsunset.conf), so a
+    // slow re-check covers that.
+    readonly property var _nlWatch: FileView {
+        path: root._nlFile
+        watchChanges: true
+        printErrors: false
+        onFileChanged: root.refresh()
+    }
     readonly property var _timer: Timer {
-        interval: 5000
+        interval: 300000
         running: true
         repeat: true
         onTriggered: root.refresh()
@@ -75,13 +78,10 @@ echo "wait $(dunstctl count waiting 2>/dev/null)"
         if (!_poll.running) _poll.running = true;
     }
 
-    readonly property var _runner: Process {
-        onRunningChanged: if (!running) root.refresh()
+    readonly property var _cmds: CmdQueue {
+        onDrained: root.refresh()
     }
-    function _run(args) {
-        _runner.command = args;
-        _runner.running = true;
-    }
+    function _run(args) { _cmds.run(args); }
 
     function toggleNightLight() { setNightLight(!nightLight); }
     function setNightLight(on) {
@@ -105,65 +105,6 @@ echo "wait $(dunstctl count waiting 2>/dev/null)"
         }
     }
     readonly property var _nlProc: Process {}
-    function toggleDnd() { _run(["dunstctl", "set-paused", "toggle"]); }
-
-    // --- notification history (dunst) ---
-    // [{ id, app, summary, body, urgency, icon, age (s) }], newest first.
-    // Fetched while something shows it (`historyWanted`).
-    property bool historyWanted: false
-    property var history: []
-    onHistoryWantedChanged: if (historyWanted) loadHistory()
-
-    function loadHistory() {
-        if (!_histProc.running) _histProc.running = true;
-    }
-    // dunst timestamps are µs on the monotonic clock → age against uptime.
-    readonly property var _histProc: Process {
-        command: ["sh", "-c", "cut -d' ' -f1 /proc/uptime; dunstctl history"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const nl = this.text.indexOf("\n");
-                const up = Number(this.text.slice(0, nl));
-                let o = null;
-                try { o = JSON.parse(this.text.slice(nl + 1)); } catch (e) { o = null; }
-                const list = o && o.data && o.data[0] ? o.data[0] : [];
-                const v = (n, k) => n[k] ? n[k].data : "";
-                root.history = list.map(n => ({
-                    id: v(n, "id"),
-                    app: v(n, "appname"),
-                    summary: v(n, "summary"),
-                    body: String(v(n, "body")).replace(/<[^>]*>/g, ""),
-                    urgency: v(n, "urgency"),
-                    icon: v(n, "icon_path"),
-                    age: Math.max(0, up - Number(v(n, "timestamp")) / 1e6)
-                })).sort((a, b) => a.age - b.age);
-            }
-        }
-    }
-    readonly property var _histTimer: Timer {
-        interval: 5000
-        running: root.historyWanted
-        repeat: true
-        onTriggered: root.loadHistory()
-    }
-    function _histRun(args) {
-        _histRunner.command = args;
-        _histRunner.running = true;
-    }
-    readonly property var _histRunner: Process {
-        onRunningChanged: if (!running) { root.loadHistory(); root.refresh(); }
-    }
-    function showAgain(id) { _histRun(["dunstctl", "history-pop", String(id)]); }
-    function removeNotification(id) { _histRun(["dunstctl", "history-rm", String(id)]); }
-    function clearHistory() { _histRun(["dunstctl", "history-clear"]); }
-
-    function fmtAge(s) {
-        if (s < 60) return "now";
-        if (s < 3600) return Math.floor(s / 60) + "m";
-        if (s < 86400) return Math.floor(s / 3600) + "h";
-        return Math.floor(s / 86400) + "d";
-    }
-
     // --- power ---
     readonly property var actions: [
         { id: "lock",     label: "Lock",     icon: "󰌾", cmd: [] },
