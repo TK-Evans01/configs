@@ -64,8 +64,11 @@ QtObject {
     readonly property bool canNext: player ? player.canGoNext === true : false
     readonly property bool canPrev: player ? player.canGoPrevious === true : false
 
-    readonly property bool shuffle: player ? player.shuffle === true : false
-    readonly property int loop: player ? (player.loopState || 0) : 0
+    // spotify_player has no shuffle/loop over MPRIS: those go through its CLI
+    // and the state comes from Spotify.playbackShuffle / playbackRepeat.
+    readonly property bool _viaCli: player !== null && !player.shuffleSupported && root.identity.toLowerCase().replace(/[ -]/g, "_") === Settings.musicPlayer
+    readonly property bool shuffle: _viaCli ? Spotify.playbackShuffle : (player ? player.shuffle === true : false)
+    readonly property int loop: _viaCli ? Spotify.playbackRepeat : (player ? (player.loopState || 0) : 0)
     readonly property real volume: player ? (player.volume !== undefined ? player.volume : 1) : 0
 
     function togglePlay() {
@@ -85,11 +88,14 @@ QtObject {
         _seekHoldUntil = Date.now() + 2500;
         player.position = pos;
     }
-    function toggleShuffle() { if (player) player.shuffle = !player.shuffle; }
+    function toggleShuffle() {
+        if (_viaCli) { Spotify.cli(["playback", "shuffle"]); return; }
+        if (player && player.shuffleSupported) player.shuffle = !player.shuffle;
+    }
     function cycleLoop() {
-        if (!player) return;
-        const next = ((player.loopState || 0) + 1) % 3;
-        player.loopState = next;
+        if (_viaCli) { Spotify.cli(["playback", "repeat"]); return; }
+        if (!player || !player.loopSupported) return;
+        player.loopState = ((player.loopState || 0) + 1) % 3;
     }
     function setVolume(v)    { if (player) player.volume = Math.max(0, Math.min(1, v)); }
 

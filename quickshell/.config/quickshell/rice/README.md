@@ -30,7 +30,7 @@ three bar islands, a tabbed dashboard and a Quick Settings panel.
 | Arch glyph | Launcher | | | |
 | Workspace number | go to it | | | walk this monitor's workspaces |
 | Clock | Dashboard › Overview | | | |
-| Media | Dashboard › Media (opens spotify_player if nothing runs) | play/pause | next | player volume |
+| Media | Dashboard › Media (opens spotify_player if nothing runs) — player, lyrics, and a **Library** card: Liked Songs / playlists / albums, filter, shuffle; click to play | play/pause | next | player volume |
 | System sparkline | Dashboard › System (hover shows numbers) | | | |
 | Weather | Dashboard › Weather | | | |
 | Tray icon | activate | secondary | menu (shell-styled) | |

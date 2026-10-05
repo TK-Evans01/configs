@@ -16,7 +16,7 @@ Item {
     }
 
     readonly property int coverSize: 380
-    implicitHeight: Svc.Mpris.running ? row.implicitHeight : empty.implicitHeight
+    implicitHeight: (Svc.Mpris.running ? row.implicitHeight : empty.implicitHeight) + Theme.pad + library.implicitHeight
 
     Card {
         id: empty
@@ -122,5 +122,12 @@ Item {
                 }
             }
         }
+    }
+
+    LibraryCard {
+        id: library
+        width: parent.width
+        y: (Svc.Mpris.running ? row.implicitHeight : empty.implicitHeight) + Theme.pad
+        shownTab: root.shownTab
     }
 }

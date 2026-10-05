@@ -18,3 +18,4 @@ singleton Clipboard 1.0 Clipboard.qml
 singleton Screenshot 1.0 Screenshot.qml
 singleton Github 1.0 Github.qml
 singleton Lock 1.0 Lock.qml
+singleton Spotify 1.0 Spotify.qml
