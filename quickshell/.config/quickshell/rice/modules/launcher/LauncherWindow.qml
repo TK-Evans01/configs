@@ -18,12 +18,15 @@ BarPopup {
     wanted: Svc.Ui.isOpen("launcher", screenName)
     popupWidth: Settings.launcherWidth
     contentHeight: col.implicitHeight
-    initialFocus: input
+    initialFocus: field.input
     onDismissed: Svc.Ui.dismiss()
-    onWantedChanged: if (wanted) { input.text = ""; root.reload(); list.currentIndex = firstSelectable(); }
+    // Also on creation: Bar.qml creates the launcher lazily, already open.
+    function _opened() { field.clear(); root.reload(); list.currentIndex = firstSelectable(); }
+    onWantedChanged: if (wanted) _opened()
+    Component.onCompleted: if (wanted) _opened()
 
     readonly property string mode: wanted ? Svc.Ui.page : ""
-    onModeChanged: { input.text = ""; reload(); }
+    onModeChanged: { field.clear(); reload(); }
     function reload() {
         if (mode === "clipboard") Svc.Clipboard.load();
         else if (mode === "keybinds") Svc.Keybinds.load();
@@ -35,7 +38,7 @@ BarPopup {
         { id: "keybinds", label: "keybinds", icon: "󰌌" }
     ]
 
-    readonly property string query: input.text
+    readonly property string query: field.text
     readonly property string calcResult: mode === "" ? Svc.Launcher.calc(query) : ""
 
     function _has(hay, q) { return hay.toLowerCase().indexOf(q) >= 0; }
@@ -60,6 +63,9 @@ BarPopup {
             return out;
         }
         if (calcResult !== "") return [{ kind: "calc", value: calcResult }];
+        // > actions (shell allowlist), @ open windows
+        if (query.startsWith(">")) return Svc.Actions.search(query.slice(1)).map(a => ({ kind: "action", action: a }));
+        if (query.startsWith("@")) return windows(query.slice(1));
         if (q) return Svc.Launcher.search(query).map(e => ({ kind: "app", entry: e }));
         const out = [];
         const freq = Svc.Launcher.frequent;
@@ -71,7 +77,21 @@ BarPopup {
         for (const e of Svc.Launcher.apps) out.push({ kind: "app", entry: e });
         return out;
     }
-    onRowsChanged: list.currentIndex = firstSelectable()
+    onRowsChanged: { list.currentIndex = firstSelectable(); armed = ""; }
+
+    function windows(q) {
+        q = q.trim().toLowerCase();
+        const out = [];
+        for (const t of Svc.Hyprland.toplevels.values) {
+            const ipc = t.lastIpcObject || {};
+            const cls = ipc.class || "";
+            const s = !q ? 1 : Math.max(Svc.Launcher.score(q, t.title), Svc.Launcher.score(q, cls));
+            if (s > 0) out.push({ kind: "window", win: t, cls: cls, ws: ipc.workspace ? ipc.workspace.name : "", s: s });
+        }
+        return out.sort((a, b) => b.s - a.s);
+    }
+    // A confirm-tier action needs Enter twice.
+    property string armed: ""
 
     function firstSelectable() {
         for (let i = 0; i < rows.length; i++) if (rows[i].kind !== "header") return i;
@@ -92,6 +112,17 @@ BarPopup {
         if (r.kind === "calc") Svc.Launcher.copy(r.value);
         else if (r.kind === "app") Svc.Launcher.launch(r.entry);
         else if (r.kind === "clip") Svc.Clipboard.copy(r.clip);
+        else if (r.kind === "action") {
+            if (r.action.confirm === "confirm" && armed !== r.action.id) { armed = r.action.id; return; }
+            Svc.Ui.close();
+            Svc.Actions.run(r.action);
+            return;
+        }
+        else if (r.kind === "window") {
+            Svc.Ui.close();
+            Svc.Hyprland.dispatch("focuswindow address:0x" + r.win.address);
+            return;
+        }
         else if (r.kind === "bind") {
             if (!r.bind.runnable) return;
             Svc.Ui.close();
@@ -103,9 +134,9 @@ BarPopup {
     }
     function setMode(id) { Svc.Ui.page = id; }
 
-    readonly property int rowH: Theme.fontSize * 2 + 10
+    readonly property int rowH: Theme.fontMd * 2 + 10
     readonly property int clipImageH: 72
-    readonly property int headerH: Theme.fontSizeSmall + 14
+    readonly property int headerH: Theme.fontBase + 14
 
     ColumnLayout {
         id: col
@@ -122,7 +153,7 @@ BarPopup {
                     required property var modelData
                     icon: modelData.icon
                     text: modelData.label
-                    size: Theme.fontSizeSmall + Theme.spacing * 2
+                    size: Theme.fontBase + Theme.spacing * 2
                     checked: root.mode === modelData.id
                     onClicked: root.setMode(modelData.id)
                 }
@@ -132,63 +163,23 @@ BarPopup {
                 visible: root.mode === "clipboard" && Svc.Clipboard.entries.length > 0
                 icon: "󰎟"
                 text: "wipe"
-                fg: Theme.red
-                size: Theme.fontSizeSmall + Theme.spacing * 2
+                fg: Theme.error
+                size: Theme.fontBase + Theme.spacing * 2
                 onClicked: Svc.Clipboard.wipe()
             }
         }
 
         // --- prompt ---
-        Rectangle {
-            Layout.fillWidth: true
-            implicitHeight: Theme.fontSize + Theme.pad * 2
-            color: Theme.surface0
-            border.width: Theme.border
-            border.color: input.activeFocus ? Theme.accent : Theme.surface2
-
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: Theme.pad
-                anchors.rightMargin: Theme.pad
-                spacing: Theme.spacing
-
-                Label {
-                    text: root.mode === "clipboard" ? "󰅌" : root.mode === "keybinds" ? "󰌌"
-                        : (root.calcResult !== "" || root.query.startsWith("=") ? "=" : ">")
-                    font.bold: true
-                    color: Theme.accent
-                }
-                Item {
-                    Layout.fillWidth: true
-                    implicitHeight: input.implicitHeight
-
-                    TextInput {
-                        id: input
-                        focus: true
-                        anchors.fill: parent
-                        verticalAlignment: TextInput.AlignVCenter
-                        color: Theme.textBright
-                        selectionColor: Theme.accent
-                        selectedTextColor: Theme.textReverse
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSize
-                        clip: true
-                        // Block cursor
-                        cursorDelegate: Rectangle {
-                            width: Math.round(Theme.fontSize * 0.6)
-                            color: Theme.accent
-                            opacity: input.activeFocus ? 1 : 0
-                            SequentialAnimation on opacity {
-                                running: input.activeFocus
-                                loops: Animation.Infinite
-                                NumberAnimation { to: 1; duration: 0 }
-                                PauseAnimation { duration: 530 }
-                                NumberAnimation { to: 0; duration: 0 }
-                                PauseAnimation { duration: 530 }
-                            }
-                        }
-
-                        Keys.onPressed: e => {
+        TextField {
+            id: field
+            fontSize: Theme.fontMd
+            prefix: root.mode === "clipboard" ? "󰅌" : root.mode === "keybinds" ? "󰌌"
+                : root.query.startsWith(">") ? "󰘳" : root.query.startsWith("@") ? "󰖯"
+                : (root.calcResult !== "" || root.query.startsWith("=") ? "=" : ">")
+            placeholder: root.mode === "clipboard" ? "search clipboard history"
+                : root.mode === "keybinds" ? "search keybinds"
+                : "search apps   ·   > actions   ·   @ windows   ·   = calc"
+            onKeyPressed: e => {
                             const ctrl = e.modifiers & Qt.ControlModifier;
                             const alt = e.modifiers & Qt.AltModifier;
                             const shift = e.modifiers & Qt.ShiftModifier;
@@ -206,24 +197,12 @@ BarPopup {
                             else return;
                             e.accepted = true;
                         }
-                    }
-                    Label {
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: input.text === ""
-                        text: root.mode === "clipboard" ? "search clipboard history"
-                            : root.mode === "keybinds" ? "search keybinds"
-                            : "search apps   ·   = calculator"
-                        color: Theme.muted
-                        size: Theme.fontSizeSmall + 1
-                        x: Math.round(Theme.fontSize * 0.6) + 4
-                    }
-                }
-                Label {
-                    visible: root.query.trim() !== "" && root.calcResult === ""
-                    text: list.count + (list.count === 1 ? " match" : " matches")
-                    size: Theme.fontSizeSmall - 2
-                    color: Theme.subtext
-                }
+
+            Label {
+                visible: root.query.trim() !== "" && root.calcResult === ""
+                text: list.count + (list.count === 1 ? " match" : " matches")
+                size: Theme.fontSm
+                color: Theme.subtext
             }
         }
 
@@ -260,11 +239,8 @@ BarPopup {
                     anchors.fill: parent
                     anchors.leftMargin: Theme.spacing
                     spacing: Theme.spacing
-                    Label {
-                        text: row.isHeader ? row.modelData.label.toUpperCase() : ""
-                        size: Theme.fontSizeSmall - 2
-                        font.letterSpacing: 1
-                        color: Theme.accent
+                    SectionLabel {
+                        label: row.isHeader ? row.modelData.label : ""
                     }
                     Rectangle { Layout.fillWidth: true; height: 1; color: Theme.surface2 }
                 }
@@ -273,13 +249,13 @@ BarPopup {
                 Rectangle {
                     visible: !row.isHeader
                     anchors.fill: parent
-                    color: row.selected ? Theme.surface1 : (hov.containsMouse ? Theme.surface0 : "transparent")
+                    radius: Theme.radiusSmall
+                    // Hover moves the selection, so only "selected" is drawn.
+                    color: row.selected ? Theme.surface1 : "transparent"
 
-                    Rectangle {
-                        visible: row.selected
-                        width: Theme.accentThickness
-                        height: parent.height
-                        color: Theme.accent
+                    AccentIndicator {
+                        edge: "left"
+                        active: row.selected
                     }
 
                     RowLayout {
@@ -291,8 +267,9 @@ BarPopup {
                         // key combo chip (keybinds)
                         Rectangle {
                             visible: row.bind !== null
-                            Layout.preferredWidth: Theme.fontSizeSmall * 15
+                            Layout.preferredWidth: Theme.fontBase * 15
                             implicitHeight: keysL.implicitHeight + 8
+                            radius: Theme.radiusSmall
                             color: Theme.surface0
                             border.width: Theme.border
                             border.color: row.selected ? Theme.accent : Theme.surface2
@@ -303,7 +280,7 @@ BarPopup {
                                 horizontalAlignment: Text.AlignHCenter
                                 elide: Text.ElideRight
                                 text: row.bind ? row.bind.keys : ""
-                                size: Theme.fontSizeSmall - 1
+                                size: Theme.fontSm
                                 font.bold: true
                                 color: row.selected ? Theme.accent : Theme.text
                             }
@@ -330,14 +307,18 @@ BarPopup {
                             Rectangle {
                                 anchors.fill: parent
                                 visible: !icon.visible
+                                radius: Theme.radiusSmall
                                 color: row.kind === "calc" ? Theme.accent : Theme.surface2
                                 Label {
                                     anchors.centerIn: parent
                                     text: row.kind === "calc" ? "󰃬"
+                                    : row.kind === "action" ? row.modelData.action.icon
+                                    : row.kind === "window" ? "󰖯"
                                         : row.clip ? (row.clip.image ? "󰋩" : "󰅍")
                                         : (row.entry ? row.entry.name.charAt(0).toUpperCase() : "")
                                     font.bold: true
-                                    color: row.kind === "calc" ? Theme.textReverse : Theme.text
+                                    color: row.kind === "calc" ? Theme.textReverse
+                                    : row.kind === "action" && root.armed === row.modelData.action.id ? Theme.error : Theme.text
                                 }
                             }
                         }
@@ -348,10 +329,12 @@ BarPopup {
                             Label {
                                 Layout.fillWidth: true
                                 text: row.kind === "calc" ? row.modelData.value
+                                    : row.kind === "action" ? row.modelData.action.title
+                                    : row.kind === "window" ? row.modelData.win.title
                                     : row.clip ? row.clip.text.replace(/\s+/g, " ").trim()
                                     : row.bind ? row.bind.label
                                     : (row.entry ? row.entry.name : "")
-                                size: row.kind === "calc" ? Theme.fontSizeLarge : Theme.fontSizeSmall + 2
+                                size: row.kind === "calc" ? Theme.fontLg : Theme.fontTitle
                                 font.bold: row.selected && !row.clip
                                 color: row.selected ? Theme.textBright : Theme.text
                                 elide: Text.ElideRight
@@ -359,12 +342,14 @@ BarPopup {
                             Label {
                                 Layout.fillWidth: true
                                 readonly property string sub: row.kind === "calc" ? "enter to copy"
+                                    : row.kind === "action" ? (root.armed === row.modelData.action.id ? "press enter again to confirm" : row.modelData.action.group)
+                                    : row.kind === "window" ? row.modelData.cls + (row.modelData.ws ? "  ·  workspace " + row.modelData.ws : "")
                                     : row.clip ? (row.clip.image ? "image · " + row.clip.info : row.clip.text.length + " chars")
                                     : row.bind ? row.bind.group + (row.bind.runnable ? "" : "  ·  key only")
                                     : row.entry ? (row.entry.genericName || row.entry.comment || "") : ""
                                 visible: sub !== ""
                                 text: sub
-                                size: Theme.fontSizeSmall - 2
+                                size: Theme.fontSm
                                 color: Theme.subtext
                                 elide: Text.ElideRight
                             }
@@ -373,13 +358,13 @@ BarPopup {
                         Label {
                             visible: row.entry !== null && row.entry.runInTerminal
                             text: "󰆍"
-                            size: Theme.fontSizeSmall
+                            size: Theme.fontBase
                             color: Theme.muted
                         }
                         IconButton {
                             visible: row.clip !== null && (row.selected || hov.containsMouse)
                             icon: "󰆴"
-                            fg: Theme.red
+                            fg: Theme.error
                             onClicked: Svc.Clipboard.remove(row.clip)
                         }
                         Label {
@@ -408,7 +393,7 @@ BarPopup {
                       ? (!Svc.Clipboard.available ? "cliphist isn't installed" : root.query ? "nothing matches" : "clipboard history is empty")
                       : root.mode === "keybinds" ? "no binds match"
                       : root.query.startsWith("=") ? "not an expression" : "no apps match “" + root.query + "”"
-                size: Theme.fontSizeSmall
+                size: Theme.fontBase
                 color: Theme.muted
             }
         }
@@ -419,8 +404,10 @@ BarPopup {
             Layout.alignment: Qt.AlignHCenter
             text: root.mode === "clipboard" ? "↑↓ select    ↵  copy    shift+del  remove    alt+1-3  mode    esc  close"
                 : root.mode === "keybinds" ? "↑↓ select    ↵  run    alt+1-3  mode    esc  close"
-                : "↑↓ tab  select    ↵  launch    = calc    alt+1-3  mode    esc  close"
-            size: Theme.fontSizeSmall - 3
+                : root.query.startsWith(">") ? "↑↓ select    ↵  run (power: twice)    esc  close"
+                : root.query.startsWith("@") ? "↑↓ select    ↵  focus window    esc  close"
+                : "↑↓ tab  select    ↵  launch    > actions    @ windows    = calc    esc  close"
+            size: Theme.fontXs
             color: Theme.muted
         }
     }

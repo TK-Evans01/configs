@@ -19,14 +19,14 @@ Card {
         spacing: Theme.spacing
         Label {
             text: Qt.formatDateTime(root.now, "HH:mm")
-            size: Theme.fontSizeHuge
+            size: Theme.fontHuge
             color: Theme.textBright
         }
         Label {
             Layout.alignment: Qt.AlignBottom
             Layout.bottomMargin: Theme.spacing
             text: Qt.formatDateTime(root.now, "ss")
-            size: Theme.fontSizeLarge
+            size: Theme.fontLg
             color: Theme.accent
         }
     }
@@ -45,7 +45,7 @@ Card {
         Label {
             text: parent.now ? Svc.Weather.fmtTemp(parent.now.temp) + "  " + Svc.Weather.describe(parent.now.code)
                   + "  ·  " + Settings.weatherPlace : ""
-            size: Theme.fontSizeSmall
+            size: Theme.fontBase
             color: Theme.text
             MouseArea {
                 anchors.fill: parent
@@ -56,7 +56,7 @@ Card {
     }
     Label {
         text: Svc.Desktop.user + "@" + Svc.Sys.host
-        size: Theme.fontSizeSmall
+        size: Theme.fontBase
         color: Theme.subtext
     }
 }

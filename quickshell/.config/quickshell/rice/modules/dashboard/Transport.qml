@@ -18,8 +18,8 @@ RowLayout {
     IconButton { icon: "󰒮"; enabledState: Svc.Mpris.canPrev; onClicked: Svc.Mpris.previous() }
     IconButton {
         icon: Svc.Mpris.playing ? "󰏤" : "󰐊"
-        fg: Theme.purple
-        size: Theme.fontSize + Theme.spacing * 3
+        fg: Theme.catMedia
+        size: Theme.fontMd + Theme.spacing * 3
         onClicked: Svc.Mpris.togglePlay()
     }
     IconButton { icon: "󰒭"; enabledState: Svc.Mpris.canNext; onClicked: Svc.Mpris.next() }

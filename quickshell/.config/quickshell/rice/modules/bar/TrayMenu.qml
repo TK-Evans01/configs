@@ -60,16 +60,12 @@ BarPopup {
             IconButton {
                 visible: root.current !== null
                 icon: "󰁍"
-                size: Theme.fontSizeSmall + Theme.spacing * 2
+                size: Theme.fontBase + Theme.spacing * 2
                 onClicked: root.stack = root.stack.slice(0, -1)
             }
-            Label {
+            SectionLabel {
                 Layout.fillWidth: true
-                text: (root.current ? root.current.label : (root.item ? (root.item.tooltipTitle || root.item.title || root.item.id) : "")).toUpperCase()
-                size: Theme.fontSizeSmall - 1
-                font.bold: true
-                font.letterSpacing: 1
-                color: Theme.accent
+                label: root.current ? root.current.label : (root.item ? (root.item.tooltipTitle || root.item.title || root.item.id) : "")
                 elide: Text.ElideRight
             }
         }
@@ -87,7 +83,7 @@ BarPopup {
                 readonly property bool toggle: entry && entry.buttonType !== QsMenuButtonType.None
 
                 Layout.fillWidth: true
-                implicitHeight: sep ? 9 : Theme.fontSize + 14
+                implicitHeight: sep ? 9 : Theme.rowHeightCompact
 
                 Rectangle {
                     visible: row.sep
@@ -97,30 +93,22 @@ BarPopup {
                     color: Theme.surface2
                 }
 
-                Rectangle {
+                ListRow {
+                    id: item
                     visible: !row.sep
                     anchors.fill: parent
-                    color: hov.containsMouse && row.on ? Theme.surface1 : "transparent"
+                    compact: true
                     opacity: row.on ? 1 : 0.4
-
-                    Rectangle {
-                        visible: hov.containsMouse && row.on
-                        width: Theme.accentThickness
-                        height: parent.height
-                        color: Theme.accent
-                    }
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: Theme.pad
-                        anchors.rightMargin: Theme.spacing
-                        spacing: Theme.spacing
-
-                        // leading slot: [x] / (•) or the entry's icon
+                    clickable: row.on
+                    active: hovered && row.on
+                    title: row.entry ? root.clean(row.entry.text) : ""
+                    // leading slot: [x] / (•) or the entry's icon
+                    leading: root.anyLeading ? lead : null
+                    Component {
+                        id: lead
                         Item {
-                            visible: root.anyLeading
-                            implicitWidth: Theme.fontSize
-                            implicitHeight: Theme.fontSize
+                            implicitWidth: Theme.fontMd
+                            implicitHeight: Theme.fontMd
                             Label {
                                 anchors.centerIn: parent
                                 visible: row.toggle
@@ -138,35 +126,20 @@ BarPopup {
                                 asynchronous: true
                             }
                         }
-                        Label {
-                            Layout.fillWidth: true
-                            text: row.entry ? root.clean(row.entry.text) : ""
-                            size: Theme.fontSizeSmall + 1
-                            color: hov.containsMouse && row.on ? Theme.textBright : Theme.text
-                            elide: Text.ElideRight
-                        }
-                        Label {
-                            visible: row.entry && row.entry.hasChildren
-                            text: "󰅂"
-                            color: Theme.subtext
-                        }
                     }
-
-                    MouseArea {
-                        id: hov
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        enabled: !row.sep
-                        cursorShape: row.on ? Qt.PointingHandCursor : Qt.ArrowCursor
-                        onClicked: {
-                            if (!row.on || !row.entry) return;
-                            if (row.entry.hasChildren) {
-                                root.stack = root.stack.concat([{ entry: row.entry, label: root.clean(row.entry.text) }]);
-                                return;
-                            }
-                            row.entry.triggered();
-                            Svc.Ui.close();
+                    onClicked: {
+                        if (!row.entry) return;
+                        if (row.entry.hasChildren) {
+                            root.stack = root.stack.concat([{ entry: row.entry, label: root.clean(row.entry.text) }]);
+                            return;
                         }
+                        row.entry.triggered();
+                        Svc.Ui.close();
+                    }
+                    Label {
+                        visible: row.entry && row.entry.hasChildren
+                        text: "󰅂"
+                        color: Theme.subtext
                     }
                 }
             }
@@ -177,7 +150,7 @@ BarPopup {
             Layout.alignment: Qt.AlignHCenter
             Layout.margins: Theme.pad
             text: "empty menu"
-            size: Theme.fontSizeSmall
+            size: Theme.fontBase
             color: Theme.muted
         }
     }

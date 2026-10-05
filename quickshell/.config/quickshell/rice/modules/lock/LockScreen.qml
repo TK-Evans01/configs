@@ -18,7 +18,7 @@ WlSessionLock {
 
     WlSessionLockSurface {
         id: surface
-        color: Theme.bg0
+        color: Theme.surface0
 
         property date now: new Date()
         property bool shown: false
@@ -58,6 +58,9 @@ WlSessionLock {
             }
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
+            // Half resolution is invisible under the blur, and keeps a
+            // 30 MP original from decoding at full size (~119 MB) per screen.
+            sourceSize: Qt.size(Math.ceil(surface.width / 2), Math.ceil(surface.height / 2))
             visible: false
         }
         MultiEffect {
@@ -70,7 +73,7 @@ WlSessionLock {
         }
         Rectangle {
             anchors.fill: parent
-            color: Theme.bg0
+            color: Theme.surface0
             opacity: 0.62
         }
 
@@ -114,7 +117,7 @@ WlSessionLock {
                     Label {
                         anchors.verticalCenter: parent.verticalCenter
                         text: "locked since " + Qt.formatTime(Svc.Lock.lockedAt, "HH:mm")
-                        size: Theme.fontSizeSmall
+                        size: Theme.fontBase
                         color: Theme.subtext
                     }
                 }
@@ -125,7 +128,7 @@ WlSessionLock {
                     Label {
                         anchors.verticalCenter: parent.verticalCenter
                         text: Qt.formatDate(surface.now, "ddd dd MMM").toLowerCase()
-                        size: Theme.fontSizeSmall
+                        size: Theme.fontBase
                         color: Theme.subtext
                     }
                 }
@@ -148,20 +151,24 @@ WlSessionLock {
                                 id: playGlyph
                                 text: Svc.Mpris.playing ? "󰏤" : "󰐊"
                                 size: Theme.iconSize
-                                color: Theme.purple
+                                color: Theme.catMedia
                             }
                         }
                         Label {
                             anchors.verticalCenter: parent.verticalCenter
                             text: Svc.Mpris.title + (Svc.Mpris.artist ? " · " + Svc.Mpris.artist : "")
-                            size: Theme.fontSizeSmall
-                            color: Svc.Mpris.playing ? Theme.purple : Theme.subtext
+                            size: Theme.fontBase
+                            color: Svc.Mpris.playing ? Theme.catMedia : Theme.subtext
                             width: Math.min(implicitWidth, 320)
                             elide: Text.ElideRight
                         }
                     }
                     Rectangle { width: 1; height: Settings.barHeight / 2; color: Theme.surface2; anchors.verticalCenter: parent.verticalCenter }
-                    PowerButtons { anchors.verticalCenter: parent.verticalCenter }
+                    PowerRow {
+                        anchors.verticalCenter: parent.verticalCenter
+                        actions: Svc.Desktop.actions.filter(a => a.id !== "logout" && a.id !== "lock")
+                        onFire: id => Svc.Desktop.power(id)
+                    }
                 }
             }
 
@@ -185,6 +192,7 @@ WlSessionLock {
                 }
 
                 Rectangle {
+                    radius: Theme.radius
                     Layout.alignment: Qt.AlignHCenter
                     Layout.topMargin: Theme.pad * 2
                     implicitWidth: 460
@@ -240,14 +248,15 @@ WlSessionLock {
                         Label {
                             Layout.alignment: Qt.AlignHCenter
                             text: Svc.Desktop.user
-                            size: Theme.fontSizeLarge
+                            size: Theme.fontLg
                             color: Theme.textBright
                         }
 
                         // password prompt
                         Rectangle {
+                            radius: Theme.radiusSmall
                             Layout.fillWidth: true
-                            implicitHeight: Theme.fontSize + Theme.pad * 2
+                            implicitHeight: Theme.fontMd + Theme.pad * 2
                             color: Theme.surface0
                             border.width: Theme.border
                             border.color: Svc.Lock.failed ? Theme.error : Theme.accent
@@ -261,12 +270,12 @@ WlSessionLock {
                                 Label {
                                     text: "●".repeat(Math.min(Svc.Lock.buffer.length, 24))
                                     color: Theme.textBright
-                                    size: Theme.fontSizeSmall
+                                    size: Theme.fontBase
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                                 Rectangle {
-                                    width: Math.round(Theme.fontSize * 0.6)
-                                    height: Theme.fontSize
+                                    width: Math.round(Theme.fontMd * 0.6)
+                                    height: Theme.fontMd
                                     anchors.verticalCenter: parent.verticalCenter
                                     color: Svc.Lock.authenticating ? Theme.subtext : Theme.accent
                                     SequentialAnimation on opacity {
@@ -285,7 +294,7 @@ WlSessionLock {
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: Svc.Lock.buffer === "" && !Svc.Lock.authenticating
                                 text: "password"
-                                size: Theme.fontSizeSmall
+                                size: Theme.fontBase
                                 color: Theme.muted
                             }
                         }
@@ -297,31 +306,10 @@ WlSessionLock {
                                 : Svc.Lock.failed ? Svc.Lock.failMessage + (Svc.Lock.attempts > 1 ? "  (" + Svc.Lock.attempts + ")" : "")
                                 : Svc.Lock.capsLock ? "󰌎  caps lock is on"
                                 : "enter to unlock  ·  esc to clear"
-                            size: Theme.fontSizeSmall - 1
+                            size: Theme.fontSm
                             color: Svc.Lock.failed ? Theme.error : Svc.Lock.capsLock ? Theme.warning : Theme.subtext
                         }
                     }
-                }
-            }
-        }
-    }
-
-    // Suspend / reboot / power off — arm on first click, fire on the second.
-    component PowerButtons: Row {
-        id: pb
-        property string armed: ""
-        spacing: 4
-        Timer { id: disarm; interval: 3000; onTriggered: pb.armed = "" }
-        Repeater {
-            model: Svc.Desktop.actions.filter(a => a.id !== "logout" && a.id !== "lock")
-            IconButton {
-                required property var modelData
-                icon: modelData.icon
-                fg: pb.armed === modelData.id ? Theme.textReverse : (modelData.id === "poweroff" ? Theme.error : Theme.text)
-                color: pb.armed === modelData.id ? Theme.error : (hovered ? Theme.surface2 : Theme.surface1)
-                onClicked: {
-                    if (pb.armed === modelData.id) { pb.armed = ""; Svc.Desktop.power(modelData.id); }
-                    else { pb.armed = modelData.id; disarm.restart(); }
                 }
             }
         }

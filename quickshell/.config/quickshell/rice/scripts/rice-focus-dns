@@ -1,0 +1,134 @@
+#!/bin/bash
+# rice-focus-dns — focus mode's site blocker. Runs as root via a sudoers line
+# that allows exactly: apply [--hard] <END_EPOCH>, clear, status.
+#
+#   apply [--hard] <END_EPOCH>   hostnames on stdin → /run/systemd/resolve/static.d/rice-focus.rr
+#   clear                        remove it (refused before END in hard mode)
+#   status                       JSON {active, until, hard, count}
+#
+# Safety: it can only *sinkhole* names (A 0.0.0.0 / AAAA ::), never redirect
+# them; every name is validated; a protect list keeps updates, VPN and mail
+# working; a root transient timer clears the block at END even if the shell
+# is gone. Install a root-owned copy to /usr/local/bin (sudoers must never
+# point at a user-writable file) — see the setup line in rice/README.md.
+#
+# Test mode (as a normal user only): RICE_FOCUS_TEST_ROOT=/some/dir runs
+# against that prefix and skips systemctl / resolvectl / systemd-run.
+set -euo pipefail
+export PATH=/usr/bin:/usr/sbin
+
+PREFIX=""
+TEST=0
+if [ "$(id -u)" != 0 ] && [ -n "${RICE_FOCUS_TEST_ROOT:-}" ]; then
+    PREFIX="$RICE_FOCUS_TEST_ROOT"; TEST=1
+fi
+DIR="$PREFIX/run/systemd/resolve/static.d"
+FILE="$DIR/rice-focus.rr"
+STATE="$PREFIX/run/rice-focus"
+UNIT=rice-focus-expire
+MAX=5000
+PROTECT='^(localhost|.*\.local|archlinux\.org|.*\.archlinux\.org|.*\.pkgbuild\.com|mullvad\.net|.*\.mullvad\.net|proton\.me|.*\.proton\.me|protonmail\.com|.*\.protonmail\.com|github\.com|.*\.github\.com|.*\.githubusercontent\.com|aur\.archlinux\.org)$'
+NAME_RE='^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$'
+
+die() { echo "rice-focus-dns: $1" >&2; exit "${2:-1}"; }
+reload_resolved() {
+    [ "$TEST" = 1 ] && return 0
+    systemctl reload systemd-resolved 2>/dev/null || systemctl try-restart systemd-resolved
+    resolvectl flush-caches 2>/dev/null || true
+}
+
+status() {
+    local active=false until=0 hard=false count=0
+    if [ -s "$FILE" ]; then
+        active=true
+        count=$(grep -c '"type":1,' "$FILE" || true)
+    fi
+    [ -f "$STATE/until" ] && until=$(cat "$STATE/until")
+    [ -f "$STATE/hard" ] && hard=true
+    printf '{"active":%s,"until":%s,"hard":%s,"count":%s}\n' "$active" "${until:-0}" "$hard" "$count"
+}
+
+apply() {
+    local hard=0
+    if [ "${1:-}" = --hard ]; then hard=1; shift; fi
+    local end="${1:-}" now
+    now=$(date +%s)
+    [[ "$end" =~ ^[0-9]+$ ]] || die "END must be a unix time"
+    (( end > now )) || die "END is in the past"
+    (( end <= now + 7 * 86400 )) || die "END is more than a week away"
+    # While a hard block is active it can only grow: it stays hard, keeps
+    # every name it has (new ones are added) and can't end earlier.
+    local hard_active=0
+    if [ -f "$STATE/hard" ] && [ -f "$STATE/until" ] && (( $(cat "$STATE/until") > now )); then
+        hard_active=1
+        hard=1
+        (( end >= $(cat "$STATE/until") )) || die "hard block active until $(cat "$STATE/until"); can't shorten it" 3
+    fi
+
+    local names=() seen=" " n bad=0
+    if [ $hard_active = 1 ] && [ -s "$FILE" ]; then
+        while IFS= read -r n; do
+            [[ "$seen" == *" $n "* ]] && continue
+            seen+="$n "; names+=("$n")
+        done < <(grep -o '"type":1,"name":"[^"]*"' "$FILE" | sed 's/.*"name":"\([^"]*\)"/\1/')
+    fi
+    while IFS= read -r n || [ -n "$n" ]; do
+        n=$(printf '%s' "$n" | tr 'A-Z' 'a-z' | tr -d '[:space:]')
+        n=${n%.}
+        [ -z "$n" ] && continue
+        if ! [[ "$n" =~ $NAME_RE ]] || [[ "$n" =~ $PROTECT ]]; then bad=$((bad + 1)); continue; fi
+        [[ "$seen" == *" $n "* ]] && continue
+        seen+="$n "
+        names+=("$n")
+        (( ${#names[@]} <= MAX )) || die "more than $MAX names"
+    done
+    (( ${#names[@]} > 0 )) || die "no valid names (rejected $bad)"
+
+    install -d -m 0755 "$DIR" "$STATE"
+    local tmp="$FILE.tmp.$$" first=1
+    {
+        printf '['
+        for n in "${names[@]}"; do
+            [ $first = 1 ] || printf ','
+            first=0
+            printf '\n{"key":{"type":1,"name":"%s"},"address":[0,0,0,0]}' "$n"
+            printf ',\n{"key":{"type":28,"name":"%s"},"address":"::"}' "$n"
+        done
+        printf '\n]\n'
+    } > "$tmp"
+    chmod 0644 "$tmp"
+    mv -f "$tmp" "$FILE"
+    echo "$end" > "$STATE/until"
+    if [ $hard = 1 ]; then touch "$STATE/hard"; else rm -f "$STATE/hard"; fi
+    reload_resolved
+
+    # Expiry that doesn't depend on the shell.
+    if [ "$TEST" = 0 ]; then
+        systemctl stop "$UNIT.timer" 2>/dev/null || true
+        systemctl reset-failed "$UNIT.service" "$UNIT.timer" 2>/dev/null || true
+        systemd-run --quiet --unit="$UNIT" --on-calendar="$(date -d "@$end" '+%Y-%m-%d %H:%M:%S')" \
+            --timer-property=AccuracySec=1s /usr/local/bin/rice-focus-dns expire >/dev/null
+    fi
+    echo "blocked ${#names[@]} names until $(date -d "@$end" '+%H:%M')$([ $hard = 1 ] && echo ' (hard)')$([ $bad -gt 0 ] && echo "; rejected $bad")"
+}
+
+clear_block() {
+    local force="${1:-}" now
+    now=$(date +%s)
+    if [ -f "$STATE/hard" ] && [ -f "$STATE/until" ] && (( now < $(cat "$STATE/until") )) && [ "$force" != --expired ]; then
+        die "hard focus: sites stay blocked until $(date -d "@$(cat "$STATE/until")" '+%H:%M')" 3
+    fi
+    rm -f "$FILE" "$STATE/until" "$STATE/hard"
+    reload_resolved
+    [ "$TEST" = 0 ] && { systemctl stop "$UNIT.timer" 2>/dev/null || true; }
+    echo "cleared"
+}
+
+case "${1:-}" in
+    apply) shift; apply "$@" ;;
+    clear) clear_block ;;
+    # Called by the transient timer at END (not allowed by the sudoers line).
+    expire) clear_block --expired ;;
+    status) status ;;
+    *) sed -n '2,9p' "$0" >&2; exit 2 ;;
+esac

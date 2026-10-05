@@ -18,26 +18,26 @@ Card {
         name: "CPU"
         percent: Svc.Sys.cpuPercent
         detail: Svc.Sys.cpuTemp > 0 ? Math.round(Svc.Sys.cpuTemp) + "°C" : ""
-        accent: Theme.blue
+        accent: Theme.series[0]
     }
     Meter {
         visible: Svc.Sys.gpuModel !== "" || Svc.Sys.gpuVramTotal > 0
         name: "GPU"
         percent: Svc.Sys.gpuPercent
         detail: Svc.Sys.gpuTemp > 0 ? Math.round(Svc.Sys.gpuTemp) + "°C" : ""
-        accent: Theme.purple
+        accent: Theme.series[1]
     }
     Meter {
         name: "RAM"
         percent: Svc.Sys.memPercent
         detail: Svc.Sys.fmtBytes(Svc.Sys.memUsed) + " / " + Svc.Sys.fmtBytes(Svc.Sys.memTotal)
-        accent: Theme.aqua
+        accent: Theme.series[2]
     }
     Meter {
         visible: card.rootDisk !== null
         name: "DSK"
         percent: card.rootDisk ? card.rootDisk.percent : 0
         detail: card.rootDisk ? "/  " + Svc.Sys.fmtBytes(card.rootDisk.used) + " / " + Svc.Sys.fmtBytes(card.rootDisk.size) : ""
-        accent: Theme.yellow
+        accent: Theme.series[3]
     }
 }

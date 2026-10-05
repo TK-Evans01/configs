@@ -27,7 +27,7 @@ Card {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             text: Qt.formatDate(root.shown, "MMMM yyyy").toUpperCase()
-            size: Theme.fontSizeSmall
+            size: Theme.fontBase
             font.bold: true
             font.letterSpacing: 1
             color: root.offset === 0 ? Theme.accent : Theme.text
@@ -54,7 +54,7 @@ Card {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 text: modelData
-                size: Theme.fontSizeSmall - 2
+                size: Theme.fontSm
                 color: index >= 5 ? Theme.orangeDim : Theme.muted
             }
         }
@@ -62,6 +62,7 @@ Card {
         Repeater {
             model: 42
             Rectangle {
+                radius: Theme.radiusSmall
                 id: cell
                 required property int index
                 readonly property int day: index - root.lead + 1
@@ -75,15 +76,15 @@ Card {
                     && root.picked.getTime() === date.getTime()
 
                 Layout.fillWidth: true
-                implicitHeight: Theme.fontSize + 10
+                implicitHeight: Theme.fontMd + 10
                 color: isToday ? Theme.accent : "transparent"
                 border.width: inMonth && !isToday && (hov.containsMouse || isPicked) ? 1 : 0
-                border.color: isPicked ? Theme.aqua : Theme.surface3
+                border.color: isPicked ? Theme.catTime : Theme.surface3
 
                 Label {
                     anchors.centerIn: parent
                     text: cell.label
-                    size: Theme.fontSizeSmall
+                    size: Theme.fontBase
                     font.bold: cell.isToday
                     color: cell.isToday ? Theme.textReverse
                          : !cell.inMonth ? Theme.surface3
@@ -100,7 +101,7 @@ Card {
                         Rectangle {
                             width: 3
                             height: 3
-                            color: cell.isToday ? Theme.textReverse : Theme.aqua
+                            color: cell.isToday ? Theme.textReverse : Theme.catTime
                         }
                     }
                 }

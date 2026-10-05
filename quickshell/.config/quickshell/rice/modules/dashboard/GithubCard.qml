@@ -14,7 +14,7 @@ Card {
         icon: ""
         title: "GitHub"
         subtitle: Svc.Github.state_ === "ok" ? Svc.Github.total + " contributions this year" : Svc.Github.error
-        accent: Svc.Github.state_ === "ok" ? Theme.green : Theme.red
+        accent: Svc.Github.state_ === "ok" ? Theme.catDev : Theme.error
         IconButton {
             icon: "󰅂"
             onClicked: Svc.Ui.tab = "github"
@@ -32,7 +32,7 @@ Card {
         Layout.fillWidth: true
         text: grid.hovered ? grid.describe(grid.hovered)
             : "today " + Svc.Github.today + "   ·   streak " + Svc.Github.streak + "d   ·   this week " + Svc.Github.thisWeek
-        size: Theme.fontSizeSmall - 1
+        size: Theme.fontSm
         color: grid.hovered ? Theme.textBright : Theme.subtext
     }
 }

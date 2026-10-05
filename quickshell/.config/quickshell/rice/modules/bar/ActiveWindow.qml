@@ -18,13 +18,13 @@ Row {
 
     visible: title !== ""
     spacing: Theme.spacing
-    height: Settings.barHeight - 1
+    height: Settings.barHeight - Theme.outlineWidth
 
     Label {
         anchors.verticalCenter: parent.verticalCenter
         visible: root.appClass !== ""
         text: root.appClass
-        size: Theme.fontSizeSmall
+        size: Theme.fontBase
         color: Theme.info
     }
     ScrollingText {

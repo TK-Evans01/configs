@@ -1,0 +1,6 @@
+# Focus mode's site blocker (rice shell). Lets your user run exactly these
+# subcommands of the ROOT-OWNED copy in /usr/local/bin without a password.
+# Never point this at a user-writable path: that would be passwordless root.
+# `clear` is refused by the helper itself during a hard focus block; there is
+# deliberately no way to force it here (a real `sudo` with your password is).
+tk ALL=(root) NOPASSWD: /usr/local/bin/rice-focus-dns apply *, /usr/local/bin/rice-focus-dns clear, /usr/local/bin/rice-focus-dns status

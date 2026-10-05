@@ -13,7 +13,7 @@ Item {
     property int gap: 2
     property var hovered: null
     readonly property int step: cell + gap
-    readonly property int labelH: Theme.fontSizeSmall
+    readonly property int labelH: Theme.fontBase
     implicitHeight: labelH + 7 * step
 
     readonly property var days: Svc.Github.days
@@ -40,7 +40,7 @@ Item {
             required property var modelData
             x: modelData.x
             text: modelData.label
-            size: Theme.fontSizeSmall - 4
+            size: Theme.fontXs
             color: Theme.muted
         }
     }
@@ -48,6 +48,7 @@ Item {
     Repeater {
         model: grid.days.length
         Rectangle {
+            radius: Theme.round ? 2 : 0
             required property int index
             readonly property var day: grid.days[index]
             readonly property int week: Math.floor((index + grid.firstDow) / 7)

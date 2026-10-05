@@ -19,8 +19,7 @@ BarPopup {
 
     readonly property Item current: ({
         "": main, network: network, bluetooth: bt, sound: sound,
-        nightlight: nightlight, notifications: notifications, mail: mail,
-        screenshot: screenshot
+        nightlight: nightlight, screenshot: screenshot, focus: focus
     })[page] || main
 
     Item {
@@ -40,7 +39,7 @@ BarPopup {
         fadeIn.target = current;
         fadeIn.restart();
     }
-    NumberAnimation { id: slideIn; property: "x"; to: 0; duration: Theme.anim; easing.type: Easing.OutCubic }
+    NumberAnimation { id: slideIn; property: "x"; to: 0; duration: Theme.anim; easing.type: Theme.easing }
     NumberAnimation { id: fadeIn; property: "opacity"; from: 0; to: 1; duration: Theme.anim }
 
     MainPage { id: main; width: parent.width; visible: root.current === main }
@@ -48,7 +47,6 @@ BarPopup {
     BluetoothPage { id: bt; width: parent.width; visible: root.current === bt }
     SoundPage { id: sound; width: parent.width; visible: root.current === sound }
     NightLightPage { id: nightlight; width: parent.width; visible: root.current === nightlight }
-    NotificationsPage { id: notifications; width: parent.width; visible: root.current === notifications }
-    MailPage { id: mail; width: parent.width; visible: root.current === mail }
     ScreenshotPage { id: screenshot; width: parent.width; visible: root.current === screenshot }
+    FocusPage { id: focus; width: parent.width; visible: root.current === focus }
 }

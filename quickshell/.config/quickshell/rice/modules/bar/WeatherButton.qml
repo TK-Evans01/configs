@@ -24,7 +24,7 @@ BarButton {
         Label {
             anchors.verticalCenter: parent.verticalCenter
             text: root.now ? Svc.Weather.fmtTemp(root.now.temp) : ""
-            size: Theme.fontSizeSmall + 1
+            size: Theme.fontTitle
             color: root.active ? Theme.accent : Theme.text
         }
     }

@@ -29,10 +29,10 @@ Card {
 
         ColumnLayout {
             spacing: 0
-            Layout.preferredWidth: Theme.fontSize * 5
+            Layout.preferredWidth: Theme.fontMd * 5
             Label {
                 text: root.percent + "%"
-                size: Theme.iconSizeLarge + 11
+                size: Theme.fontXl
                 color: Theme.usageColor(root.percent, Theme.textBright)
             }
             Repeater {
@@ -40,7 +40,7 @@ Card {
                 Label {
                     required property string modelData
                     text: modelData
-                    size: Theme.fontSizeSmall - 2
+                    size: Theme.fontSm
                     color: Theme.subtext
                 }
             }

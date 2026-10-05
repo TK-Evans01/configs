@@ -1,5 +1,6 @@
 import QtQuick
 import "../../config"
+import "../../components"
 import "../../services" as Svc
 
 // This monitor's workspaces, in order. The shown one is lit; on the focused
@@ -26,43 +27,25 @@ Row {
     Repeater {
         model: root.ids
 
-        Item {
+        BarButton {
             id: cell
             required property int modelData
             readonly property bool shown: modelData === root.activeId
             readonly property bool lit: shown && root.monitorFocused
 
-            width: Math.max(Theme.fontSize * 2, num.implicitWidth + Theme.pad)
-            height: Settings.barHeight - 1
+            // The shown workspace keeps its indicator; muted when this
+            // monitor isn't focused.
+            active: shown
+            indicator: lit ? Theme.accent : Theme.muted
+            minWidth: Theme.fontMd * 2
+            onClicked: Svc.Hyprland.dispatch("workspace " + cell.modelData)
+            onWheeled: d => Svc.Hyprland.dispatch("workspace " + (d > 0 ? "m-1" : "m+1"))
 
-            Rectangle {
-                anchors.fill: parent
-                color: hov.containsMouse ? Theme.surface2 : "transparent"
-            }
-            Text {
-                id: num
-                anchors.centerIn: parent
+            Label {
                 text: cell.modelData
                 color: cell.lit ? Theme.accent : (cell.shown ? Theme.text : Theme.muted)
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSize
+                size: Theme.fontMd
                 font.bold: cell.shown
-            }
-            Rectangle {
-                anchors.bottom: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: cell.shown ? parent.width - 8 : 0
-                height: Theme.accentThickness
-                color: cell.lit ? Theme.accent : Theme.muted
-                Behavior on width { NumberAnimation { duration: Theme.anim; easing.type: Easing.OutCubic } }
-            }
-            MouseArea {
-                id: hov
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: Svc.Hyprland.dispatch("workspace " + cell.modelData)
-                onWheel: w => Svc.Hyprland.dispatch("workspace " + (w.angleDelta.y > 0 ? "m-1" : "m+1"))
             }
         }
     }

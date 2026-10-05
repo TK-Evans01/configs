@@ -64,7 +64,7 @@ ColumnLayout {
             wrapMode: Text.WordWrap
             text: (!Svc.Screenshot.hasOcr ? "OCR needs tesseract-data-" + Settings.ocrLang + ". " : "")
                   + (!Svc.Screenshot.hasEditor ? "Edit needs satty." : "")
-            size: Theme.fontSizeSmall - 3
+            size: Theme.fontXs
             color: Theme.muted
         }
     }
@@ -95,9 +95,10 @@ ColumnLayout {
             subtitle: Svc.Screenshot.latest.split("/").pop()
         }
         Rectangle {
+            radius: Theme.radius
             Layout.fillWidth: true
             implicitHeight: Math.min(220, width * 9 / 16)
-            color: Theme.bg0
+            color: Theme.surface0
             border.width: Theme.border
             border.color: lastHov.containsMouse ? Theme.accent : Theme.surface2
             Image {

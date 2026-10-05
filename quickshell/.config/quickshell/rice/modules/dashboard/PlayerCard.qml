@@ -10,7 +10,7 @@ Card {
         icon: "󰝚"
         title: "Now playing"
         subtitle: Svc.Mpris.running ? Svc.Mpris.identity : ""
-        accent: Theme.purple
+        accent: Theme.catMedia
     }
 
     RowLayout {
@@ -34,7 +34,7 @@ Card {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 0
                 text: Svc.Mpris.title || "—"
-                color: Theme.purpleBright
+                color: Theme.catMediaBright
                 bold: true
             }
             ScrollingText {
@@ -42,7 +42,7 @@ Card {
                 Layout.preferredWidth: 0
                 text: Svc.Mpris.artist
                 color: Theme.subtext
-                pixelSize: Theme.fontSizeSmall
+                pixelSize: Theme.fontBase
             }
             Progress { showTimes: false; Layout.topMargin: Theme.spacing }
             Transport { Layout.topMargin: 4 }
@@ -56,7 +56,7 @@ Card {
             Layout.fillWidth: true
             text: "nothing playing"
             color: Theme.muted
-            size: Theme.fontSizeSmall
+            size: Theme.fontBase
         }
         IconButton {
             icon: "󰐊"

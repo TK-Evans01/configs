@@ -45,7 +45,7 @@ Row {
                 }
                 root.menuItem = modelData;
                 menu.anchorItem = btn;
-                Svc.Ui.toggle("traymenu", root.screenName, "");
+                Svc.Ui.toggle("traymenu", root.screenName, modelData.id);
             }
 
             Image {

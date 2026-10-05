@@ -25,7 +25,7 @@ Item {
         Label {
             Layout.alignment: Qt.AlignHCenter
             text: "󰝛"
-            size: Theme.fontSizeHuge
+            size: Theme.fontHuge
             color: Theme.surface3
         }
         Label {
@@ -69,7 +69,7 @@ Item {
                         required property var modelData
                         text: Svc.Mpris.playerName(modelData).toLowerCase()
                         icon: modelData.isPlaying ? "󰐊" : ""
-                        size: Theme.fontSizeSmall + Theme.spacing * 2
+                        size: Theme.fontBase + Theme.spacing * 2
                         checked: modelData === Svc.Mpris.player
                         onClicked: Svc.Mpris.select(modelData)
                     }
@@ -80,8 +80,8 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 0
                 text: Svc.Mpris.title || "—"
-                color: Theme.purpleBright
-                pixelSize: Theme.fontSizeLarge
+                color: Theme.catMediaBright
+                pixelSize: Theme.fontLg
                 bold: true
             }
             ScrollingText {
@@ -97,7 +97,7 @@ Item {
                 visible: text !== ""
                 text: Svc.Mpris.album
                 color: Theme.subtext
-                pixelSize: Theme.fontSizeSmall
+                pixelSize: Theme.fontBase
             }
 
             LyricsView {
@@ -116,7 +116,7 @@ Item {
                     Layout.fillWidth: false
                     Layout.preferredWidth: 220
                     icon: "󰕾"
-                    fill: Theme.purple
+                    fill: Theme.catMedia
                     value: Math.round(Svc.Mpris.volume * 100)
                     onMoved: p => Svc.Mpris.setVolume(p / 100)
                 }

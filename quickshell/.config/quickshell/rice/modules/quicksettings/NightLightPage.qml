@@ -8,6 +8,8 @@ import "../../services" as Svc
 ColumnLayout {
     id: page
     spacing: Theme.pad
+    // In the settings window: no back-button header (the window has its own).
+    property bool embedded: false
     readonly property var presets: [
         { label: "candle", k: 2700 },
         { label: "warm", k: 3500 },
@@ -16,6 +18,8 @@ ColumnLayout {
     ]
 
     PageHeader {
+
+        visible: !page.embedded
         icon: "󰖔"
         title: "Night light"
         subtitle: Svc.Desktop.nightLight
@@ -47,8 +51,8 @@ ColumnLayout {
         // warm → cool strip under the slider, as a legend
         Row {
             Layout.fillWidth: true
-            Layout.leftMargin: Theme.fontSize + Theme.spacing * 3
-            Layout.rightMargin: Theme.fontSizeSmall * 4 + Theme.spacing
+            Layout.leftMargin: Theme.fontMd + Theme.spacing * 3
+            Layout.rightMargin: Theme.fontBase * 4 + Theme.spacing
             height: 4
             Repeater {
                 model: 12
@@ -70,7 +74,7 @@ ColumnLayout {
                     required property var modelData
                     Layout.fillWidth: true
                     text: modelData.label + " " + modelData.k
-                    size: Theme.fontSizeSmall + Theme.spacing * 2
+                    size: Theme.fontBase + Theme.spacing * 2
                     checked: Svc.Desktop.nightLight && Svc.Desktop.nightTemp === modelData.k
                     onClicked: Svc.Desktop.setNightTemp(modelData.k)
                 }
@@ -98,7 +102,7 @@ ColumnLayout {
         Layout.fillWidth: true
         wrapMode: Text.WordWrap
         text: "hyprsunset.conf profiles (05:00 / 17:00) re-apply their own values when they trigger."
-        size: Theme.fontSizeSmall - 3
+        size: Theme.fontXs
         color: Theme.muted
     }
 }

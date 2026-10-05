@@ -8,6 +8,8 @@ import "../../services" as Svc
 ColumnLayout {
     id: page
     spacing: Theme.pad
+    // In the settings window: no back-button header (the window has its own).
+    property bool embedded: false
     readonly property var bt: Svc.Bluetooth
 
     // BlueZ hands back freedesktop icon names.
@@ -33,6 +35,8 @@ ColumnLayout {
     }
 
     PageHeader {
+
+        visible: !page.embedded
         icon: page.bt.enabled ? "󰂯" : "󰂲"
         title: "Bluetooth"
         subtitle: !page.bt.present ? "no adapter" : page.bt.adapter.name
@@ -49,7 +53,7 @@ ColumnLayout {
             icon: "󰂳"
             title: "Devices"
             subtitle: page.bt.discovering ? "scanning · put the device in pairing mode" : page.bt.devices.length + " known"
-            accent: page.bt.discovering ? Theme.yellow : Theme.blue
+            accent: page.bt.discovering ? Theme.pending : Theme.catSystem
             IconButton {
                 icon: "󰑓"
                 text: page.bt.discovering ? "stop" : "scan"
@@ -61,12 +65,12 @@ ColumnLayout {
         Label {
             visible: page.bt.devices.length === 0
             text: page.bt.enabled ? "no devices" : "bluetooth is off"
-            size: Theme.fontSizeSmall
+            size: Theme.fontBase
             color: Theme.muted
         }
         Repeater {
             model: page.bt.devices
-            DeviceRow {
+            ListRow {
                 id: devRow
                 required property var modelData
                 icon: page.deviceIcon(modelData)
@@ -80,7 +84,7 @@ ColumnLayout {
                 IconButton {
                     visible: devRow.modelData.paired && devRow.hovered
                     icon: "󰆴"
-                    fg: Theme.red
+                    fg: Theme.error
                     onClicked: page.bt.forget(devRow.modelData)
                 }
             }

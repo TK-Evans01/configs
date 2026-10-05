@@ -25,8 +25,9 @@ Card {
     CardHeader {
         icon: "󰲸"
         title: "Library"
-        subtitle: Svc.Spotify.error || (Svc.Spotify.loading ? "refreshing…" : "")
-        accent: Theme.purple
+        subtitle: Svc.Spotify.error || ""
+        accent: Theme.catMedia
+        Spinner { visible: Svc.Spotify.loading; tint: Theme.catMedia }
         IconButton {
             icon: "󰒝"
             checked: Svc.Spotify.shuffle
@@ -41,7 +42,7 @@ Card {
         IconButton {
             icon: "󰋑"
             text: Svc.Spotify.startingId === "liked" ? "starting…" : "liked songs"
-            fg: Theme.red
+            fg: Theme.error
             onClicked: Svc.Spotify.playLiked()
         }
         IconButton {
@@ -55,33 +56,10 @@ Card {
             onClicked: root.kind = "albums"
         }
         // filter
-        Rectangle {
-            Layout.fillWidth: true
-            implicitHeight: Theme.fontSize + Theme.spacing * 2
-            color: Theme.surface0
-            border.width: Theme.border
-            border.color: filter.activeFocus ? Theme.accent : Theme.surface2
-            Label {
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.spacing
-                anchors.verticalCenter: parent.verticalCenter
-                visible: filter.text === ""
-                text: "filter"
-                size: Theme.fontSizeSmall
-                color: Theme.muted
-            }
-            TextInput {
-                id: filter
-                anchors.fill: parent
-                anchors.leftMargin: Theme.spacing
-                anchors.rightMargin: Theme.spacing
-                verticalAlignment: TextInput.AlignVCenter
-                color: Theme.textBright
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeSmall
-                clip: true
-                Keys.onEscapePressed: text = ""
-            }
+        TextField {
+            id: filter
+            placeholder: "filter"
+            onKeyPressed: e => { if (e.key === Qt.Key_Escape && text !== "") { clear(); e.accepted = true; } }
         }
     }
 
@@ -94,7 +72,7 @@ Card {
         boundsBehavior: Flickable.StopAtBounds
         model: root.rows
 
-        delegate: DeviceRow {
+        delegate: ListRow {
             id: row
             required property var modelData
             width: ListView.view.width
@@ -107,8 +85,8 @@ Card {
                 readonly property bool starting: Svc.Spotify.startingId === row.modelData.id
                 visible: row.hovered || starting
                 text: starting ? "starting…" : (Svc.Spotify.shuffle ? "󰒝 ▶" : "▶")
-                size: starting ? Theme.fontSizeSmall - 1 : Theme.fontSize
-                color: Theme.purple
+                size: starting ? Theme.fontSm : Theme.fontMd
+                color: Theme.catMedia
             }
         }
 
@@ -116,7 +94,7 @@ Card {
             anchors.centerIn: parent
             visible: list.count === 0 && !Svc.Spotify.loading
             text: Svc.Spotify.error ? "open spotify_player (SUPER+S), then 󰑓" : "nothing matches"
-            size: Theme.fontSizeSmall
+            size: Theme.fontBase
             color: Theme.muted
         }
     }

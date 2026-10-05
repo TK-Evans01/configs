@@ -17,7 +17,7 @@ Card {
         icon: "󰃭"
         title: root.day ? Qt.formatDate(root.day, "ddd dd MMM") : "Upcoming"
         subtitle: Svc.Calendar.state_ === "stale" ? "offline · cached" : ""
-        accent: Theme.aqua
+        accent: Theme.catTime
         IconButton {
             visible: root.day !== null
             icon: "󰅖"
@@ -32,7 +32,7 @@ Card {
     Label {
         visible: root.list.length === 0
         text: root.day ? "nothing that day" : "nothing coming up"
-        size: Theme.fontSizeSmall
+        size: Theme.fontBase
         color: Theme.muted
     }
 
@@ -47,19 +47,19 @@ Card {
             Rectangle {
                 Layout.fillHeight: true
                 implicitWidth: Theme.accentThickness
-                color: ev.modelData.allDay ? Theme.yellow : Theme.aqua
+                color: ev.modelData.allDay ? Theme.accent : Theme.catTime
             }
             Label {
                 visible: root.day === null
-                Layout.preferredWidth: Theme.fontSizeSmall * 4
+                Layout.preferredWidth: Theme.fontBase * 4
                 text: Svc.Calendar.fmtDay(ev.modelData)
-                size: Theme.fontSizeSmall - 1
+                size: Theme.fontSm
                 color: Svc.Calendar.fmtDay(ev.modelData) === "today" ? Theme.accent : Theme.subtext
             }
             Label {
-                Layout.preferredWidth: Theme.fontSizeSmall * 7
+                Layout.preferredWidth: Theme.fontBase * 7
                 text: Svc.Calendar.fmtWhen(ev.modelData)
-                size: Theme.fontSizeSmall - 1
+                size: Theme.fontSm
                 color: Theme.subtext
             }
             ColumnLayout {
@@ -68,7 +68,7 @@ Card {
                 Label {
                     Layout.fillWidth: true
                     text: ev.modelData.title
-                    size: Theme.fontSizeSmall
+                    size: Theme.fontBase
                     color: Theme.textBright
                     elide: Text.ElideRight
                 }
@@ -76,7 +76,7 @@ Card {
                     Layout.fillWidth: true
                     visible: ev.modelData.location !== ""
                     text: "󰍎 " + ev.modelData.location
-                    size: Theme.fontSizeSmall - 3
+                    size: Theme.fontXs
                     color: Theme.muted
                     elide: Text.ElideRight
                 }

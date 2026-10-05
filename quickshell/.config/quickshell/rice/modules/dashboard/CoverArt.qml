@@ -5,6 +5,7 @@ import "../../services" as Svc
 
 // Square cover with a hairline frame; a big note glyph stands in without art.
 Rectangle {
+    radius: Theme.radius
     color: Theme.surface1
     border.width: Theme.border
     border.color: Theme.surface2

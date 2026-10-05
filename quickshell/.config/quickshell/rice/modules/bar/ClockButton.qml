@@ -29,9 +29,19 @@ BarButton {
         }
         Label {
             anchors.verticalCenter: parent.verticalCenter
+            visible: !Svc.Focus.active
             text: Qt.formatDateTime(root.now, "ddd dd MMM").toLowerCase()
-            size: Theme.fontSizeSmall
+            size: Theme.fontBase
             color: Theme.subtext
+        }
+        // Focus mode: phase glyph + time left instead of the date.
+        Label {
+            anchors.verticalCenter: parent.verticalCenter
+            visible: Svc.Focus.active
+            text: (Svc.Focus.focusing ? "󰌾 " : "󰅶 ") + Svc.Focus.remainingText
+            size: Theme.fontBase
+            font.bold: Svc.Focus.focusing
+            color: Svc.Focus.focusing ? Theme.catTime : Theme.subtext
         }
     }
 }

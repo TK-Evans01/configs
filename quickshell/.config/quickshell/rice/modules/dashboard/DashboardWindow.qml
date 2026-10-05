@@ -6,13 +6,18 @@ import "../../services" as Svc
 
 // Tabbed dashboard under the bar's center island. Tabs slide sideways and the
 // panel follows the current tab's height. Ctrl+Tab / Ctrl+Shift+Tab cycle,
-// Alt+1…4 jump.
+// Alt+1…N jump (one per tab in Settings.dashboardTabs).
 BarPopup {
     id: root
 
     required property string screenName
     readonly property var tabs: Settings.dashboardTabs
     readonly property int tabIndex: Math.max(0, tabs.findIndex(t => t.id === Svc.Ui.tab))
+    // The tab sliding out stays loaded for the slide, then is dropped.
+    property int prevIndex: -1
+    onTabIndexChanged: { prevIndex = _shown; _shown = tabIndex; dropPrev.restart(); }
+    property int _shown: tabIndex
+    Timer { id: dropPrev; interval: Theme.animLong + 50; onTriggered: root.prevIndex = -1 }
 
     wanted: Svc.Ui.isOpen("dashboard", screenName)
     popupWidth: Settings.dashboardWidth
@@ -70,7 +75,8 @@ BarPopup {
                         required property var modelData
                         required property int index
                         width: pages.width
-                        active: root.visible
+                        // Only the shown tab (and the one sliding out) is built.
+                        active: root.visible && (index === root.tabIndex || index === root.prevIndex)
                         sourceComponent: ({
                             overview: overviewC,
                             media: mediaC,

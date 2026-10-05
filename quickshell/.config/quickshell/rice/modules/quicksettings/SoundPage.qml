@@ -7,8 +7,12 @@ import "../../services" as Svc
 ColumnLayout {
     id: page
     spacing: Theme.pad
+    // In the settings window: no back-button header (the window has its own).
+    property bool embedded: false
 
     PageHeader {
+
+        visible: !page.embedded
         icon: "󰓃"
         title: "Sound"
         subtitle: "volume and devices"
@@ -17,12 +21,13 @@ ColumnLayout {
 
     Card {
         Layout.fillWidth: true
-        CardHeader { icon: "󰕾"; title: "Volume" }
+        CardHeader { icon: "󰕾"; title: "Volume"; accent: Theme.catMedia }
         Slider {
             icon: Svc.Audio.outMuted ? "󰝟" : "󰕾"
             value: Svc.Audio.outPercent
             max: 150
             muted: Svc.Audio.outMuted
+            fill: Theme.catMedia
             onMoved: p => Svc.Audio.setOutputVolume(p)
             onIconClicked: Svc.Audio.toggleMute()
         }
@@ -31,7 +36,7 @@ ColumnLayout {
             value: Svc.Audio.inPercent
             max: 150
             muted: Svc.Audio.inMuted
-            fill: Theme.aqua
+            fill: Theme.catMedia
             onMoved: p => Svc.Audio.setInputVolume(p)
             onIconClicked: Svc.Audio.toggleInputMute()
         }
@@ -53,7 +58,7 @@ ColumnLayout {
         }
         Repeater {
             model: sec.devices
-            DeviceRow {
+            ListRow {
                 required property var modelData
                 icon: sec.sink ? (/hdmi|displayport/i.test(modelData.name) ? "󰡁" : /headset|usb/i.test(modelData.name) ? "󰋋" : "󰓃")
                                : (/usb|headset/i.test(modelData.name) ? "󰋎" : "󰍬")

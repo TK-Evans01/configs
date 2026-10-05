@@ -30,14 +30,14 @@ BarButton {
         Label {
             text: !root.has ? "󰝚" : (Svc.Mpris.playing ? "󰐊" : "󰏤")
             size: Theme.iconSize
-            color: !root.has ? Theme.muted : (Svc.Mpris.playing ? Theme.purple : Theme.subtext)
+            color: !root.has ? Theme.muted : (Svc.Mpris.playing ? Theme.catMedia : Theme.subtext)
         }
         ScrollingText {
             anchors.verticalCenter: parent.verticalCenter
             visible: root.has
             text: root.track
-            pixelSize: Theme.fontSizeSmall + 1
-            color: Svc.Mpris.playing ? Theme.purple : Theme.subtext
+            pixelSize: Theme.fontTitle
+            color: Svc.Mpris.playing ? Theme.catMedia : Theme.subtext
             maxWidth: Settings.mediaLabelWidth
             scrolling: Svc.Mpris.playing || root.hovered
         }

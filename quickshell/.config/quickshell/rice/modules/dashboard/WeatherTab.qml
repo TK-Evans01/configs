@@ -24,10 +24,14 @@ Item {
         Card {
             Layout.fillWidth: true
             visible: root.now === null
-            Label {
+            RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                text: Svc.Weather.loading ? "fetching weather…" : (Svc.Weather.error || "no data yet")
-                color: Theme.muted
+                spacing: Theme.spacing
+                Spinner { visible: Svc.Weather.loading; tint: Theme.catWeather }
+                Label {
+                    text: Svc.Weather.loading ? "fetching weather" : (Svc.Weather.error || "no data yet")
+                    color: Theme.muted
+                }
             }
             IconButton {
                 Layout.alignment: Qt.AlignHCenter
@@ -46,7 +50,7 @@ Item {
                 icon: "󰍎"
                 title: Settings.weatherPlace
                 subtitle: "updated " + Qt.formatDateTime(Svc.Weather.updated, "HH:mm")
-                accent: Theme.aqua
+                accent: Theme.catWeather
                 IconButton {
                     icon: "󰑓"
                     enabledState: !Svc.Weather.loading
@@ -60,14 +64,14 @@ Item {
 
                 Label {
                     text: root.now ? Svc.Weather.icon(root.now.code, root.now.isDay) : ""
-                    size: Theme.fontSizeHuge
+                    size: Theme.fontHuge
                     color: root.now ? Svc.Weather.color(root.now.code, root.now.isDay) : Theme.muted
                 }
                 ColumnLayout {
                     spacing: 0
                     Label {
                         text: root.now ? Svc.Weather.fmtTemp(root.now.temp) + Svc.Weather.tempUnit.slice(1) : ""
-                        size: Theme.fontSizeHuge - 22
+                        size: Theme.fontXl
                         color: Theme.textBright
                     }
                     Label {
@@ -80,17 +84,17 @@ Item {
                     columns: 2
                     columnSpacing: Theme.pad
                     rowSpacing: 2
-                    component Stat: Label { size: Theme.fontSizeSmall; color: Theme.subtext }
-                    component Val: Label { size: Theme.fontSizeSmall; color: Theme.text; Layout.alignment: Qt.AlignRight }
-                    Stat { text: "feels like" }
+                    component Key: Label { size: Theme.fontBase; color: Theme.subtext }
+                    component Val: Label { size: Theme.fontBase; color: Theme.text; Layout.alignment: Qt.AlignRight }
+                    Key { text: "feels like" }
                     Val { text: root.now ? Svc.Weather.fmtTemp(root.now.feels) : "" }
-                    Stat { text: "high / low" }
+                    Key { text: "high / low" }
                     Val { text: root.today ? Svc.Weather.fmtTemp(root.today.max) + " / " + Svc.Weather.fmtTemp(root.today.min) : "" }
-                    Stat { text: "humidity" }
+                    Key { text: "humidity" }
                     Val { text: root.now ? root.now.humidity + "%" : "" }
-                    Stat { text: "wind" }
+                    Key { text: "wind" }
                     Val { text: root.now ? Math.round(root.now.wind) + " " + Svc.Weather.windUnit : "" }
-                    Stat { text: "sun" }
+                    Key { text: "sun" }
                     Val {
                         text: root.today ? "󰖜 " + Qt.formatTime(root.today.sunrise, "HH:mm") + "  󰖛 " + Qt.formatTime(root.today.sunset, "HH:mm") : ""
                     }
@@ -102,7 +106,7 @@ Item {
         Card {
             Layout.fillWidth: true
             visible: Svc.Weather.hourly.length > 0
-            CardHeader { icon: "󰥔"; title: "Next 24 hours"; accent: Theme.blue }
+            CardHeader { icon: "󰥔"; title: "Next 24 hours"; accent: Theme.catWeather }
 
             Item {
                 id: hours
@@ -125,6 +129,7 @@ Item {
 
                         // temperature column (taller = warmer within the day)
                         Rectangle {
+                            radius: Theme.round ? 2 : 0
                             readonly property real frac: hours.hi > hours.lo ? (modelData.temp - hours.lo) / (hours.hi - hours.lo) : 0.5
                             anchors.horizontalCenter: parent.horizontalCenter
                             y: 40 + (1 - frac) * 50
@@ -135,6 +140,7 @@ Item {
                         }
                         // rain chance tick along the bottom
                         Rectangle {
+                            radius: Theme.round ? 2 : 0
                             anchors.bottom: timeL.top
                             anchors.bottomMargin: 2
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -147,7 +153,7 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             y: 0
                             text: Svc.Weather.icon(modelData.code, modelData.isDay)
-                            size: Theme.fontSize
+                            size: Theme.fontMd
                             color: Svc.Weather.color(modelData.code, modelData.isDay)
                         }
                         Label {
@@ -155,7 +161,7 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             y: 20
                             text: Svc.Weather.fmtTemp(modelData.temp)
-                            size: Theme.fontSizeSmall - 2
+                            size: Theme.fontSm
                             color: Theme.text
                         }
                         Label {
@@ -163,7 +169,7 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.bottom: parent.bottom
                             text: parent.showLabel ? Qt.formatTime(modelData.time, "HH") : ""
-                            size: Theme.fontSizeSmall - 3
+                            size: Theme.fontXs
                             color: Theme.muted
                         }
                     }
@@ -171,7 +177,7 @@ Item {
             }
             Label {
                 text: "bars: temperature  ·  blue ticks: chance of rain"
-                size: Theme.fontSizeSmall - 3
+                size: Theme.fontXs
                 color: Theme.muted
             }
         }
@@ -180,7 +186,7 @@ Item {
         Card {
             Layout.fillWidth: true
             visible: Svc.Weather.daily.length > 0
-            CardHeader { icon: "󰃭"; title: "7 days"; accent: Theme.yellow }
+            CardHeader { icon: "󰃭"; title: "7 days"; accent: Theme.catWeather }
 
             Repeater {
                 model: Svc.Weather.daily
@@ -192,28 +198,28 @@ Item {
                     spacing: Theme.pad
 
                     Label {
-                        Layout.preferredWidth: Theme.fontSizeSmall * 4
+                        Layout.preferredWidth: Theme.fontBase * 4
                         text: day.index === 0 ? "today" : Qt.formatDate(day.modelData.date, "ddd").toLowerCase()
-                        size: Theme.fontSizeSmall
+                        size: Theme.fontBase
                         font.bold: day.index === 0
                         color: day.index === 0 ? Theme.accent : Theme.text
                     }
                     Label {
-                        Layout.preferredWidth: Theme.fontSize * 1.5
+                        Layout.preferredWidth: Theme.fontMd * 1.5
                         text: Svc.Weather.icon(day.modelData.code, true)
                         color: Svc.Weather.color(day.modelData.code, true)
                     }
                     Label {
-                        Layout.preferredWidth: Theme.fontSizeSmall * 4
+                        Layout.preferredWidth: Theme.fontBase * 4
                         text: day.modelData.pop > 0 ? "󰖌 " + day.modelData.pop + "%" : ""
-                        size: Theme.fontSizeSmall - 2
+                        size: Theme.fontSm
                         color: Theme.blue
                     }
                     Label {
-                        Layout.preferredWidth: Theme.fontSizeSmall * 3
+                        Layout.preferredWidth: Theme.fontBase * 3
                         horizontalAlignment: Text.AlignRight
                         text: Svc.Weather.fmtTemp(day.modelData.min)
-                        size: Theme.fontSizeSmall
+                        size: Theme.fontBase
                         color: Theme.subtext
                     }
                     // min–max range on the week's scale
@@ -221,8 +227,9 @@ Item {
                         Layout.fillWidth: true
                         implicitHeight: 8
                         readonly property real span: Math.max(1, root.weekMax - root.weekMin)
-                        Rectangle { anchors.fill: parent; color: Theme.surface1 }
+                        Rectangle { anchors.fill: parent; color: Theme.surface1; radius: Theme.radiusPill }
                         Rectangle {
+                            radius: Theme.radiusPill
                             x: parent.width * (day.modelData.min - root.weekMin) / parent.span
                             width: Math.max(4, parent.width * (day.modelData.max - day.modelData.min) / parent.span)
                             height: parent.height
@@ -230,16 +237,16 @@ Item {
                         }
                     }
                     Label {
-                        Layout.preferredWidth: Theme.fontSizeSmall * 3
+                        Layout.preferredWidth: Theme.fontBase * 3
                         text: Svc.Weather.fmtTemp(day.modelData.max)
-                        size: Theme.fontSizeSmall
+                        size: Theme.fontBase
                         color: Theme.textBright
                     }
                     Label {
-                        Layout.preferredWidth: Theme.fontSizeSmall * 7
+                        Layout.preferredWidth: Theme.fontBase * 7
                         horizontalAlignment: Text.AlignRight
                         text: Svc.Weather.describe(day.modelData.code)
-                        size: Theme.fontSizeSmall - 2
+                        size: Theme.fontSm
                         color: Theme.subtext
                         elide: Text.ElideRight
                     }

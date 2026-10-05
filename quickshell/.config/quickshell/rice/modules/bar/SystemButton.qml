@@ -41,12 +41,12 @@ BarButton {
             height: details.implicitHeight
             visible: width > 0
             clip: true
-            Behavior on width { NumberAnimation { duration: Theme.anim; easing.type: Easing.OutCubic } }
+            Behavior on width { NumberAnimation { duration: Theme.anim; easing.type: Theme.easing } }
             Label {
                 id: details
                 text: "cpu " + root.cpu + "%  mem " + Svc.Sys.memPercent + "%"
                       + (root.hot ? "  󰔏 " + Math.round(Svc.Sys.cpuTemp) + "°" : "")
-                size: Theme.fontSizeSmall
+                size: Theme.fontBase
                 color: root.hot ? Theme.tempColor(Svc.Sys.cpuTemp) : Theme.text
             }
         }
