@@ -99,14 +99,19 @@ QtObject {
     }
     function setVolume(v)    { if (player) player.volume = Math.max(0, Math.min(1, v)); }
 
-    // The music player lives in a tmux session: open attaches a terminal to it
-    // (starting it there the first time, so a login prompt is visible);
-    // closing the terminal only detaches, so playback continues.
+    // The player runs headless (`spotify_player -d`, started by Hyprland).
+    // Open: make sure the daemon runs, then show its TUI — a remote, in tmux
+    // session musicSession — reusing it when it's already up there. Closing
+    // the terminal only detaches; playback is the daemon's either way.
     function launch() {
         Quickshell.execDetached(["sh", "-c",
-            'tmux has-session -t "$1" 2>/dev/null && exec "$3" -e tmux attach -t "$1"; '
-          + 'exec "$3" -e tmux new-session -s "$1" "$2"',
-            "sh", Settings.musicSession, Settings.musicPlayer, Settings.terminal]);
+            'p="$1"; s="$2"; t="$3"; shift 3; '
+          + 'pgrep -f "^$p -d" >/dev/null || { setsid -f "$p" -d >/dev/null 2>&1; sleep 2; }; '
+          + 'if tmux has-session -t "$s" 2>/dev/null && [ "$(tmux display -p -t "$s" "#{pane_current_command}")" = "$p" ]; then '
+          +   'exec "$t" -e tmux attach -t "$s"; fi; '
+          + 'tmux kill-session -t "$s" 2>/dev/null; '
+          + 'exec "$t" -e tmux new-session -s "$s" "$p" "$@"',
+            "sh", Settings.musicPlayer, Settings.musicSession, Settings.terminal].concat(Settings.musicTuiArgs));
     }
 
     readonly property var _ticker: Timer {

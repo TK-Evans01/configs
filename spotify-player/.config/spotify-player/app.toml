@@ -1,6 +1,7 @@
 # spotify_player — retro gruvbox, driven mostly from the quickshell bar.
-# Runs inside the tmux session "music" (qs -c rice ipc call rice music /
-# SUPER+S): closing the terminal detaches, playback keeps going.
+# `spotify_player -d` (Hyprland exec-once) is the player: audio, MPRIS, the
+# "archlinux" Spotify device, the CLI port. SUPER+S opens the TUI in tmux
+# session "music" as a remote (no streaming, no MPRIS, port 8081).
 theme = "gruvbox-material"
 
 # Own Spotify app ID (developer.spotify.com, redirect http://127.0.0.1:8989/login):
@@ -8,7 +9,8 @@ theme = "gruvbox-material"
 # of git in ~/.config/rice/. Without the file, the shared ID is used.
 client_id_command = { command = "sh", args = ["-c", "cat ~/.config/rice/spotify-client-id 2>/dev/null || echo d420a117a32841c2b3474932e49fb54b"] }
 
-enable_media_control = true      # MPRIS: the bar, playerctl and media keys
+enable_streaming = "DaemonOnly"  # only the daemon plays; a TUI is a remote
+enable_media_control = true      # MPRIS: the bar, playerctl and media keys (the TUI turns it off)
 enable_notify = false            # the bar already shows the track
 enable_mouse_scroll_volume = true
 border_type = "Plain"            # square, like the shell

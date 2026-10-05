@@ -133,7 +133,7 @@ requests / issues and the unread notification count. Refreshes every 10 min.
 | Keys | Opens |
 |------|-------|
 | SUPER+R | Launcher (`$menu`) |
-| SUPER+S | Music: spotify_player in tmux session `music` (close the window = detach, playback continues) |
+| SUPER+S | Music: spotify_player's TUI (tmux session `music`) as a remote for the headless player `spotify_player -d` started at login — closing it never stops playback |
 | SUPER+A | Quick Settings |
 | SUPER+O | Dashboard › Overview |
 | SUPER+I | Dashboard › System |

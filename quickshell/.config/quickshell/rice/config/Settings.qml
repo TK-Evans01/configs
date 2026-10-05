@@ -28,6 +28,9 @@ QtObject {
     // identity is preferred by the bar (playerctl name: spotify_player).
     readonly property string musicPlayer: "spotify_player"
     readonly property string musicSession: "music"
+    // TUI opened by SUPER+S: a remote for the daemon (`spotify_player -d`) —
+    // no MPRIS (the daemon has it) and its own CLI port (the daemon has 8080).
+    readonly property var musicTuiArgs: ["-o", "enable_media_control=false", "-o", "client_port=8081"]
     readonly property int spotifyLibraryMaxAgeH: 6   // library cache age before a background refetch
     // Same face SDDM shows (AccountsService convention).
     readonly property string avatar: Quickshell.env("HOME") + "/.face.icon"
