@@ -30,7 +30,7 @@ three bar islands, a tabbed dashboard and a Quick Settings panel.
 | Arch glyph | Launcher | | | |
 | Workspace number | go to it | | | walk this monitor's workspaces |
 | Clock | Dashboard › Overview | | | |
-| Media | Dashboard › Media (starts ncspot if nothing runs) | play/pause | next | player volume |
+| Media | Dashboard › Media (opens spotify_player if nothing runs) | play/pause | next | player volume |
 | System sparkline | Dashboard › System (hover shows numbers) | | | |
 | Weather | Dashboard › Weather | | | |
 | Tray icon | activate | secondary | menu (shell-styled) | |
@@ -130,6 +130,7 @@ requests / issues and the unread notification count. Refreshes every 10 min.
 | Keys | Opens |
 |------|-------|
 | SUPER+R | Launcher (`$menu`) |
+| SUPER+S | Music: spotify_player in tmux session `music` (close the window = detach, playback continues) |
 | SUPER+A | Quick Settings |
 | SUPER+O | Dashboard › Overview |
 | SUPER+I | Dashboard › System |
@@ -144,7 +145,7 @@ requests / issues and the unread notification count. Refreshes every 10 min.
 | SUPER+SHIFT+S | Screenshot region → `~/Pictures/Screenshots` + clipboard |
 | SUPER+SHIFT+T | Region → OCR text to clipboard |
 | PRINT | Screenshot page |
-| SUPER+, / SUPER+. / media keys | previous / next / play-pause (`playerctl`, ncspot first) |
+| SUPER+, / SUPER+. / media keys | previous / next / play-pause (`playerctl`, spotify_player first) |
 
 Quick Settings tiles: the ▸ on **Night light** opens warmth (2500–6500K,
 presets) and brightness (gamma) sliders — moving one turns it on; the ▸ on
@@ -166,6 +167,7 @@ qs -c rice ipc call rice dnd                  # toggle
 qs -c rice ipc call rice lock
 qs -c rice ipc call rice caffeine             # toggle
 qs -c rice ipc call rice mail                 # Quick Settings › Mail
+qs -c rice ipc call rice music                # open / attach spotify_player
 qs -c rice ipc call rice refresh              # weather + mail + calendar + github now
 qs -c rice ipc call rice close
 ```

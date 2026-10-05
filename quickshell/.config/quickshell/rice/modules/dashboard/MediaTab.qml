@@ -36,7 +36,7 @@ Item {
         IconButton {
             Layout.alignment: Qt.AlignHCenter
             icon: "󰐊"
-            text: "start ncspot"
+            text: "open spotify"
             onClicked: Svc.Mpris.launch()
         }
     }

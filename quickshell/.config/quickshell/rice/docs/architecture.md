@@ -58,7 +58,7 @@ Directories are imported by relative path (`import "../../components"`);
 | `Weather` | Open-Meteo via `curl` | `current`, `hourly` (24h), `daily` (7d); WMO code → `icon()`, `describe()`, `color()`; refresh every `weatherRefreshMin` |
 | `Hyprland` | `Quickshell.Hyprland` | workspaces, monitors, `focusedMonitor`, `activeToplevel`, `monitorFor(screen)`, `dispatch()`. Refreshes toplevels on start so the title isn't blank after a reload |
 | `Audio` | `pactl` | event-driven (`pactl subscribe`); outputs/inputs, defaults, mute, volume setters |
-| `Mpris` | `Quickshell.Services.Mpris` | `players`, `select(p)`; active = hand-picked › playing (ncspot first) › ncspot › first. Transport, seek, shuffle/loop, volume; `launch()` starts/attaches ncspot in tmux |
+| `Mpris` | `Quickshell.Services.Mpris` | `players`, `select(p)`; active = hand-picked › playing (`Settings.musicPlayer` first) › music player › first. Transport, seek, shuffle/loop, volume; `launch()` attaches a terminal to the tmux session `Settings.musicSession` (creating it with spotify_player the first time) |
 | `Lyrics` | lrclib.net via `curl` | fetches only while `wanted` (Media tab open) and the track changed; cached in `~/.cache/quickshell/lyrics`; `status`, `lines`, `currentIndex` |
 | `Sys` | `/proc`, `/sys`, `df` | 2s poll: CPU/GPU/RAM/disks/temps + `cpuHistory/gpuHistory/memHistory`, uptime, load, kernel, host |
 | `Network` | `mullvad`, `ip`, `/sys/class/net` | **Mullvad** state/relay/location/IP + `toggle()`/`reconnect()`; reachability; physical links with uplink flag |

@@ -60,7 +60,7 @@ Card {
         }
         IconButton {
             icon: "󰐊"
-            text: "ncspot"
+            text: "spotify"
             onClicked: Svc.Mpris.launch()
         }
     }

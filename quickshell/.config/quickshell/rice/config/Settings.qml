@@ -23,6 +23,11 @@ QtObject {
     readonly property bool showWeather: true
     readonly property bool showMail: true
     readonly property string terminal: "alacritty"
+
+    // Music: spotify_player in the tmux session `musicSession`. Its MPRIS
+    // identity is preferred by the bar (playerctl name: spotify_player).
+    readonly property string musicPlayer: "spotify_player"
+    readonly property string musicSession: "music"
     // Same face SDDM shows (AccountsService convention).
     readonly property string avatar: Quickshell.env("HOME") + "/.face.icon"
 

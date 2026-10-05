@@ -3,7 +3,7 @@ import "../../config"
 import "../../components"
 import "../../services" as Svc
 
-// Now playing. Click: dashboard Media tab (or start ncspot when nothing runs).
+// Now playing. Click: dashboard Media tab (or open spotify when nothing runs).
 // Middle: play/pause. Right: next. Wheel: player volume.
 BarButton {
     id: root

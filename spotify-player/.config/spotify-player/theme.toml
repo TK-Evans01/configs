@@ -1,0 +1,44 @@
+# gruvbox-material, the same palette as the quickshell rice Theme.qml.
+# Background is left to the terminal.
+[[themes]]
+name = "gruvbox-material"
+
+[themes.palette]
+foreground = "#d4be98"
+black = "#282828"
+red = "#ea6962"
+green = "#a9b665"
+yellow = "#d8a657"
+blue = "#7daea3"
+magenta = "#d3869b"
+cyan = "#89b482"
+white = "#d4be98"
+bright_black = "#7c6f64"
+bright_red = "#f28985"
+bright_green = "#c2cf85"
+bright_yellow = "#e8bf7c"
+bright_blue = "#9ec5bb"
+bright_magenta = "#e8a5b8"
+bright_cyan = "#a7c9a1"
+bright_white = "#ddc7a1"
+
+[themes.component_style]
+block_title = { fg = "#d8a657", modifiers = ["Bold"] }
+border = { fg = "#45403d" }
+playback_status = { fg = "#d8a657", modifiers = ["Bold"] }
+playback_track = { fg = "#ddc7a1", modifiers = ["Bold"] }
+playback_artists = { fg = "#d3869b", modifiers = ["Bold"] }
+playback_album = { fg = "#a89984" }
+playback_genres = { fg = "#7c6f64", modifiers = ["Italic"] }
+playback_metadata = { fg = "#7c6f64" }
+playback_progress_bar = { fg = "#d3869b", bg = "#45403d" }
+playback_progress_bar_unfilled = { fg = "#45403d" }
+current_playing = { fg = "#d8a657", modifiers = ["Bold"] }
+page_desc = { fg = "#89b482", modifiers = ["Bold"] }
+playlist_desc = { fg = "#7c6f64" }
+table_header = { fg = "#7daea3", modifiers = ["Bold"] }
+selection = { fg = "#282828", bg = "#d8a657", modifiers = ["Bold"] }
+secondary_row = { fg = "#a89984" }
+like = { fg = "#ea6962" }
+lyrics_played = { fg = "#7c6f64" }
+lyrics_playing = { fg = "#e8a5b8", modifiers = ["Bold"] }

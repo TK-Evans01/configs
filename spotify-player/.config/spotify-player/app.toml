@@ -1,0 +1,30 @@
+# spotify_player — retro gruvbox, driven mostly from the quickshell bar.
+# Runs inside the tmux session "music" (qs -c rice ipc call rice music /
+# SUPER+S): closing the terminal detaches, playback keeps going.
+theme = "gruvbox-material"
+
+# Own Spotify app ID (developer.spotify.com, redirect http://127.0.0.1:8989/login):
+# the default shared ncspot ID is constantly rate-limited (HTTP 429). Kept out
+# of git in ~/.config/rice/. Without the file, the shared ID is used.
+client_id_command = { command = "sh", args = ["-c", "cat ~/.config/rice/spotify-client-id 2>/dev/null || echo d420a117a32841c2b3474932e49fb54b"] }
+
+enable_media_control = true      # MPRIS: the bar, playerctl and media keys
+enable_notify = false            # the bar already shows the track
+enable_mouse_scroll_volume = true
+border_type = "Plain"            # square, like the shell
+progress_bar_type = "Line"
+play_icon = "▶"
+pause_icon = "▌▌"
+liked_icon = "♥"
+seek_duration_secs = 10
+
+[device]
+name = "archlinux"
+device_type = "computer"
+volume = 70
+bitrate = 320
+normalization = true
+autoplay = false
+
+[layout]
+playback_window_position = "Top"

@@ -1,6 +1,8 @@
 pragma Singleton
 import QtQuick
+import Quickshell
 import Quickshell.Io
+import "../config"
 import Quickshell.Services.Mpris as M
 
 QtObject {
@@ -11,13 +13,14 @@ QtObject {
     property var _picked: null
     readonly property var players: _list
 
-    // Hand-picked > playing (ncspot first) > ncspot > first.
+    // Hand-picked > playing (music player first) > music player > first.
     readonly property var player: {
         if (_picked && _list.indexOf(_picked) >= 0) return _picked;
-        const isNcspot = p => (p.identity || "").toLowerCase() === "ncspot";
+        const isMusic = p => (p.identity || "").toLowerCase().replace(/[ -]/g, "_") === Settings.musicPlayer
+                            || (p.dbusName || "").indexOf(Settings.musicPlayer) >= 0;
         const playingNow = _list.filter(p => p && p.isPlaying);
-        if (playingNow.length) return playingNow.find(isNcspot) || playingNow[0];
-        return _list.find(p => p && isNcspot(p)) || (_list.length > 0 ? _list[0] : null);
+        if (playingNow.length) return playingNow.find(isMusic) || playingNow[0];
+        return _list.find(p => p && isMusic(p)) || (_list.length > 0 ? _list[0] : null);
     }
     function select(p) { _picked = p; }
     function playerName(p) { return p ? (p.identity || p.dbusName || "player") : ""; }
@@ -62,19 +65,15 @@ QtObject {
     }
     function setVolume(v)    { if (player) player.volume = Math.max(0, Math.min(1, v)); }
 
-    // ncspot runs in a detached tmux session named "ncspot".
-    // First click starts it headless; subsequent clicks attach a terminal to the session.
-    readonly property var _launcher: Process {
-        id: launcher
-        running: false
-        command: ["sh", "-c",
-            "if tmux has-session -t ncspot 2>/dev/null; then "
-          +   "exec alacritty -e tmux attach -t ncspot; "
-          + "else "
-          +   "exec tmux new-session -d -s ncspot ncspot; "
-          + "fi"]
+    // The music player lives in a tmux session: open attaches a terminal to it
+    // (starting it there the first time, so a login prompt is visible);
+    // closing the terminal only detaches, so playback continues.
+    function launch() {
+        Quickshell.execDetached(["sh", "-c",
+            'tmux has-session -t "$1" 2>/dev/null && exec "$3" -e tmux attach -t "$1"; '
+          + 'exec "$3" -e tmux new-session -s "$1" "$2"',
+            "sh", Settings.musicSession, Settings.musicPlayer, Settings.terminal]);
     }
-    function launch() { launcher.running = true; }
 
     readonly property var _ticker: Timer {
         interval: 500
