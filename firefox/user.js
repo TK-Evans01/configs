@@ -38,6 +38,11 @@ user_pref("network.prefetch-next", false);
 user_pref("network.dns.disablePrefetch", true);
 user_pref("network.predictor.enabled", false);
 
+// === DNS over HTTPS off (5 = off by choice) ===
+// System DNS (Mullvad via systemd-resolved) stays authoritative, so local
+// answers like the focus-mode blocklist apply in Firefox too.
+user_pref("network.trr.mode", 5);
+
 // Force prefers-color-scheme: dark on all sites
 user_pref("layout.css.prefers-color-scheme-content-override", 0);
 user_pref("ui.systemUsesDarkTheme", 1);

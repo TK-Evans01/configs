@@ -1,0 +1,4 @@
+# Quickshell (rice) is the notification daemon; never auto-start another.
+[D-BUS Service]
+Name=org.freedesktop.Notifications
+Exec=/bin/false

@@ -2,3 +2,6 @@
 *.bak-*
 *.pacnew
 *.orig
+
+# quickshell regenerates this symlink into /run
+.qmlls.ini

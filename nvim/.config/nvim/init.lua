@@ -476,14 +476,31 @@ require("lazy").setup({
 	},
 
 	-- ---------------------------------------------------------------------------
-	-- gruvbox: colorscheme (loaded last among themes so it wins)
+	-- colours: the rice shell's theme. theme-apply.py writes the palette to
+	-- ~/.local/state/rice/theme/nvim.lua and calls RiceTheme() in running
+	-- instances, so nvim follows a theme switch live. mini.base16 turns the 16
+	-- colours into a full scheme (treesitter, LSP, diagnostics).
 	-- ---------------------------------------------------------------------------
 	{
-		"ellisonleao/gruvbox.nvim",
+		"echasnovski/mini.base16",
 		priority = 1000,
 		config = function()
-			require("gruvbox").setup()
-			vim.cmd.colorscheme("gruvbox")
+			function RiceTheme()
+				local path = vim.fn.expand("~/.local/state/rice/theme/nvim.lua")
+				local ok, t = pcall(dofile, path)
+				if not ok or type(t) ~= "table" then
+					-- No shell theme yet (fresh install): gruvbox-material.
+					t = { background = "dark", palette = {
+						base00 = "#282828", base01 = "#1d2021", base02 = "#45403d", base03 = "#7c6f64",
+						base04 = "#a89984", base05 = "#d4be98", base06 = "#ddc7a1", base07 = "#ddc7a1",
+						base08 = "#ea6962", base09 = "#e78a4e", base0A = "#d8a657", base0B = "#a9b665",
+						base0C = "#89b482", base0D = "#7daea3", base0E = "#d3869b", base0F = "#a55f35" } }
+				end
+				vim.o.background = t.background
+				require("mini.base16").setup({ palette = t.palette, use_cterm = false })
+				vim.g.colors_name = "rice"
+			end
+			RiceTheme()
 		end,
 	},
 

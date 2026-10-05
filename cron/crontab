@@ -1,1 +1,2 @@
-*/10 * * * * /home/tk/.config/hypr/external/randomWallpaper.sh
+# Wallpaper rotation moved into the shell (services/Wallpaper.qml,
+# Settings › Wallpaper). Add cron jobs here; install with: crontab cron/crontab

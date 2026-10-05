@@ -43,3 +43,6 @@ set adjust-open                 best-fit
 set pages-per-row               1
 set scroll-page-aware           true
 set smooth-scroll               true
+
+# The rice shell's theme (written by theme-apply.py) overrides the colours above.
+include ~/.local/state/rice/theme/zathurarc

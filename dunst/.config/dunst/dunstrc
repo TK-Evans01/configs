@@ -4,7 +4,8 @@
     width = 480
     height = (0, 320)
     origin = top-right
-    offset = (24, 60)
+    # gaps_out 10; bar 44 + gaps 10 → lines up with window tops
+    offset = (10, 54)
     scale = 0
     notification_limit = 5
 
@@ -20,7 +21,7 @@
     padding = 16
     horizontal_padding = 18
     text_icon_padding = 0
-    frame_width = 3
+    frame_width = 1
     frame_color = "#d4be98"
     gap_size = 6
     separator_color = frame
@@ -46,7 +47,7 @@
     sticky_history = yes
     history_length = 50
 
-    dmenu = /usr/bin/tofi -p 'dunst:'
+    # dmenu: unused (tofi removed; the shell launcher replaced it)
     browser = /usr/bin/firefox
     always_run_script = true
     title = Dunst

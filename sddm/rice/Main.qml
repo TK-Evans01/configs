@@ -10,21 +10,25 @@ Rectangle {
     height: 1080
     color: c.bg0
 
-    // gruvbox-material, mirrored from the shell's Theme.qml
+    // Colours from theme.conf.user, which the rice shell rewrites on a theme
+    // switch (theme-apply.py); gruvbox-material when it isn't there.
     QtObject {
         id: c
-        readonly property color bg0: "#1d2021"
-        readonly property color bg1: "#282828"
-        readonly property color bg2: "#32302f"
-        readonly property color bg3: "#45403d"
-        readonly property color fg0: "#d4be98"
-        readonly property color fg1: "#ddc7a1"
-        readonly property color grey: "#a89984"
-        readonly property color greyDim: "#7c6f64"
-        readonly property color red: "#ea6962"
-        readonly property color orange: "#e78a4e"
-        readonly property color yellow: "#d8a657"
-        readonly property color purple: "#d3869b"
+        function pick(k, d) { const v = config.stringValue(k); return v ? v : d; }
+        readonly property color bg0: pick("bg0", "#1d2021")
+        readonly property color bg1: pick("bg1", "#282828")
+        readonly property color bg2: pick("bg2", "#32302f")
+        readonly property color bg3: pick("bg3", "#45403d")
+        readonly property color fg0: pick("fg0", "#d4be98")
+        readonly property color fg1: pick("fg1", "#ddc7a1")
+        readonly property color grey: pick("grey", "#a89984")
+        readonly property color greyDim: pick("greyDim", "#7c6f64")
+        readonly property color red: pick("red", "#ea6962")
+        readonly property color orange: pick("orange", "#e78a4e")
+        readonly property color yellow: pick("yellow", "#d8a657")
+        readonly property color purple: pick("purple", "#d3869b")
+        readonly property color blue: pick("blue", "#7daea3")
+        readonly property color outline: pick("outline", "#d4be98")
     }
     // DepartureMono ships with the theme: the greeter can't see ~/.local fonts.
     FontLoader { id: pixel; source: "fonts/DepartureMonoNerdFontMono-Regular.otf" }
@@ -110,7 +114,7 @@ Rectangle {
             anchors.leftMargin: 11
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
-            Txt { text: "󰣇"; size: 22; color: "#7daea3" }
+            Txt { text: "󰣇"; size: 22; color: c.blue }
             Txt { text: sddm.hostName; size: 14; color: c.grey; anchors.verticalCenter: parent.verticalCenter }
         }
         Row {

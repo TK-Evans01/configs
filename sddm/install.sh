@@ -8,6 +8,11 @@ here="$(dirname "$(realpath "$0")")"
 sudo rm -rf /usr/share/sddm/themes/rice
 sudo cp -r "$here/rice" /usr/share/sddm/themes/rice
 sudo chmod -R a+rX /usr/share/sddm/themes/rice
+# Colour overrides the rice shell writes on a theme switch (theme-apply.py):
+# owned by you, so that needs no sudo afterwards. Seeded from the current theme.
+seed="$HOME/.local/state/rice/theme/sddm.conf"
+sudo install -m 644 -o "$USER" -g "$(id -gn)" /dev/null /usr/share/sddm/themes/rice/theme.conf.user
+[ -f "$seed" ] && cat "$seed" > /usr/share/sddm/themes/rice/theme.conf.user
 
 # Theme selection. SDDM reads *every* file in sddm.conf.d (in name order), so
 # the old file is backed up outside it — a theme.conf.bak there would win.

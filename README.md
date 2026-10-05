@@ -8,24 +8,25 @@ directory is a package mirroring `$HOME`.
 |---------|------|
 | `quickshell` | the shell — bar, dashboard, quick settings, launcher, lock screen ([README](quickshell/.config/quickshell/rice/README.md)) |
 | `hypr` | Hyprland (`hyprland.conf`, `external/` keybinds + look & feel, hyprsunset, wallpaper script) |
-| `ghostty` | terminal + gruvbox-material theme (images in yazi via kitty graphics) |
+| `ghostty` | terminal; colours follow the shell theme (images in yazi via kitty graphics) |
 | `alacritty` | old terminal, kept for reference |
-| `tmux` | tmux + tpm, gruvbox-material, resurrect/continuum (sessions survive reboots) |
+| `tmux` | tmux + tpm, status line follows the shell theme, resurrect/continuum (sessions survive reboots) |
 | `nvim` | Neovim |
 | `spotify-player` | spotify_player + gruvbox theme |
-| `dunst` | notifications |
+| `dunst` | retired (the shell is the notification daemon); config kept for reference |
+| `dbus` | blocks D-Bus auto-start of dunst / xfce4-notifyd so the shell owns notifications |
 | `bash`, `git`, `starship` | shell, git identity + global ignore, prompt |
 | `btop`, `zathura`, `gtk` | system monitor, PDF viewer, GTK icon theme |
 | `mpd`, `ncmpcpp`, `beets` | local music: daemon, client, library manager (config only) |
 | `sddm/` | login theme — not stowed, see `sddm/README.md` (`./install.sh [wayland]`) |
 | `firefox/` | textfox + my `user.js` / CSS — not stowed (`./install.sh`) |
-| `cron/` | crontab (wallpaper rotation) — `crontab cron/crontab` |
+| `cron/` | crontab (empty now: wallpaper rotation moved into the shell) — `crontab cron/crontab` |
 
 ## Fresh install
 
 ```bash
 # 1. packages (official repos)
-sudo pacman -S --needed hyprland uwsm hyprsunset awww quickshell ghostty tmux dunst stow \
+sudo pacman -S --needed hyprland uwsm hyprsunset awww quickshell ghostty tmux stow \
   wl-clipboard cliphist tesseract tesseract-data-eng playerctl grim slurp jq curl \
   spotify-player protonmail-bridge gnome-keyring python-dateutil python-gobject github-cli \
   btop zathura zathura-pdf-mupdf starship mpd ncmpcpp beets neovim \
@@ -35,7 +36,7 @@ yay -S grimblast-git mullvad-vpn-bin discordo-git
 
 # 2. dotfiles
 git clone git@github.com:TK-Evans01/configs.git ~/Projects/configs && cd ~/Projects/configs
-for p in bash beets btop dunst ghostty git gtk hypr mpd ncmpcpp nvim quickshell spotify-player starship tmux zathura; do
+for p in bash beets btop dbus ghostty git gtk hypr mpd ncmpcpp nvim quickshell spotify-player starship tmux zathura; do
   stow --no-folding -t ~ "$p"
 done
 crontab cron/crontab
@@ -45,6 +46,10 @@ install -Dm644 sddm/rice/fonts/DepartureMonoNerdFontMono-Regular.otf ~/.local/sh
 fc-cache -f
 curl -LO https://github.com/SylEleuth/gruvbox-plus-icon-pack/releases/download/v6.6.0/gruvbox-plus-icon-pack-6.6.0.zip
 unzip -q gruvbox-plus-icon-pack-6.6.0.zip 'Gruvbox-Plus-Dark/*' -d ~/.local/share/icons/
+
+# 3b. theme files the configs include (the shell rewrites them on first start;
+#     Hyprland errors if its include is missing before that)
+mkdir -p ~/.local/state/rice/theme && touch ~/.local/state/rice/theme/hyprland.conf
 
 # 4. tmux plugins
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm

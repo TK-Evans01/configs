@@ -1,5 +1,14 @@
 # Ghostty — retro gruvbox-material, square, no chrome (ported from alacritty)
 theme = gruvbox-material
+# The rice shell's theme (colours + ANSI), written by theme-apply.py; optional (?)
+# so a fresh install without it still starts. Reloads on SIGUSR2.
+config-file = ?~/.local/state/rice/theme/ghostty
+# Its own GTK bits (clipboard toast, resize + link overlays) styled like the
+# shell's panels; same generator.
+gtk-custom-css = ?~/.local/state/rice/theme/ghostty-gtk.css
+# Theme switches reload the config in every window; skip that toast, keep
+# the clipboard one. (`app-notifications = true` brings both back.)
+app-notifications = clipboard-copy,no-config-reload
 
 font-family = DepartureMonoNerdFontMono
 font-size = 14

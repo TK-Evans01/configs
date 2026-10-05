@@ -12,6 +12,9 @@ git clone -q --depth 1 https://github.com/adriankarlen/textfox "$tmp/textfox"
 [ -d "$profile/chrome" ] && mv "$profile/chrome" "$profile/chrome.bak-$(date +%F-%H%M)"
 cp -r "$tmp/textfox/chrome" "$profile/chrome"
 { echo; cat "$here/userContent-overrides.css"; } >> "$profile/chrome/userContent.css"
+# The rice shell's theme for textfox (theme-apply.py keeps it current).
+theme_css="$HOME/.local/state/rice/theme/firefox.css"
+[ -f "$theme_css" ] && cp "$theme_css" "$profile/chrome/config.css"
 
 # user.js: textfox's prefs + mine (RAM/process tuning), linked so edits land in git
 ln -sf "$here/user.js" "$profile/user.js"

@@ -6,6 +6,9 @@ click twice), big pixel clock, square card with your avatar, `>` prompt with a
 block cursor, caps-lock and wrong-password messages.
 
 - DepartureMono ships in `rice/fonts/` — the greeter user can't read `~/.local/share/fonts`.
+- Colours follow the rice shell's theme: `install.sh` creates
+  `theme.conf.user` owned by you, and the shell rewrites it on every theme
+  switch (no sudo after that). Without it the theme is gruvbox-material.
 - The background is pre-blurred and darkened (`make-background.sh <image>`), so
   no GPU effects are needed (works under weston / software rendering).
 
