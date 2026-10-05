@@ -1,0 +1,111 @@
+{
+ "schema": 1,
+ "_doc": "Focus mode site bundles: exact hostnames (DNS blocks don't do wildcards). Keep shared hosts (googleapis.com, gstatic.com, discord.gg) out.",
+ "bundles": [
+  {
+   "id": "youtube",
+   "name": "YouTube",
+   "hosts": [
+    "youtube.com",
+    "www.youtube.com",
+    "m.youtube.com",
+    "music.youtube.com",
+    "youtu.be",
+    "youtubei.googleapis.com",
+    "i.ytimg.com",
+    "yt3.ggpht.com",
+    "www.youtube-nocookie.com"
+   ]
+  },
+  {
+   "id": "reddit",
+   "name": "Reddit",
+   "hosts": [
+    "reddit.com",
+    "www.reddit.com",
+    "old.reddit.com",
+    "new.reddit.com",
+    "i.redd.it",
+    "v.redd.it",
+    "preview.redd.it",
+    "redditmedia.com",
+    "www.redditmedia.com",
+    "redditstatic.com",
+    "www.redditstatic.com"
+   ]
+  },
+  {
+   "id": "twitch",
+   "name": "Twitch",
+   "hosts": [
+    "twitch.tv",
+    "www.twitch.tv",
+    "m.twitch.tv",
+    "gql.twitch.tv",
+    "static.twitchcdn.net",
+    "usher.ttvnw.net"
+   ]
+  },
+  {
+   "id": "x",
+   "name": "X / Twitter",
+   "hosts": [
+    "x.com",
+    "www.x.com",
+    "twitter.com",
+    "www.twitter.com",
+    "mobile.twitter.com",
+    "t.co",
+    "pbs.twimg.com",
+    "abs.twimg.com",
+    "video.twimg.com"
+   ]
+  },
+  {
+   "id": "news",
+   "name": "News & aggregators",
+   "hosts": [
+    "news.ycombinator.com",
+    "hckrnews.com",
+    "www.cnn.com",
+    "cnn.com",
+    "www.foxnews.com",
+    "www.bbc.com",
+    "www.nytimes.com",
+    "lobste.rs"
+   ]
+  },
+  {
+   "id": "discord-web",
+   "name": "Discord (web + app)",
+   "hosts": [
+    "discord.com",
+    "www.discord.com",
+    "gateway.discord.gg",
+    "cdn.discordapp.com",
+    "media.discordapp.net",
+    "discordapp.com"
+   ]
+  },
+  {
+   "id": "steam-web",
+   "name": "Steam store & community",
+   "hosts": [
+    "store.steampowered.com",
+    "steamcommunity.com",
+    "www.steamcommunity.com"
+   ]
+  },
+  {
+   "id": "shopping",
+   "name": "Shopping",
+   "hosts": [
+    "amazon.com",
+    "www.amazon.com",
+    "smile.amazon.com",
+    "ebay.com",
+    "www.ebay.com"
+   ]
+  }
+ ]
+}

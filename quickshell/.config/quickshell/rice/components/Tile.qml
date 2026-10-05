@@ -18,7 +18,9 @@ Rectangle {
     signal openDetails()
 
     Layout.fillWidth: true
-    implicitHeight: Theme.fontSize * 2 + Theme.pad * 2
+    implicitHeight: Theme.fontMd * 2 + Theme.pad * 2
+    radius: Theme.radius
+    clip: true
     color: body.containsMouse ? Theme.surface1 : Theme.surface0
     border.width: Theme.border
     border.color: active ? activeColor : Theme.surface2
@@ -42,12 +44,13 @@ Rectangle {
         Rectangle {
             Layout.fillHeight: true
             Layout.preferredWidth: height
+            radius: Theme.radius
             color: root.active ? root.activeColor : Theme.surface1
             Behavior on color { ColorAnimation { duration: Theme.anim } }
             Label {
                 anchors.centerIn: parent
                 text: root.icon
-                size: Theme.fontSizeLarge
+                size: Theme.fontLg
                 color: root.active ? Theme.textReverse : (root.busy ? Theme.warning : Theme.text)
             }
         }
@@ -58,7 +61,7 @@ Rectangle {
             Label {
                 Layout.fillWidth: true
                 text: root.label
-                size: Theme.fontSizeSmall + 1
+                size: Theme.fontTitle
                 font.bold: true
                 color: Theme.textBright
                 elide: Text.ElideRight
@@ -67,7 +70,7 @@ Rectangle {
                 Layout.fillWidth: true
                 visible: root.sublabel !== ""
                 text: root.sublabel
-                size: Theme.fontSizeSmall - 2
+                size: Theme.fontSm
                 color: root.active ? root.activeColor : Theme.subtext
                 elide: Text.ElideRight
             }
@@ -76,7 +79,8 @@ Rectangle {
         Rectangle {
             visible: root.hasDetails
             Layout.fillHeight: true
-            Layout.preferredWidth: Theme.fontSize + Theme.spacing * 2
+            Layout.preferredWidth: Theme.fontMd + Theme.spacing * 2
+            radius: Theme.radius
             color: more.containsMouse ? Theme.surface2 : "transparent"
             Rectangle { width: 1; height: parent.height; color: Theme.surface2 }
             Label {

@@ -1,0 +1,379 @@
+{
+ "schema": 1,
+ "items": {
+  "Breezing_Up_(A_Fair_Wind)-Winslow_Homer.jpg": {
+   "sha": "3dba3197cae0",
+   "themes": [
+    "eink-light",
+    "gruvbox-material-light",
+    "kanagawa-dragon"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "Christinas_World-Andrew_Wyeth.jpg": {
+   "sha": "bafd04512f03",
+   "themes": [
+    "gruvbox-material-light",
+    "eink-light"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "Fallen_Angel-Alexandre_Cabanel-1823.jpg": {
+   "sha": "7bdebf4614e7",
+   "themes": [
+    "kanagawa-dragon",
+    "nord"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "John_Martin1.jpg": {
+   "sha": "38c79160d8ff",
+   "themes": [
+    "kanagawa-dragon",
+    "crt-amber",
+    "eink-light"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "The_Sea_of_Acheron-(1852).jpeg": {
+   "sha": "7cde67ec4fad",
+   "themes": [
+    "eink-light",
+    "eink-dark",
+    "kanagawa-dragon"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "The_Taking_of_Christ-Caravaggio_(c.1602).jpg": {
+   "sha": "2aaa597a66fd",
+   "themes": [
+    "kanagawa-dragon",
+    "crt-amber",
+    "tokyonight-night"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "_The_School_of_Athens__by_Raffaello_Sanzio_da_Urbino.jpg": {
+   "sha": "af44cdaee5a6",
+   "themes": [
+    "gruvbox-material-dark",
+    "gruvbox-material-light",
+    "kanagawa-dragon"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "dore/10.jpg": {
+   "sha": "01ecf2fa2692",
+   "themes": [
+    "eink-light",
+    "eink-dark",
+    "gruvbox-material-dark"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "dore/11.jpg": {
+   "sha": "767f7ddb1765",
+   "themes": [
+    "eink-light",
+    "eink-dark",
+    "gruvbox-material-dark"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "dore/2434343.jpg": {
+   "sha": "a6131045e079",
+   "themes": [
+    "eink-light",
+    "gruvbox-material-dark",
+    "eink-dark"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "dore/2434358.jpg": {
+   "sha": "fde6fd9683ba",
+   "themes": [
+    "eink-light",
+    "gruvbox-material-dark",
+    "eink-dark"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "dore/450161-Gustave-Dor-illustration-classic-art-death-lithograph.jpg": {
+   "sha": "f5ed04f082d3",
+   "themes": [
+    "eink-light",
+    "gruvbox-material-dark",
+    "eink-dark"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "dore/5.jpg": {
+   "sha": "beadc2921369",
+   "themes": [
+    "eink-light",
+    "gruvbox-material-dark",
+    "eink-dark"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "dore/6.jpg": {
+   "sha": "dc690ac0f358",
+   "themes": [
+    "eink-light",
+    "gruvbox-material-dark",
+    "eink-dark"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "dore/7.jpg": {
+   "sha": "764ff562d47a",
+   "themes": [
+    "eink-light",
+    "eink-dark",
+    "gruvbox-material-dark"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "dore/8.jpg": {
+   "sha": "5011f91bfbed",
+   "themes": [
+    "eink-light",
+    "eink-dark",
+    "gruvbox-material-dark"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "dore/9.jpg": {
+   "sha": "41f6ec9646dd",
+   "themes": [
+    "eink-light",
+    "eink-dark",
+    "gruvbox-material-dark"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "dore/Dore_Gustave_39.jpg": {
+   "sha": "15f6c41e4d19",
+   "themes": [
+    "eink-light",
+    "eink-dark",
+    "gruvbox-material-dark"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "dore/g19-gruvbox.png": {
+   "sha": "f51ef7d7010c",
+   "themes": [
+    "gruvbox-material-dark",
+    "eink-light",
+    "kanagawa-dragon"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "long_roads.jpg": {
+   "sha": "8b8c55fc62e1",
+   "themes": [
+    "kanagawa-dragon",
+    "eink-dark",
+    "eink-light"
+   ],
+   "seasons": [
+    "any"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  },
+  "pieter-bruegel-the-elder-the-triumph-of-death-1562-obelisk-art-history.webp": {
+   "sha": "ce16e5edb796",
+   "themes": [
+    "gruvbox-material-light"
+   ],
+   "seasons": [
+    "autumn"
+   ],
+   "tags": [],
+   "fav": false,
+   "auto": {
+    "themes": true,
+    "seasons": true
+   },
+   "reviewed": false
+  }
+ }
+}

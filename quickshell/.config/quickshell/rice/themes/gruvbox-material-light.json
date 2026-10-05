@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "gruvbox-material-light",
+  "name": "Gruvbox Material Light",
+  "variant": "light",
+  "shape": "square",
+  "font": "departure-mono",
+  "palette": {
+    "bg0": "#fbf1c7",
+    "bg1": "#f4e8be",
+    "bg2": "#f2e5bc",
+    "bg3": "#eee0b7",
+    "bg4": "#e5d5ad",
+    "fg0": "#654735",
+    "fg1": "#4f3829",
+    "grey": "#928374",
+    "greyDim": "#a89984",
+    "red": "#c14a4a",
+    "orange": "#c35e0a",
+    "yellow": "#b47109",
+    "green": "#6c782e",
+    "aqua": "#4c7a5d",
+    "blue": "#45707a",
+    "purple": "#945e80"
+  },
+  "roles": {
+    "accent": "orange"
+  }
+}

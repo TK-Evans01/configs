@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "fonts": [
+    {
+      "id": "departure-mono",
+      "name": "Departure Mono",
+      "family": "DepartureMono Nerd Font Mono",
+      "package": "manual (sddm/rice/fonts) or AUR otf-departure-mono-nerd",
+      "sizes": {
+        "xs": 11,
+        "sm": 12,
+        "base": 14,
+        "title": 15,
+        "md": 18,
+        "lg": 22,
+        "xl": 44,
+        "huge": 66,
+        "icon": 22,
+        "iconLg": 33
+      }
+    },
+    {
+      "id": "terminess",
+      "name": "Terminess",
+      "family": "Terminess Nerd Font Mono",
+      "package": "ttf-terminus-nerd",
+      "sizes": {
+        "xs": 12,
+        "sm": 12,
+        "base": 14,
+        "title": 16,
+        "md": 18,
+        "lg": 22,
+        "xl": 44,
+        "huge": 64,
+        "icon": 22,
+        "iconLg": 32
+      }
+    },
+    {
+      "id": "3270",
+      "name": "IBM 3270",
+      "family": "3270 Nerd Font Mono",
+      "package": "ttf-3270-nerd",
+      "sizes": {
+        "xs": 12,
+        "sm": 13,
+        "base": 15,
+        "title": 16,
+        "md": 19,
+        "lg": 23,
+        "xl": 46,
+        "huge": 68,
+        "icon": 22,
+        "iconLg": 33
+      }
+    },
+    {
+      "id": "bigblue-437",
+      "name": "BigBlue Terminal 437",
+      "family": "BigBlueTerm437 Nerd Font Mono",
+      "package": "ttf-bigblueterminal-nerd",
+      "sizes": {
+        "xs": 10,
+        "sm": 12,
+        "base": 14,
+        "title": 16,
+        "md": 16,
+        "lg": 24,
+        "xl": 40,
+        "huge": 64,
+        "icon": 22,
+        "iconLg": 32
+      }
+    },
+    {
+      "id": "gohu",
+      "name": "Gohu",
+      "family": "GohuFont 14 Nerd Font Mono",
+      "package": "ttf-gohu-nerd",
+      "sizes": {
+        "xs": 11,
+        "sm": 11,
+        "base": 14,
+        "title": 14,
+        "md": 18,
+        "lg": 22,
+        "xl": 44,
+        "huge": 66,
+        "icon": 22,
+        "iconLg": 33
+      }
+    },
+    {
+      "id": "proggy",
+      "name": "ProggyClean",
+      "family": "ProggyClean Nerd Font Mono",
+      "package": "ttf-proggyclean-nerd",
+      "sizes": {
+        "xs": 12,
+        "sm": 13,
+        "base": 16,
+        "title": 16,
+        "md": 20,
+        "lg": 24,
+        "xl": 48,
+        "huge": 64,
+        "icon": 22,
+        "iconLg": 32
+      }
+    },
+    {
+      "id": "profont",
+      "name": "ProFont IIx",
+      "family": "ProFont IIx Nerd Font Mono",
+      "package": "ttf-profont-nerd",
+      "sizes": {
+        "xs": 11,
+        "sm": 12,
+        "base": 14,
+        "title": 15,
+        "md": 18,
+        "lg": 22,
+        "xl": 44,
+        "huge": 66,
+        "icon": 22,
+        "iconLg": 33
+      }
+    },
+    {
+      "id": "sharetech",
+      "name": "Share Tech Mono",
+      "family": "ShureTechMono Nerd Font Mono",
+      "package": "ttf-sharetech-mono-nerd",
+      "sizes": {
+        "xs": 11,
+        "sm": 12,
+        "base": 14,
+        "title": 15,
+        "md": 18,
+        "lg": 22,
+        "xl": 44,
+        "huge": 66,
+        "icon": 22,
+        "iconLg": 33
+      }
+    }
+  ]
+}

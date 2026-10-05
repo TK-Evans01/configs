@@ -1,3 +1,5 @@
 module config
 singleton Theme 1.0 Theme.qml
 singleton Settings 1.0 Settings.qml
+singleton Fmt 1.0 Fmt.qml
+singleton Prefs 1.0 Prefs.qml

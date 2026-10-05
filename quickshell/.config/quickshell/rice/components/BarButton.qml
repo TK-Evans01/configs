@@ -1,12 +1,14 @@
 import QtQuick
 import "../config"
 
-// Square bar button: hover lifts the cell, `active` (its popup is open) adds
-// the accent underline. Content goes inside; the button sizes to it.
+// Bar button: hover lifts the cell, `active` (its popup is open) adds the
+// accent indicator. Content goes inside; the button sizes to it.
 Item {
     id: root
 
     property bool active: false
+    property color indicator: Theme.accent
+    property real minWidth: 0
     default property alias content: holder.data
     readonly property alias hovered: mouse.containsMouse
     readonly property bool pressed: mouse.pressed
@@ -16,22 +18,22 @@ Item {
     signal middleClicked()
     signal wheeled(int delta)
 
-    implicitWidth: holder.childrenRect.width + Theme.pad * 2
-    implicitHeight: Settings.barHeight - 1
+    implicitWidth: Math.max(minWidth, holder.childrenRect.width + Theme.pad * 2)
+    implicitHeight: Settings.barHeight - Theme.outlineWidth
 
+    // Hover is quieter than open: open = raised + accent indicator.
     Rectangle {
         anchors.fill: parent
-        color: root.active ? Theme.surface1 : (root.hovered ? Theme.surface2 : "transparent")
+        anchors.margins: Theme.round ? 4 : 0
+        radius: Theme.radiusSmall
+        color: root.active || root.hovered ? Theme.surface1 : "transparent"
         Behavior on color { ColorAnimation { duration: Theme.animShort } }
     }
 
-    Rectangle {
-        anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        width: root.active ? parent.width - Theme.spacing : 0
-        height: Theme.accentThickness
-        color: Theme.accent
-        Behavior on width { NumberAnimation { duration: Theme.anim; easing.type: Easing.OutCubic } }
+    AccentIndicator {
+        active: root.active
+        tint: root.indicator
+        anchors.margins: Theme.round ? 4 : 0
     }
 
     Item {

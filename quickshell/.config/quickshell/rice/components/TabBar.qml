@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../config"
 
-// Text tabs with an underline that slides to the current one.
+// Text tabs; the accent indicator (underline or pill) stretches to the current one.
 Item {
     id: root
 
@@ -23,13 +23,14 @@ Item {
                 required property var modelData
                 readonly property bool isCurrent: modelData.id === root.current
                 width: lbl.implicitWidth + Theme.pad * 3
-                height: Theme.fontSize + Theme.pad * 2
+                height: Theme.fontMd + Theme.pad * 2
+                radius: Theme.radiusSmall
                 color: hov.containsMouse && !isCurrent ? Theme.surface1 : "transparent"
                 Label {
                     id: lbl
                     anchors.centerIn: parent
                     text: modelData.icon + "  " + modelData.label.toUpperCase()
-                    size: Theme.fontSizeSmall
+                    size: Theme.fontBase
                     font.bold: parent.isCurrent
                     color: parent.isCurrent ? Theme.accent : Theme.subtext
                 }
@@ -50,20 +51,44 @@ Item {
         height: 1
         color: Theme.surface2
     }
-    Rectangle {
-        id: underline
+    // Selection: the edge moving toward the new tab leads (fast), the other
+    // trails (slow), so the indicator stretches as it travels.
+    Item {
+        id: sel
         readonly property Item cur: {
             rep.count;
             for (let i = 0; i < rep.count; i++)
                 if (rep.itemAt(i) && rep.itemAt(i).isCurrent) return rep.itemAt(i);
             return null;
         }
-        anchors.bottom: parent.bottom
-        x: cur ? cur.x : 0
-        width: cur ? cur.width : 0
-        height: Theme.accentThickness
-        color: Theme.accent
-        Behavior on x { NumberAnimation { duration: Theme.anim; easing.type: Easing.OutCubic } }
-        Behavior on width { NumberAnimation { duration: Theme.anim; easing.type: Easing.OutCubic } }
+        readonly property real targetL: cur ? cur.x : 0
+        readonly property real targetR: cur ? cur.x + cur.width : 0
+        property real l: targetL
+        property real r: targetR
+        property bool movingRight: true
+        onTargetLChanged: movingRight = targetL > l
+        Behavior on l { NumberAnimation { duration: sel.movingRight ? Theme.anim + 60 : 50; easing.type: Theme.easing } }
+        Behavior on r { NumberAnimation { duration: sel.movingRight ? 50 : Theme.anim + 60; easing.type: Theme.easing } }
+
+        x: l
+        width: r - l
+        height: row.height
+        z: -1
+
+        Rectangle {
+            visible: Theme.accentStyle === "underline"
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: -(root.height - row.height)
+            width: parent.width
+            height: Theme.accentThickness
+            color: Theme.accent
+        }
+        Rectangle {
+            visible: Theme.accentStyle === "pill"
+            anchors.fill: parent
+            anchors.margins: 3
+            radius: Theme.radiusSmall
+            color: Qt.alpha(Theme.accent, 0.2)
+        }
     }
 }

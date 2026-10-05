@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "tokyonight-night",
+  "name": "Tokyo Night",
+  "variant": "dark",
+  "shape": "round",
+  "font": "departure-mono",
+  "palette": {
+    "bg0": "#16161e",
+    "bg1": "#1a1b26",
+    "bg2": "#292e42",
+    "bg3": "#3b4261",
+    "bg4": "#414868",
+    "fg0": "#c0caf5",
+    "fg1": "#d5dcfa",
+    "grey": "#737aa2",
+    "greyDim": "#565f89",
+    "red": "#f7768e",
+    "orange": "#ff9e64",
+    "yellow": "#e0af68",
+    "green": "#9ece6a",
+    "aqua": "#73daca",
+    "blue": "#7aa2f7",
+    "purple": "#bb9af7"
+  },
+  "roles": {
+    "accent": "blue"
+  }
+}

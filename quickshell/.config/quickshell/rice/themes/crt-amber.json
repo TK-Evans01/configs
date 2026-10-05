@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "crt-amber",
+  "name": "CRT Amber",
+  "variant": "dark",
+  "shape": "square",
+  "font": "departure-mono",
+  "palette": {
+    "bg0": "#0a0700",
+    "bg1": "#140e02",
+    "bg2": "#1f1605",
+    "bg3": "#2e2108",
+    "bg4": "#4a350d",
+    "fg0": "#ffb000",
+    "fg1": "#ffc94d",
+    "grey": "#b37b00",
+    "greyDim": "#7a5400",
+    "red": "#ff5f3a",
+    "orange": "#ff8c1a",
+    "yellow": "#ffb000",
+    "green": "#d9a400",
+    "aqua": "#e6a817",
+    "blue": "#cc8f00",
+    "purple": "#ff9a5a"
+  },
+  "roles": {
+    "success": "#a8c23a",
+    "catMedia": "orange",
+    "catSystem": "yellow",
+    "catTime": "yellow",
+    "catWeather": "yellow",
+    "catDev": "yellow",
+    "catNotify": "orange",
+    "catNet": "yellow"
+  }
+}

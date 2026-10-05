@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "everforest-dark",
+  "name": "Everforest",
+  "variant": "dark",
+  "shape": "round",
+  "font": "departure-mono",
+  "palette": {
+    "bg0": "#232a2e",
+    "bg1": "#2d353b",
+    "bg2": "#343f44",
+    "bg3": "#3d484d",
+    "bg4": "#475258",
+    "fg0": "#d3c6aa",
+    "fg1": "#e4d8bc",
+    "grey": "#859289",
+    "greyDim": "#7a8478",
+    "red": "#e67e80",
+    "orange": "#e69875",
+    "yellow": "#dbbc7f",
+    "green": "#a7c080",
+    "aqua": "#83c092",
+    "blue": "#7fbbb3",
+    "purple": "#d699b6"
+  },
+  "roles": {
+    "accent": "green"
+  }
+}

@@ -22,14 +22,14 @@ RowLayout {
     Label {
         text: root.icon
         color: Theme.accent
-        size: Theme.fontSizeLarge
+        size: Theme.fontLg
     }
     ColumnLayout {
         Layout.fillWidth: true
         spacing: 0
         Label {
             text: root.title.toUpperCase()
-            size: Theme.fontSize
+            size: Theme.fontMd
             font.bold: true
             color: Theme.textBright
         }
@@ -37,7 +37,7 @@ RowLayout {
             Layout.fillWidth: true
             visible: root.subtitle !== ""
             text: root.subtitle
-            size: Theme.fontSizeSmall
+            size: Theme.fontBase
             color: Theme.subtext
             elide: Text.ElideRight
         }

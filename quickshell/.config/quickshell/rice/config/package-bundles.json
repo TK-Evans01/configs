@@ -1,0 +1,54 @@
+{
+ "schema": 1,
+ "_doc": "Settings › Packages › Bundles: sets that install in one transaction (repo packages; aur: true for AUR ones).",
+ "bundles": [
+  {
+   "id": "fonts",
+   "name": "Retro fonts",
+   "icon": "󰛖",
+   "about": "Pixel / terminal Nerd Fonts for Settings › Appearance › Font.",
+   "packages": [
+    "ttf-terminus-nerd",
+    "ttf-3270-nerd",
+    "ttf-bigblueterminal-nerd",
+    "ttf-gohu-nerd",
+    "ttf-proggyclean-nerd",
+    "ttf-profont-nerd",
+    "ttf-sharetech-mono-nerd"
+   ]
+  },
+  {
+   "id": "maintenance",
+   "name": "Maintenance",
+   "icon": "󰦕",
+   "about": "Update checks, cache cleaning, dependency trees, package queries.",
+   "packages": [
+    "pacman-contrib",
+    "expac"
+   ]
+  },
+  {
+   "id": "images",
+   "name": "Images & wallpapers",
+   "icon": "󰋩",
+   "about": "For the wallpaper manager (E7): conversions, metadata, thumbnails.",
+   "packages": [
+    "imagemagick",
+    "perl-image-exiftool",
+    "python-pillow"
+   ]
+  },
+  {
+   "id": "voice",
+   "name": "Voice assistant (phase 1)",
+   "icon": "󰍬",
+   "about": "Local speech-to-text + LLM on the RX 9070 via Vulkan (report 06). Models (~7 GB) download separately.",
+   "packages": [
+    "whisper-cpp",
+    "llama-cpp",
+    "ggml-vulkan",
+    "python-onnxruntime-cpu"
+   ]
+  }
+ ]
+}

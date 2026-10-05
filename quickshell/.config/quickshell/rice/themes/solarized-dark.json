@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "solarized-dark",
+  "name": "Solarized Dark",
+  "variant": "dark",
+  "shape": "square",
+  "font": "departure-mono",
+  "palette": {
+    "bg0": "#00212b",
+    "bg1": "#002b36",
+    "bg2": "#073642",
+    "bg3": "#0a4050",
+    "bg4": "#586e75",
+    "fg0": "#93a1a1",
+    "fg1": "#eee8d5",
+    "grey": "#839496",
+    "greyDim": "#657b83",
+    "red": "#dc322f",
+    "orange": "#cb4b16",
+    "yellow": "#b58900",
+    "green": "#859900",
+    "aqua": "#2aa198",
+    "blue": "#268bd2",
+    "purple": "#6c71c4"
+  }
+}

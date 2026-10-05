@@ -19,12 +19,12 @@ RowLayout {
         visible: root.icon !== ""
         text: root.icon
         color: root.accent
-        size: Theme.fontSize
+        size: Theme.fontMd
     }
     Label {
         text: root.title.toUpperCase()
         color: root.accent
-        size: Theme.fontSizeSmall
+        size: Theme.fontBase
         font.bold: true
         font.letterSpacing: 1
     }
@@ -33,7 +33,7 @@ RowLayout {
         visible: root.subtitle !== ""
         text: root.subtitle
         color: Theme.subtext
-        size: Theme.fontSizeSmall
+        size: Theme.fontBase
         elide: Text.ElideRight
     }
     // Pushes the trailing slot right when there is no subtitle to do it.

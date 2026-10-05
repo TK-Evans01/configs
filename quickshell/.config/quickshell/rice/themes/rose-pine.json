@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "id": "rose-pine",
+  "name": "Rosé Pine",
+  "variant": "dark",
+  "shape": "round",
+  "font": "departure-mono",
+  "palette": {
+    "bg0": "#191724",
+    "bg1": "#1f1d2e",
+    "bg2": "#26233a",
+    "bg3": "#403d52",
+    "bg4": "#524f67",
+    "fg0": "#e0def4",
+    "fg1": "#f0eefc",
+    "grey": "#908caa",
+    "greyDim": "#6e6a86",
+    "red": "#eb6f92",
+    "orange": "#ebbcba",
+    "yellow": "#f6c177",
+    "green": "#31748f",
+    "aqua": "#9ccfd8",
+    "blue": "#c4a7e7",
+    "purple": "#ebbcba"
+  },
+  "roles": {
+    "accent": "blue",
+    "success": "aqua",
+    "catMedia": "#c4a7e7",
+    "catNotify": "#c4a7e7",
+    "info": "aqua"
+  }
+}

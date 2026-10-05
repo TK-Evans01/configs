@@ -1,0 +1,859 @@
+{
+  "schema": 1,
+  "_doc": "Allowlist of shell actions: the launcher's > mode, settings search and the voice assistant pick from here. call = [ipc function, args...] on target rice (shell.qml IpcHandler). confirm: none | confirm (ask again). voice: false = never by voice. Theme actions are added at runtime from themes/. Check with scripts/check-actions.py.",
+  "actions": [
+    {
+      "id": "dashboard.overview",
+      "title": "Dashboard: Overview",
+      "icon": "󰕮",
+      "group": "open",
+      "call": [
+        "dashboard",
+        "overview"
+      ],
+      "aliases": [
+        "home",
+        "clock",
+        "calendar",
+        "agenda"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "dashboard.media",
+      "title": "Dashboard: Media",
+      "icon": "󰎆",
+      "group": "open",
+      "call": [
+        "dashboard",
+        "media"
+      ],
+      "aliases": [
+        "music",
+        "player",
+        "lyrics",
+        "library"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "dashboard.system",
+      "title": "Dashboard: System",
+      "icon": "󰍛",
+      "group": "open",
+      "call": [
+        "dashboard",
+        "system"
+      ],
+      "aliases": [
+        "cpu",
+        "gpu",
+        "memory",
+        "ram",
+        "disk",
+        "resources"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "dashboard.weather",
+      "title": "Dashboard: Weather",
+      "icon": "󰖐",
+      "group": "open",
+      "call": [
+        "dashboard",
+        "weather"
+      ],
+      "aliases": [
+        "forecast",
+        "temperature"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "dashboard.github",
+      "title": "Dashboard: Github",
+      "icon": "",
+      "group": "open",
+      "call": [
+        "dashboard",
+        "github"
+      ],
+      "aliases": [
+        "commits",
+        "repos",
+        "pull requests"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "dashboard.docker",
+      "title": "Dashboard: Docker",
+      "icon": "󰡨",
+      "group": "open",
+      "call": [
+        "dashboard",
+        "docker"
+      ],
+      "aliases": [
+        "containers"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "qs.main",
+      "title": "Quick settings",
+      "icon": "󰒓",
+      "group": "open",
+      "call": [
+        "quicksettings",
+        ""
+      ],
+      "aliases": [
+        "settings",
+        "toggles"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "qs.network",
+      "title": "Network / VPN",
+      "icon": "󰖂",
+      "group": "open",
+      "call": [
+        "quicksettings",
+        "network"
+      ],
+      "aliases": [
+        "mullvad",
+        "vpn",
+        "wifi",
+        "ethernet"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "qs.bluetooth",
+      "title": "Bluetooth",
+      "icon": "󰂯",
+      "group": "open",
+      "call": [
+        "quicksettings",
+        "bluetooth"
+      ],
+      "aliases": [
+        "devices",
+        "headphones",
+        "pair"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "qs.sound",
+      "title": "Sound devices",
+      "icon": "󰕾",
+      "group": "open",
+      "call": [
+        "quicksettings",
+        "sound"
+      ],
+      "aliases": [
+        "audio",
+        "output",
+        "input",
+        "microphone",
+        "volume"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "qs.nightlight",
+      "title": "Night light settings",
+      "icon": "󰖔",
+      "group": "open",
+      "call": [
+        "quicksettings",
+        "nightlight"
+      ],
+      "aliases": [
+        "warmth",
+        "gamma",
+        "brightness"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "qs.screenshot",
+      "title": "Screenshot tools",
+      "icon": "󰹑",
+      "group": "open",
+      "call": [
+        "quicksettings",
+        "screenshot"
+      ],
+      "aliases": [
+        "capture",
+        "ocr"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "sidebar.notifications",
+      "title": "Notifications & mail",
+      "icon": "󰂚",
+      "group": "open",
+      "call": [
+        "sidebar",
+        "notifications"
+      ],
+      "aliases": [
+        "notifications",
+        "mail",
+        "email",
+        "inbox",
+        "history"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "sidebar.weather",
+      "title": "Weather panel",
+      "icon": "󰖐",
+      "group": "open",
+      "call": [
+        "sidebar",
+        "weather"
+      ],
+      "aliases": [
+        "forecast"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "sidebar.feeds",
+      "title": "News feeds",
+      "icon": "󰑫",
+      "group": "open",
+      "call": [
+        "sidebar",
+        "feeds"
+      ],
+      "aliases": [
+        "news",
+        "rss",
+        "arch news",
+        "hacker news"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "session",
+      "title": "Session menu",
+      "icon": "󰐥",
+      "group": "session",
+      "call": [
+        "session"
+      ],
+      "aliases": [
+        "power menu",
+        "logout menu"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "settings",
+      "title": "Settings",
+      "icon": "󰒓",
+      "group": "open",
+      "call": [
+        "settings",
+        ""
+      ],
+      "aliases": [
+        "preferences",
+        "config",
+        "options",
+        "theme",
+        "appearance"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "settings.connections",
+      "title": "Settings: Connections",
+      "icon": "󰌘",
+      "group": "open",
+      "call": [
+        "settings",
+        "connections"
+      ],
+      "aliases": [
+        "accounts",
+        "login",
+        "sign in",
+        "connectors"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "settings.packages",
+      "title": "Settings: Packages (install / updates)",
+      "icon": "󰏓",
+      "group": "open",
+      "call": [
+        "settings",
+        "packages"
+      ],
+      "aliases": [
+        "install",
+        "app store",
+        "updates",
+        "upgrade",
+        "pacman",
+        "aur"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "settings.sound",
+      "title": "Settings: Sound (per-app volume)",
+      "icon": "󰕾",
+      "group": "open",
+      "call": [
+        "settings",
+        "sound"
+      ],
+      "aliases": [
+        "app volume",
+        "mixer",
+        "audio settings"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "settings.appearance",
+      "title": "Settings: Appearance",
+      "icon": "󰏘",
+      "group": "open",
+      "call": [
+        "settings",
+        "appearance"
+      ],
+      "aliases": [
+        "themes",
+        "fonts",
+        "shape"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "launcher.clipboard",
+      "title": "Clipboard history",
+      "icon": "󰅌",
+      "group": "open",
+      "call": [
+        "clipboard"
+      ],
+      "aliases": [
+        "paste",
+        "copy history"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "launcher.keybinds",
+      "title": "Keybinds",
+      "icon": "󰌌",
+      "group": "open",
+      "call": [
+        "keybinds"
+      ],
+      "aliases": [
+        "shortcuts",
+        "keys",
+        "hotkeys"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "music.open",
+      "title": "Open Spotify player",
+      "icon": "󰓇",
+      "group": "music",
+      "call": [
+        "music"
+      ],
+      "aliases": [
+        "spotify",
+        "spotify player"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "music.playpause",
+      "title": "Play / pause",
+      "icon": "󰐎",
+      "group": "music",
+      "call": [
+        "playpause"
+      ],
+      "aliases": [
+        "play",
+        "pause",
+        "resume",
+        "stop music"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "music.next",
+      "title": "Next track",
+      "icon": "󰒭",
+      "group": "music",
+      "call": [
+        "next"
+      ],
+      "aliases": [
+        "skip"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "music.previous",
+      "title": "Previous track",
+      "icon": "󰒮",
+      "group": "music",
+      "call": [
+        "previous"
+      ],
+      "aliases": [
+        "back",
+        "last track"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "dnd.on",
+      "title": "Do not disturb: on",
+      "icon": "󰂛",
+      "group": "toggle",
+      "call": [
+        "dndSet",
+        "on"
+      ],
+      "aliases": [
+        "quiet",
+        "silence notifications"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "dnd.off",
+      "title": "Do not disturb: off",
+      "icon": "󰂛",
+      "group": "toggle",
+      "call": [
+        "dndSet",
+        "off"
+      ],
+      "aliases": [
+        "quiet",
+        "silence notifications"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "nightlight.on",
+      "title": "Night light: on",
+      "icon": "󰖔",
+      "group": "toggle",
+      "call": [
+        "nightlightSet",
+        "on"
+      ],
+      "aliases": [
+        "warm screen",
+        "blue light"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "nightlight.off",
+      "title": "Night light: off",
+      "icon": "󰖔",
+      "group": "toggle",
+      "call": [
+        "nightlightSet",
+        "off"
+      ],
+      "aliases": [
+        "warm screen",
+        "blue light"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "caffeine.on",
+      "title": "Caffeine: on",
+      "icon": "󰅶",
+      "group": "toggle",
+      "call": [
+        "caffeineSet",
+        "on"
+      ],
+      "aliases": [
+        "stay awake",
+        "keep awake",
+        "no sleep"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "caffeine.off",
+      "title": "Caffeine: off",
+      "icon": "󰅶",
+      "group": "toggle",
+      "call": [
+        "caffeineSet",
+        "off"
+      ],
+      "aliases": [
+        "stay awake",
+        "keep awake",
+        "no sleep"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "shot.area.save",
+      "title": "Screenshot region",
+      "icon": "󰹑",
+      "group": "tools",
+      "call": [
+        "screenshot",
+        "area",
+        "save"
+      ],
+      "aliases": [
+        "snip"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "shot.area.copy",
+      "title": "Copy region to clipboard",
+      "icon": "󰹑",
+      "group": "tools",
+      "call": [
+        "screenshot",
+        "area",
+        "copy"
+      ],
+      "aliases": [],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "shot.area.text",
+      "title": "OCR region to text",
+      "icon": "󰹑",
+      "group": "tools",
+      "call": [
+        "screenshot",
+        "area",
+        "text"
+      ],
+      "aliases": [
+        "read text"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "shot.screen.save",
+      "title": "Screenshot whole screen",
+      "icon": "󰹑",
+      "group": "tools",
+      "call": [
+        "screenshot",
+        "screen",
+        "save"
+      ],
+      "aliases": [
+        "full screenshot"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "shot.active.save",
+      "title": "Screenshot active window",
+      "icon": "󰹑",
+      "group": "tools",
+      "call": [
+        "screenshot",
+        "active",
+        "save"
+      ],
+      "aliases": [
+        "window screenshot"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "focus.deep",
+      "title": "Focus: deep work",
+      "icon": "󰽥",
+      "group": "focus",
+      "call": [
+        "focus",
+        "deep",
+        0
+      ],
+      "aliases": [
+        "deep work",
+        "focus mode",
+        "concentrate"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "focus.study",
+      "title": "Focus: study",
+      "icon": "󰑴",
+      "group": "focus",
+      "call": [
+        "focus",
+        "study",
+        0
+      ],
+      "aliases": [
+        "study mode",
+        "pomodoro"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "focus.gaming-off",
+      "title": "Focus: gaming off",
+      "icon": "󰊴",
+      "group": "focus",
+      "call": [
+        "focus",
+        "gaming-off",
+        0
+      ],
+      "aliases": [
+        "no games",
+        "block steam"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "wallpaper.pick",
+      "title": "Wallpaper picker",
+      "icon": "󰋩",
+      "group": "look",
+      "call": [
+        "wallpaper"
+      ],
+      "aliases": [
+        "wallpapers",
+        "background",
+        "backgrounds"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "wallpaper.next",
+      "title": "Next wallpaper",
+      "icon": "󰒭",
+      "group": "look",
+      "call": [
+        "wallpaperNext"
+      ],
+      "aliases": [
+        "change wallpaper",
+        "new background",
+        "shuffle wallpaper"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "refresh",
+      "title": "Refresh weather, mail, calendar, GitHub",
+      "icon": "󰑓",
+      "group": "tools",
+      "call": [
+        "refresh"
+      ],
+      "aliases": [
+        "update",
+        "sync"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "shape.square",
+      "title": "Shape: square (retro)",
+      "icon": "󰝣",
+      "group": "look",
+      "call": [
+        "shape",
+        "square"
+      ],
+      "aliases": [
+        "square corners",
+        "retro"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "shape.round",
+      "title": "Shape: round",
+      "icon": "󰝥",
+      "group": "look",
+      "call": [
+        "shape",
+        "round"
+      ],
+      "aliases": [
+        "rounded",
+        "round corners"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "shape.default",
+      "title": "Shape: theme default",
+      "icon": "󰝥",
+      "group": "look",
+      "call": [
+        "shape",
+        ""
+      ],
+      "aliases": [],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "lock",
+      "title": "Lock screen",
+      "icon": "󰌾",
+      "group": "session",
+      "call": [
+        "lock"
+      ],
+      "aliases": [
+        "lock"
+      ],
+      "confirm": "none",
+      "voice": true
+    },
+    {
+      "id": "power.suspend",
+      "title": "Suspend",
+      "icon": "󰤄",
+      "group": "session",
+      "call": [
+        "power",
+        "suspend"
+      ],
+      "aliases": [
+        "sleep"
+      ],
+      "confirm": "confirm",
+      "voice": true
+    },
+    {
+      "id": "power.logout",
+      "title": "Log out",
+      "icon": "󰍃",
+      "group": "session",
+      "call": [
+        "power",
+        "logout"
+      ],
+      "aliases": [
+        "sign out",
+        "exit hyprland"
+      ],
+      "confirm": "confirm",
+      "voice": false
+    },
+    {
+      "id": "power.reboot",
+      "title": "Reboot",
+      "icon": "󰜉",
+      "group": "session",
+      "call": [
+        "power",
+        "reboot"
+      ],
+      "aliases": [
+        "restart"
+      ],
+      "confirm": "confirm",
+      "voice": false
+    },
+    {
+      "id": "power.poweroff",
+      "title": "Shut down",
+      "icon": "󰐥",
+      "group": "session",
+      "call": [
+        "power",
+        "poweroff"
+      ],
+      "aliases": [
+        "power off",
+        "turn off"
+      ],
+      "confirm": "confirm",
+      "voice": false
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+ "schema": 1,
+ "_doc": "Settings › Connections. Status/login plumbing in scripts/connectors.sh (check/save/login/logout per id).",
+ "connectors": [
+  {
+   "id": "claude",
+   "name": "Claude Code",
+   "icon": "󰚩",
+   "group": "Accounts",
+   "about": "The claude CLI (sessions, voice escalation later).",
+   "login": "terminal",
+   "loginLabel": "sign in",
+   "logout": true
+  },
+  {
+   "id": "github",
+   "name": "GitHub",
+   "icon": "",
+   "group": "Accounts",
+   "about": "gh CLI login: the GitHub card + tab.",
+   "login": "terminal",
+   "loginLabel": "sign in (browser)",
+   "logout": true
+  },
+  {
+   "id": "github-ssh",
+   "name": "GitHub SSH key",
+   "icon": "󰣀",
+   "group": "Accounts",
+   "about": "Git push/pull over ssh (ssh -T git@github.com).",
+   "test": true
+  },
+  {
+   "id": "spotify",
+   "name": "Spotify",
+   "icon": "󰓇",
+   "group": "Accounts",
+   "about": "spotify_player with your own developer app (developer.spotify.com, redirect http://127.0.0.1:8989/login).",
+   "fields": [
+    {
+     "key": "clientId",
+     "label": "Client ID",
+     "secret": false,
+     "placeholder": "32 hex characters"
+    }
+   ],
+   "login": "terminal",
+   "loginLabel": "authenticate",
+   "logout": true
+  },
+  {
+   "id": "discord",
+   "name": "Discord (discordo)",
+   "icon": "󰙯",
+   "group": "Accounts",
+   "about": "discordo keeps its token in the keyring; it asks on first run.",
+   "login": "terminal",
+   "loginLabel": "open discordo"
+  },
+  {
+   "id": "mullvad",
+   "name": "Mullvad VPN",
+   "icon": "󰦝",
+   "group": "Privacy",
+   "about": "The VPN tile and status glyph.",
+   "fields": [
+    {
+     "key": "account",
+     "label": "Account number",
+     "secret": true,
+     "placeholder": "16 digits"
+    }
+   ],
+   "logout": true
+  },
+  {
+   "id": "bridge",
+   "name": "Proton Mail (Bridge)",
+   "icon": "󰇮",
+   "group": "Proton",
+   "about": "Bridge must be signed in to Proton (CLI login), then the shell reads the inbox over local IMAP with Bridge's own username + password (Bridge › account › mailbox details).",
+   "login": "terminal",
+   "loginLabel": "Proton login (Bridge CLI)",
+   "fields": [
+    {
+     "key": "netrc",
+     "label": "Bridge IMAP username",
+     "secret": false,
+     "placeholder": "you@proton.me",
+     "pair": "Bridge IMAP password"
+    }
+   ],
+   "logout": true
+  },
+  {
+   "id": "calendar",
+   "name": "Proton Calendar",
+   "icon": "󰃭",
+   "group": "Proton",
+   "about": "Read-only share link (Proton Calendar › settings › share via link).",
+   "fields": [
+    {
+     "key": "url",
+     "label": "Share link",
+     "secret": true,
+     "placeholder": "https://calendar.proton.me/api/calendar/v1/url/…"
+    }
+   ],
+   "logout": true
+  },
+  {
+   "id": "docker",
+   "name": "Docker",
+   "icon": "󰡨",
+   "group": "Services",
+   "about": "The Docker tab. Needs the daemon and the docker group.",
+   "manual": "sudo systemctl enable --now docker && sudo usermod -aG docker $USER"
+  },
+  {
+   "id": "weather",
+   "name": "Open-Meteo weather",
+   "icon": "󰖐",
+   "group": "Services",
+   "about": "No account; only your coordinates are sent.",
+   "test": true
+  },
+  {
+   "id": "lyrics",
+   "name": "lrclib lyrics",
+   "icon": "󰎈",
+   "group": "Services",
+   "about": "No account; sends artist / title / album.",
+   "test": true
+  }
+ ]
+}

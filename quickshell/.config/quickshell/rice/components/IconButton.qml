@@ -10,14 +10,14 @@ Rectangle {
     property color fg: Theme.text
     property bool enabledState: true
     property bool checked: false
-    property int size: Theme.fontSize + Theme.spacing * 2
+    property int size: Theme.fontMd + Theme.spacing * 2
     readonly property alias hovered: mouse.containsMouse
 
     signal clicked()
 
     implicitHeight: size
     implicitWidth: text === "" ? size : row.implicitWidth + Theme.pad * 2
-    radius: Theme.radius
+    radius: Theme.radiusSmall
     color: checked ? Theme.accent : (mouse.containsMouse && enabledState ? Theme.surface2 : Theme.surface1)
     border.width: Theme.border
     border.color: checked ? Theme.accent : Theme.surface2
@@ -33,7 +33,7 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         text: root.icon
         color: root.checked ? Theme.textReverse : root.fg
-        size: Theme.fontSize
+        size: Theme.fontMd
     }
 
     Row {
@@ -45,13 +45,13 @@ Rectangle {
             visible: root.icon !== ""
             text: root.icon
             color: root.checked ? Theme.textReverse : root.fg
-            size: Theme.fontSize
+            size: Theme.fontMd
         }
         Label {
             visible: root.text !== ""
             text: root.text
             color: root.checked ? Theme.textReverse : root.fg
-            size: Theme.fontSizeSmall
+            size: Theme.fontBase
         }
     }
 

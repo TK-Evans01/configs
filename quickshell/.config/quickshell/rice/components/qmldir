@@ -5,7 +5,7 @@ BarDivider 1.0 BarDivider.qml
 BarPopup 1.0 BarPopup.qml
 Card 1.0 Card.qml
 CardHeader 1.0 CardHeader.qml
-DeviceRow 1.0 DeviceRow.qml
+ListRow 1.0 ListRow.qml
 IconButton 1.0 IconButton.qml
 Meter 1.0 Meter.qml
 PageHeader 1.0 PageHeader.qml
@@ -15,3 +15,11 @@ Sparkline 1.0 Sparkline.qml
 Switch 1.0 Switch.qml
 TabBar 1.0 TabBar.qml
 Tile 1.0 Tile.qml
+AccentIndicator 1.0 AccentIndicator.qml
+SectionLabel 1.0 SectionLabel.qml
+Spinner 1.0 Spinner.qml
+Stat 1.0 Stat.qml
+PowerRow 1.0 PowerRow.qml
+TextField 1.0 TextField.qml
+EdgePanel 1.0 EdgePanel.qml
+PanelShape 1.0 PanelShape.qml

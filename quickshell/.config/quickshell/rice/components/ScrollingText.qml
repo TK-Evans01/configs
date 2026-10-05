@@ -7,8 +7,8 @@ Item {
     id: root
 
     property string text: ""
-    property color color: Theme.fg0
-    property int pixelSize: Theme.fontSize
+    property color color: Theme.text
+    property int pixelSize: Theme.fontMd
     property bool bold: false
 
     // 0 = no cap; otherwise the widest the item will ever be.
@@ -52,23 +52,19 @@ Item {
         }
     }
 
-    NumberAnimation {
+    // Whole-pixel steps on a timer (one px per scrollMsPerPx ≈ 36 fps), not
+    // an animation: an animation repaints at the monitor's rate (360 Hz here)
+    // for as long as a title scrolls, and pixel fonts stay crisp on whole px.
+    Timer {
         id: carousel
-        target: row
-        property: "x"
-        from: 0
-        to: -(root.textWidth + root.gap)
-        duration: Math.max(1, (root.textWidth + root.gap) * Settings.scrollMsPerPx)
-        loops: Animation.Infinite
-        running: root.scrolling && root.overflowing
-
-        onRunningChanged: if (!running) row.x = 0;
+        interval: Math.max(10, Settings.scrollMsPerPx)
+        repeat: true
+        running: root.scrolling && root.overflowing && root.visible
+        onRunningChanged: if (!running) row.x = 0
+        onTriggered: row.x = row.x - 1 <= -(root.textWidth + root.gap) ? 0 : row.x - 1
     }
 
     // Restart from the left whenever the string changes, so a new track or
     // window title is read from its beginning.
-    onTextChanged: {
-        row.x = 0;
-        if (carousel.running) carousel.restart();
-    }
+    onTextChanged: row.x = 0
 }

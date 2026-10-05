@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "nord",
+  "name": "Nord",
+  "variant": "dark",
+  "shape": "round",
+  "font": "departure-mono",
+  "palette": {
+    "bg0": "#242933",
+    "bg1": "#2e3440",
+    "bg2": "#3b4252",
+    "bg3": "#434c5e",
+    "bg4": "#4c566a",
+    "fg0": "#d8dee9",
+    "fg1": "#eceff4",
+    "grey": "#a3abb9",
+    "greyDim": "#7b88a1",
+    "red": "#bf616a",
+    "orange": "#d08770",
+    "yellow": "#ebcb8b",
+    "green": "#a3be8c",
+    "aqua": "#8fbcbb",
+    "blue": "#81a1c1",
+    "purple": "#b48ead"
+  },
+  "roles": {
+    "accent": "#88c0d0"
+  }
+}

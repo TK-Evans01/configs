@@ -1,0 +1,938 @@
+{
+ "schema": 1,
+ "_doc": "Settings window pages. Items edit Settings.<key> through Prefs overrides (live, saved). Pages/sections with `custom` use modules/settings/<Custom>Page.qml.",
+ "pages": [
+  {
+   "id": "appearance",
+   "title": "Appearance",
+   "icon": "󰏘",
+   "custom": "Appearance",
+   "keywords": [
+    "theme",
+    "colours",
+    "colors",
+    "shape",
+    "round",
+    "square",
+    "font",
+    "palette",
+    "login",
+    "sddm"
+   ]
+  },
+  {
+   "id": "wallpaper",
+   "title": "Wallpaper",
+   "icon": "󰋩",
+   "custom": "Wallpaper",
+   "keywords": [
+    "background",
+    "wallpapers",
+    "rotation",
+    "season",
+    "span",
+    "picker",
+    "tags"
+   ],
+   "sections": [
+    {
+     "title": "Library",
+     "items": [
+      {
+       "key": "wallpaperDir",
+       "type": "string",
+       "label": "Folder",
+       "help": "Sub-folders count too."
+      }
+     ]
+    },
+    {
+     "title": "Rotation",
+     "items": [
+      {
+       "key": "wallpaperRotateMin",
+       "type": "int",
+       "label": "Change every",
+       "min": 0,
+       "max": 720,
+       "step": 5,
+       "unit": "min",
+       "help": "0 = never. Picks among the best for the current theme + season, skipping recent ones."
+      },
+      {
+       "key": "wallpaperPlacement",
+       "type": "enum",
+       "label": "Placement",
+       "options": [
+        [
+         "crop",
+         "fill"
+        ],
+        [
+         "fit",
+         "fit"
+        ],
+        [
+         "span",
+         "span both screens"
+        ]
+       ],
+       "help": "Span works for images wide enough for both monitors; others fill each screen."
+      }
+     ]
+    },
+    {
+     "title": "Themes",
+     "items": [
+      {
+       "key": "wallpaperThemePolicy",
+       "type": "enum",
+       "label": "Wallpaper and theme",
+       "options": [
+        [
+         "fixed",
+         "suggest only"
+        ],
+        [
+         "follow",
+         "follow the wallpaper"
+        ]
+       ],
+       "help": "Follow: applying a wallpaper tagged with a theme switches to it, and browsing previews its palette."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bar",
+   "title": "Bar",
+   "icon": "󰍜",
+   "sections": [
+    {
+     "title": "Items",
+     "items": [
+      {
+       "key": "showLauncher",
+       "type": "bool",
+       "label": "Launcher button",
+       "help": ""
+      },
+      {
+       "key": "showMedia",
+       "type": "bool",
+       "label": "Media",
+       "help": ""
+      },
+      {
+       "key": "showSystem",
+       "type": "bool",
+       "label": "System sparkline",
+       "help": ""
+      },
+      {
+       "key": "showWeather",
+       "type": "bool",
+       "label": "Weather",
+       "help": ""
+      },
+      {
+       "key": "showTray",
+       "type": "bool",
+       "label": "Tray",
+       "help": ""
+      },
+      {
+       "key": "showMail",
+       "type": "bool",
+       "label": "Mail count",
+       "help": ""
+      }
+     ]
+    },
+    {
+     "title": "Size",
+     "items": [
+      {
+       "key": "barHeight",
+       "type": "int",
+       "label": "Bar height",
+       "min": 32,
+       "max": 64,
+       "step": 1,
+       "unit": "px",
+       "help": "Popups and panels line up with it."
+      },
+      {
+       "key": "windowLabelWidth",
+       "type": "int",
+       "label": "Window title width",
+       "min": 120,
+       "max": 800,
+       "step": 20,
+       "unit": "px",
+       "help": ""
+      },
+      {
+       "key": "mediaLabelWidth",
+       "type": "int",
+       "label": "Track title width",
+       "min": 120,
+       "max": 600,
+       "step": 20,
+       "unit": "px",
+       "help": ""
+      }
+     ]
+    },
+    {
+     "title": "Scrolling text",
+     "items": [
+      {
+       "key": "scrollMsPerPx",
+       "type": "int",
+       "label": "Scroll speed",
+       "min": 10,
+       "max": 80,
+       "step": 2,
+       "unit": "ms/px",
+       "help": "Lower is faster."
+      },
+      {
+       "key": "scrollGap",
+       "type": "int",
+       "label": "Gap between loops",
+       "min": 16,
+       "max": 160,
+       "step": 8,
+       "unit": "px",
+       "help": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "panels",
+   "title": "Panels",
+   "icon": "󰕮",
+   "sections": [
+    {
+     "title": "Widths",
+     "items": [
+      {
+       "key": "dashboardWidth",
+       "type": "int",
+       "label": "Dashboard",
+       "min": 700,
+       "max": 1400,
+       "step": 20,
+       "unit": "px",
+       "help": ""
+      },
+      {
+       "key": "quickSettingsWidth",
+       "type": "int",
+       "label": "Quick settings",
+       "min": 440,
+       "max": 760,
+       "step": 20,
+       "unit": "px",
+       "help": ""
+      },
+      {
+       "key": "sidebarWidth",
+       "type": "int",
+       "label": "Sidebar",
+       "min": 360,
+       "max": 720,
+       "step": 20,
+       "unit": "px",
+       "help": ""
+      },
+      {
+       "key": "launcherWidth",
+       "type": "int",
+       "label": "Launcher",
+       "min": 480,
+       "max": 1000,
+       "step": 20,
+       "unit": "px",
+       "help": ""
+      },
+      {
+       "key": "trayMenuWidth",
+       "type": "int",
+       "label": "Tray menu",
+       "min": 220,
+       "max": 480,
+       "step": 20,
+       "unit": "px",
+       "help": ""
+      }
+     ]
+    },
+    {
+     "title": "Launcher",
+     "items": [
+      {
+       "key": "launcherRows",
+       "type": "int",
+       "label": "Visible rows",
+       "min": 5,
+       "max": 16,
+       "step": 1,
+       "unit": "",
+       "help": ""
+      },
+      {
+       "key": "launcherFrequent",
+       "type": "int",
+       "label": "Frequent apps shown",
+       "min": 0,
+       "max": 12,
+       "step": 1,
+       "unit": "",
+       "help": ""
+      },
+      {
+       "key": "terminal",
+       "type": "string",
+       "label": "Terminal",
+       "help": "Runs terminal apps, music, the file manager."
+      }
+     ]
+    },
+    {
+     "title": "Sparklines",
+     "items": [
+      {
+       "key": "historySize",
+       "type": "int",
+       "label": "Samples kept",
+       "min": 10,
+       "max": 120,
+       "step": 5,
+       "unit": "",
+       "help": "System polls every 2 s."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "notifications",
+   "title": "Notifications",
+   "icon": "󰂚",
+   "sections": [
+    {
+     "title": "Toasts",
+     "items": [
+      {
+       "key": "toastTimeout",
+       "type": "int",
+       "label": "Default timeout",
+       "min": 2000,
+       "max": 20000,
+       "step": 500,
+       "unit": "ms",
+       "help": "When the app doesn't set one. Critical ones always stay."
+      },
+      {
+       "key": "toastMax",
+       "type": "int",
+       "label": "On screen at once",
+       "min": 1,
+       "max": 8,
+       "step": 1,
+       "unit": "",
+       "help": ""
+      },
+      {
+       "key": "toastPerSourceMax",
+       "type": "int",
+       "label": "Per source",
+       "min": 1,
+       "max": 10,
+       "step": 1,
+       "unit": "",
+       "help": "More than this within the window only go to the sidebar."
+      },
+      {
+       "key": "toastPerSourceWindow",
+       "type": "int",
+       "label": "Rate window",
+       "min": 5000,
+       "max": 120000,
+       "step": 5000,
+       "unit": "ms",
+       "help": ""
+      },
+      {
+       "key": "toastWidth",
+       "type": "int",
+       "label": "Width",
+       "min": 300,
+       "max": 640,
+       "step": 20,
+       "unit": "px",
+       "help": ""
+      }
+     ]
+    },
+    {
+     "title": "History",
+     "items": [
+      {
+       "key": "notifyHistory",
+       "type": "int",
+       "label": "Notifications kept",
+       "min": 20,
+       "max": 500,
+       "step": 10,
+       "unit": "",
+       "help": "Saved across restarts."
+      }
+     ]
+    },
+    {
+     "title": "Sources",
+     "custom": "Sources",
+     "keywords": [
+      "groups",
+      "discord",
+      "mail",
+      "dev",
+      "app names"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "focus",
+   "title": "Focus",
+   "icon": "󰔟",
+   "keywords": [
+    "focus mode",
+    "pomodoro",
+    "block sites",
+    "distractions",
+    "deep work",
+    "study"
+   ],
+   "sections": [],
+   "custom": "Focus"
+  },
+  {
+   "id": "connections",
+   "title": "Connections",
+   "icon": "󰌘",
+   "custom": "Connections",
+   "keywords": [
+    "accounts",
+    "login",
+    "sign in",
+    "claude",
+    "github",
+    "mullvad",
+    "proton",
+    "bridge",
+    "calendar",
+    "spotify",
+    "discord",
+    "docker",
+    "connectors"
+   ]
+  },
+  {
+   "id": "sound",
+   "title": "Sound",
+   "icon": "󰕾",
+   "custom": "Sound",
+   "keywords": [
+    "audio",
+    "volume",
+    "output",
+    "input",
+    "microphone",
+    "speakers",
+    "headset",
+    "apps",
+    "streams"
+   ]
+  },
+  {
+   "id": "bluetooth",
+   "title": "Bluetooth",
+   "icon": "󰂯",
+   "custom": "Bluetooth",
+   "keywords": [
+    "pair",
+    "devices",
+    "headphones",
+    "controller"
+   ]
+  },
+  {
+   "id": "network",
+   "title": "Network & VPN",
+   "icon": "󰖂",
+   "custom": "Network",
+   "keywords": [
+    "mullvad",
+    "vpn",
+    "wifi",
+    "ethernet",
+    "links"
+   ]
+  },
+  {
+   "id": "nightlight",
+   "title": "Night light",
+   "icon": "󰖔",
+   "sections": [
+    {
+     "title": "When on",
+     "items": [
+      {
+       "key": "nightLightTemp",
+       "type": "int",
+       "label": "Warmth",
+       "min": 2500,
+       "max": 6500,
+       "step": 100,
+       "unit": "K",
+       "help": "Lower is warmer."
+      },
+      {
+       "key": "nightLightGamma",
+       "type": "int",
+       "label": "Brightness",
+       "min": 40,
+       "max": 100,
+       "step": 5,
+       "unit": "%",
+       "help": ""
+      }
+     ]
+    },
+    {
+     "title": "Slider range",
+     "items": [
+      {
+       "key": "nightLightMinTemp",
+       "type": "int",
+       "label": "Warmest",
+       "min": 1500,
+       "max": 4000,
+       "step": 100,
+       "unit": "K",
+       "help": ""
+      },
+      {
+       "key": "nightLightMaxTemp",
+       "type": "int",
+       "label": "Coolest",
+       "min": 5000,
+       "max": 8000,
+       "step": 100,
+       "unit": "K",
+       "help": ""
+      }
+     ]
+    }
+   ],
+   "custom": "NightLight",
+   "keywords": [
+    "warmth",
+    "gamma",
+    "hyprsunset",
+    "blue light"
+   ]
+  },
+  {
+   "id": "lock",
+   "title": "Lock & idle",
+   "icon": "󰌾",
+   "sections": [
+    {
+     "title": "Idle",
+     "items": [
+      {
+       "key": "lockAfterMin",
+       "type": "int",
+       "label": "Lock after",
+       "min": 0,
+       "max": 120,
+       "step": 1,
+       "unit": "min",
+       "help": "0 = never."
+      },
+      {
+       "key": "screenOffAfterMin",
+       "type": "int",
+       "label": "Screens off after",
+       "min": 0,
+       "max": 180,
+       "step": 1,
+       "unit": "min",
+       "help": "0 = never."
+      },
+      {
+       "key": "lockBeforeSleep",
+       "type": "bool",
+       "label": "Lock before sleep",
+       "help": ""
+      }
+     ]
+    },
+    {
+     "title": "Profile",
+     "items": [
+      {
+       "key": "avatar",
+       "type": "string",
+       "label": "Avatar image",
+       "help": "Same file SDDM shows (~/.face.icon)."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "weather",
+   "title": "Weather",
+   "icon": "󰖐",
+   "sections": [
+    {
+     "title": "Location",
+     "items": [
+      {
+       "key": "weatherPlace",
+       "type": "string",
+       "label": "Place name",
+       "help": "Shown on the card only."
+      },
+      {
+       "key": "weatherLat",
+       "type": "real",
+       "label": "Latitude",
+       "min": -90,
+       "max": 90,
+       "step": 0.0001,
+       "unit": "",
+       "help": ""
+      },
+      {
+       "key": "weatherLon",
+       "type": "real",
+       "label": "Longitude",
+       "min": -180,
+       "max": 180,
+       "step": 0.0001,
+       "unit": "",
+       "help": ""
+      }
+     ]
+    },
+    {
+     "title": "Data",
+     "items": [
+      {
+       "key": "weatherImperial",
+       "type": "bool",
+       "label": "Imperial units",
+       "help": "°F and mph; off = °C and km/h."
+      },
+      {
+       "key": "weatherRefreshMin",
+       "type": "int",
+       "label": "Refresh every",
+       "min": 5,
+       "max": 120,
+       "step": 5,
+       "unit": "min",
+       "help": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mail",
+   "title": "Mail & calendar",
+   "icon": "󰇮",
+   "sections": [
+    {
+     "title": "Proton Mail (Bridge)",
+     "items": [
+      {
+       "key": "mailRefreshSec",
+       "type": "int",
+       "label": "Check every",
+       "min": 30,
+       "max": 1800,
+       "step": 30,
+       "unit": "s",
+       "help": ""
+      },
+      {
+       "key": "mailNotify",
+       "type": "bool",
+       "label": "Notify on new mail",
+       "help": ""
+      },
+      {
+       "key": "mailUrl",
+       "type": "string",
+       "label": "Webmail address",
+       "help": ""
+      }
+     ]
+    },
+    {
+     "title": "Proton Calendar",
+     "items": [
+      {
+       "key": "calendarRefreshMin",
+       "type": "int",
+       "label": "Refresh every",
+       "min": 5,
+       "max": 240,
+       "step": 5,
+       "unit": "min",
+       "help": ""
+      },
+      {
+       "key": "calendarUrl",
+       "type": "string",
+       "label": "Calendar address",
+       "help": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "feeds",
+   "title": "Feeds",
+   "icon": "󰑫",
+   "sections": [
+    {
+     "title": "Sources",
+     "custom": "Feeds",
+     "keywords": [
+      "rss",
+      "atom",
+      "news",
+      "arch",
+      "phoronix",
+      "hacker news"
+     ]
+    },
+    {
+     "title": "Fetching",
+     "items": [
+      {
+       "key": "feedsRefreshMin",
+       "type": "int",
+       "label": "Refresh every",
+       "min": 5,
+       "max": 240,
+       "step": 5,
+       "unit": "min",
+       "help": ""
+      },
+      {
+       "key": "feedsPerSource",
+       "type": "int",
+       "label": "Items per feed",
+       "min": 3,
+       "max": 50,
+       "step": 1,
+       "unit": "",
+       "help": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "launcher",
+   "title": "Launcher",
+   "icon": "󰀻",
+   "sections": [
+    {
+     "title": "Hidden apps",
+     "items": [
+      {
+       "key": "launcherHidden",
+       "type": "list",
+       "label": "Desktop entry ids never listed",
+       "help": "File name without .desktop, e.g. xfce4-about."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "media",
+   "title": "Music & media",
+   "icon": "󰎆",
+   "sections": [
+    {
+     "title": "Spotify",
+     "items": [
+      {
+       "key": "spotifyLibraryMaxAgeH",
+       "type": "int",
+       "label": "Library cache age",
+       "min": 1,
+       "max": 72,
+       "step": 1,
+       "unit": "h",
+       "help": "Older caches refetch in the background."
+      },
+      {
+       "key": "lyrics",
+       "type": "bool",
+       "label": "Synced lyrics",
+       "help": "Sends artist/title/album to lrclib.net."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "github",
+   "title": "GitHub",
+   "icon": "",
+   "sections": [
+    {
+     "title": "Card + tab",
+     "items": [
+      {
+       "key": "showGithub",
+       "type": "bool",
+       "label": "Show GitHub",
+       "help": ""
+      },
+      {
+       "key": "githubRefreshMin",
+       "type": "int",
+       "label": "Refresh every",
+       "min": 5,
+       "max": 120,
+       "step": 5,
+       "unit": "min",
+       "help": ""
+      },
+      {
+       "key": "githubRepos",
+       "type": "int",
+       "label": "Recent repos",
+       "min": 1,
+       "max": 20,
+       "step": 1,
+       "unit": "",
+       "help": ""
+      },
+      {
+       "key": "githubCommits",
+       "type": "int",
+       "label": "Commits shown",
+       "min": 1,
+       "max": 20,
+       "step": 1,
+       "unit": "",
+       "help": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tools",
+   "title": "Tools",
+   "icon": "󰹑",
+   "sections": [
+    {
+     "title": "Screenshots",
+     "items": [
+      {
+       "key": "screenshotDir",
+       "type": "string",
+       "label": "Save to",
+       "help": ""
+      },
+      {
+       "key": "ocrLang",
+       "type": "string",
+       "label": "OCR language",
+       "help": "tesseract language code, e.g. eng."
+      }
+     ]
+    },
+    {
+     "title": "Clipboard",
+     "items": [
+      {
+       "key": "clipboardMax",
+       "type": "int",
+       "label": "Entries kept",
+       "min": 20,
+       "max": 1000,
+       "step": 20,
+       "unit": "",
+       "help": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "packages",
+   "title": "Packages",
+   "icon": "󰏓",
+   "custom": "Packages",
+   "keywords": [
+    "install",
+    "app store",
+    "pacman",
+    "aur",
+    "yay",
+    "updates",
+    "upgrade",
+    "remove",
+    "orphans",
+    "cache",
+    "bundles",
+    "fonts"
+   ]
+  },
+  {
+   "id": "actions",
+   "title": "Actions",
+   "icon": "󰘳",
+   "custom": "Actions",
+   "keywords": [
+    "commands",
+    "allowlist",
+    "voice",
+    "ipc"
+   ]
+  },
+  {
+   "id": "about",
+   "title": "About",
+   "icon": "󰋽",
+   "custom": "About",
+   "keywords": [
+    "version",
+    "memory",
+    "paths",
+    "reset"
+   ]
+  }
+ ]
+}

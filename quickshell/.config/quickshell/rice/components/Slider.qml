@@ -16,6 +16,7 @@ RowLayout {
     property bool muted: false
     property color fill: Theme.accent
     property bool showPercent: true
+    property int valueWidth: 0          // fixed value-label width (0 = fit), keeps tracks aligned in lists
 
     signal moved(int pct)
     signal iconClicked()
@@ -33,13 +34,14 @@ RowLayout {
     Item {
         id: track
         Layout.fillWidth: true
-        implicitHeight: Theme.fontSize + Theme.spacing * 2
+        implicitHeight: Theme.fontMd + Theme.spacing * 2
         readonly property real frac: Math.max(0, Math.min(1, (root.value - root.min) / (root.max - root.min)))
 
         Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             width: parent.width
             height: 10
+            radius: Theme.radiusPill
             color: Theme.surface0
             border.width: Theme.border
             border.color: Theme.surface2
@@ -48,6 +50,7 @@ RowLayout {
                 x: 1; y: 1
                 width: Math.max(0, (parent.width - 2) * track.frac)
                 height: parent.height - 2
+                radius: Theme.radiusPill
                 color: root.muted ? Theme.surface3 : root.fill
                 Behavior on width { enabled: !drag.pressed; NumberAnimation { duration: Theme.animShort } }
             }
@@ -56,11 +59,12 @@ RowLayout {
         Rectangle {
             x: Math.round(track.frac * (track.width - width))
             anchors.verticalCenter: parent.verticalCenter
-            width: 8
-            height: 20
+            width: Theme.round ? 16 : 8
+            height: Theme.round ? 16 : 20
+            radius: Theme.radiusPill
             color: drag.containsMouse || drag.pressed ? Theme.textBright : (root.muted ? Theme.surface3 : root.fill)
             border.width: Theme.border
-            border.color: Theme.bg0
+            border.color: Theme.surface0
         }
 
         MouseArea {
@@ -80,10 +84,10 @@ RowLayout {
 
     Label {
         visible: root.showPercent
-        Layout.preferredWidth: Theme.fontSizeSmall * (root.suffix.length > 1 ? 4 : 3)
+        Layout.preferredWidth: root.valueWidth > 0 ? root.valueWidth : Math.max(Theme.fontBase * 3, implicitWidth)
         horizontalAlignment: Text.AlignRight
         text: root.value + root.suffix
-        size: Theme.fontSizeSmall
+        size: Theme.fontBase
         color: root.muted ? Theme.muted : Theme.subtext
     }
 }
