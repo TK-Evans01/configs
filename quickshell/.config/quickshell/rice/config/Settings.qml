@@ -62,7 +62,9 @@ QtObject {
     readonly property int mailRefreshSec: 120
     readonly property bool mailNotify: true                 // notify-send on new unread
     readonly property string mailUrl: "https://mail.proton.me/u/0/inbox"
-    readonly property var bridgeCommand: ["protonmail-bridge", "--noninteractive"]   // background, after first sign-in
+    // Headless core: the launcher (`protonmail-bridge --noninteractive`) waits
+    // for a gRPC handshake the core never sends in that mode and pops an error.
+    readonly property var bridgeCommand: ["protonmail-bridge-core", "--noninteractive"]
 
     // Proton Calendar share link (scripts/proton-calendar.py; link in
     // ~/.config/rice/proton-calendar.url). Hidden until configured.

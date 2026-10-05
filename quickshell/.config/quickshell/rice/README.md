@@ -101,13 +101,16 @@ umask 077; printf 'machine 127.0.0.1 login %s password %s\n' 'USERNAME' 'BRIDGE_
 The bar shows the unread count (polled every 2 min); Quick Settings › Mail lists
 unread subjects. INBOX is opened read-only with `BODY.PEEK`, so nothing gets
 marked read. New mail fires a `notify-send`. Bridge must be running
-(`protonmail-bridge --noninteractive` runs it in the background after the first sign-in; the Mail page has a start button).
+(`protonmail-bridge-core --noninteractive` runs it headless after the first sign-in; the Mail page has a start button).
 
 Startup: Bridge needs a Secret Service keychain — `gnome-keyring`, whose
 keyring must be named `login` with your login password so SDDM's PAM
 (`pam_gnome_keyring`) unlocks it at login. Hyprland ignores
 `~/.config/autostart`, so Bridge starts from `hyprland.conf`:
-`exec-once = sleep 3 && protonmail-bridge --noninteractive` (headless). The first sync
+`exec-once = sleep 3 && protonmail-bridge-core --noninteractive` — the core
+directly: in 3.27 the launcher (`protonmail-bridge --noninteractive`) waits for a
+gRPC handshake the headless core never sends and pops "Server did not provide
+gRPC service configuration in time". The first sync
 of a large mailbox takes a while; counts fill in as it goes.
 
 **Calendar** — Proton Calendar › Settings › calendar › *Share via link*, then
