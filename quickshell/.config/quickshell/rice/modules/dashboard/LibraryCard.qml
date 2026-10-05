@@ -25,7 +25,7 @@ Card {
     CardHeader {
         icon: "󰲸"
         title: "Library"
-        subtitle: Svc.Spotify.error || (Svc.Spotify.loading ? "loading…" : "")
+        subtitle: Svc.Spotify.error || (Svc.Spotify.loading ? "refreshing…" : "")
         accent: Theme.purple
         IconButton {
             icon: "󰒝"
@@ -40,7 +40,7 @@ Card {
         spacing: Theme.spacing / 2
         IconButton {
             icon: "󰋑"
-            text: "liked songs"
+            text: Svc.Spotify.startingId === "liked" ? "starting…" : "liked songs"
             fg: Theme.red
             onClicked: Svc.Spotify.playLiked()
         }
@@ -104,8 +104,10 @@ Card {
             subtitle: modelData.sub
             onClicked: modelData.album ? Svc.Spotify.playAlbum(modelData.id) : Svc.Spotify.playPlaylist(modelData.id)
             Label {
-                visible: row.hovered
-                text: Svc.Spotify.shuffle ? "󰒝 ▶" : "▶"
+                readonly property bool starting: Svc.Spotify.startingId === row.modelData.id
+                visible: row.hovered || starting
+                text: starting ? "starting…" : (Svc.Spotify.shuffle ? "󰒝 ▶" : "▶")
+                size: starting ? Theme.fontSizeSmall - 1 : Theme.fontSize
                 color: Theme.purple
             }
         }

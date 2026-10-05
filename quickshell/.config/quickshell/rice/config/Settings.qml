@@ -28,6 +28,7 @@ QtObject {
     // identity is preferred by the bar (playerctl name: spotify_player).
     readonly property string musicPlayer: "spotify_player"
     readonly property string musicSession: "music"
+    readonly property int spotifyLibraryMaxAgeH: 6   // library cache age before a background refetch
     // Same face SDDM shows (AccountsService convention).
     readonly property string avatar: Quickshell.env("HOME") + "/.face.icon"
 
