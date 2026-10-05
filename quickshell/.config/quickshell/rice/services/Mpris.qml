@@ -39,11 +39,26 @@ QtObject {
     }
     readonly property string album: player ? (player.trackAlbum || "") : ""
     readonly property string artUrl: player ? (player.trackArtUrl || "") : ""
-    readonly property bool playing: player ? player.isPlaying === true : false
+    // Some players (spotify_player) report a new play state ~1–3s after the
+    // command; show the expected state right away and fall back to the
+    // player's own once it reports (or after 4s).
+    property var _expectPlaying: null
+    readonly property bool _reportedPlaying: player ? player.isPlaying === true : false
+    readonly property bool playing: _expectPlaying !== null ? _expectPlaying : _reportedPlaying
+    on_ReportedPlayingChanged: if (_expectPlaying === _reportedPlaying) _expectPlaying = null
+    readonly property var _expectTimer: Timer {
+        interval: 4000
+        onTriggered: root._expectPlaying = null
+    }
+    property real _seekHoldUntil: 0
 
     property real position: 0
     readonly property real length: player ? (player.length || 0) : 0
-    function _refreshPos() { position = player ? (player.position || 0) : 0 }
+    function _refreshPos() {
+        // Right after a seek the player may still report the old position.
+        if (Date.now() < _seekHoldUntil) return;
+        position = player ? (player.position || 0) : 0;
+    }
     onPlayerChanged: _refreshPos()
     readonly property bool canSeek: player ? player.canSeek === true : false
     readonly property bool canNext: player ? player.canGoNext === true : false
@@ -53,10 +68,23 @@ QtObject {
     readonly property int loop: player ? (player.loopState || 0) : 0
     readonly property real volume: player ? (player.volume !== undefined ? player.volume : 1) : 0
 
-    function togglePlay()    { if (player) player.togglePlaying(); }
+    function togglePlay() {
+        if (!player) return;
+        // Explicit play/pause from the state we show: togglePlaying() would go
+        // by the player's lagging report and repeat the last command.
+        const wantPlaying = !playing;
+        _expectPlaying = wantPlaying;
+        _expectTimer.restart();
+        if (wantPlaying) player.play(); else player.pause();
+    }
     function next()          { if (player && player.canGoNext) player.next(); }
     function previous()      { if (player && player.canGoPrevious) player.previous(); }
-    function seek(pos)       { if (player && player.canSeek) player.position = pos; }
+    function seek(pos) {
+        if (!player || !player.canSeek) return;
+        position = pos;
+        _seekHoldUntil = Date.now() + 2500;
+        player.position = pos;
+    }
     function toggleShuffle() { if (player) player.shuffle = !player.shuffle; }
     function cycleLoop() {
         if (!player) return;

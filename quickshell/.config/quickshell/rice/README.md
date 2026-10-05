@@ -168,6 +168,7 @@ qs -c rice ipc call rice lock
 qs -c rice ipc call rice caffeine             # toggle
 qs -c rice ipc call rice mail                 # Quick Settings › Mail
 qs -c rice ipc call rice music                # open / attach spotify_player
+qs -c rice ipc call rice playpause            # also: next, previous
 qs -c rice ipc call rice refresh              # weather + mail + calendar + github now
 qs -c rice ipc call rice close
 ```

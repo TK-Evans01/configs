@@ -42,6 +42,9 @@ ShellRoot {
         function close(): void { Svc.Ui.close(); }
         function refresh(): void { Svc.Weather.refresh(); Svc.Mail.refresh(); Svc.Calendar.refresh(); Svc.Github.refresh(); }
         function music(): void { Svc.Mpris.launch(); }
+        function playpause(): void { Svc.Mpris.togglePlay(); }
+        function next(): void { Svc.Mpris.next(); }
+        function previous(): void { Svc.Mpris.previous(); }
         function mail(): void { Svc.Ui.toggle("quicksettings", focused(), "mail"); }
         function dnd(): void { Svc.Desktop.toggleDnd(); }
         function lock(): void { Svc.Lock.lock(); }
